@@ -1,0 +1,62 @@
+        /* ===== Centered reading column + per-tab Table of Contents ===== */
+        /* Free space is split evenly by the auto margins on .page-main, so the
+           gap (sidebar -> content) equals the gap (content -> toc rail). */
+        .page-shell { display:flex; align-items:flex-start; gap:0; padding:0 3.5rem; }
+        .page-main { flex:0 1 900px; width:100%; max-width:900px; min-width:0; margin:0 auto; }
+        .toc-rail {
+            flex:0 0 220px; width:220px; align-self:flex-start; margin-left:0;
+            position:sticky; top:5rem; max-height:calc(100vh - 7rem); overflow-y:auto;
+            border-left:1px solid var(--border-color); padding-left:1.4rem;
+            -ms-overflow-style:none; scrollbar-width:thin;
+        }
+        .page-main h2.section-heading, .page-main .pillars, .page-main .obj-tracker,
+        .page-main .checkpoint-advance, .page-main .unlock-banner { scroll-margin-top: 5.5rem; }
+        .toc-rail.empty { display:none; }
+        .toc-rail-title { padding-top:0.2rem; }
+        .toc-rail-title { font-family:'JetBrains Mono',monospace; font-size:0.6rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--text-faint); margin-bottom:0.75rem; }
+        .toc-link { display:block; padding:0.28rem 0 0.28rem 0.7rem; margin-left:-0.7rem; color:var(--text-muted); text-decoration:none; font-size:0.82rem; line-height:1.45; border-left:2px solid transparent; transition:color .15s, border-color .15s; }
+        .toc-link:hover { color:var(--accent-blue); }
+        .toc-link.lvl1 { font-weight:600; color:var(--text-main); }
+        .toc-link.active { color:var(--accent-blue); border-left-color:var(--accent-blue); }
+        html[data-theme="light"] .toc-link:hover, html[data-theme="light"] .toc-link.active { color:#9a7420; border-left-color:#9a7420; }
+
+        /* Technique on the left, sight-reading on the right (reading is done well below your level) */
+        .pillar.technique { order:0; }
+        .pillar.reading { order:1; }
+
+        /* Home page */
+        .home-link { cursor:pointer; }
+        .home-lede { font-size:1.06rem; color:var(--text-muted); max-width:640px; margin-top:0.5rem; }
+        .home-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.1rem; margin:1.9rem 0 1.4rem; }
+        .home-card { background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius); padding:1.2rem 1.3rem; }
+        .home-card-label { font-family:'JetBrains Mono',monospace; font-size:0.6rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--accent-blue); display:block; margin-bottom:0.5rem; }
+        html[data-theme="light"] .home-card-label { color:#9a7420; }
+        .home-card p { margin:0; font-size:0.92rem; color:var(--text-muted); line-height:1.6; }
+        .home-actions { display:flex; gap:0.8rem; flex-wrap:wrap; margin-top:0.4rem; }
+        @media (max-width:680px){ .home-grid { grid-template-columns:1fr; } }
+
+        /* Mobile drawer: per-tab contents toggle on the active item */
+        .nav-item { position:relative; }
+        .nav-ct {
+            display:none; position:absolute; right:10px; top:50%; transform:translateY(-50%);
+            width:30px; height:30px; align-items:center; justify-content:center;
+            border-radius:6px; color:var(--text-muted); cursor:pointer; z-index:2;
+        }
+        .nav-ct:hover { color:var(--accent-blue); background:rgba(var(--accent-blue-rgb),0.12); }
+        .nav-ct svg { width:17px; height:17px; }
+        .nav-toc { display:none; flex-direction:column; padding:0.15rem 0 0.5rem; background:rgba(0,0,0,0.16); }
+        html[data-theme="light"] .nav-toc { background:rgba(0,0,0,0.04); }
+        .nav-toc.open { display:flex; }
+        .nav-toc a { display:block; padding:0.4rem 1.5rem 0.4rem 2.4rem; font-size:0.82rem; color:var(--text-muted); text-decoration:none; border-left:3px solid transparent; }
+        .nav-toc a.lvl1 { font-weight:600; padding-left:2rem; }
+        .nav-toc a:hover { color:var(--accent-blue); background:rgba(var(--accent-blue-rgb),0.06); }
+        .mobile-menu-btn { font-size:1.5rem; padding:4px 4px; }
+        .mobile-logo { margin-left:0.7rem; margin-right:auto; }
+
+        @media (max-width:900px){
+            .page-shell { display:block; padding:0; }
+            .toc-rail { display:none !important; }
+            .nav-item.active .nav-ct { display:flex; }
+            .page-main h2.section-heading, .page-main .pillars, .page-main .obj-tracker,
+            .page-main .checkpoint-advance, .page-main .unlock-banner { scroll-margin-top: 4.5rem; }
+        }

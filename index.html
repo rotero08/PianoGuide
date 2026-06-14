@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Complete Pianist</title>
+
+    <!-- Restore saved theme before paint to avoid a flash of the wrong theme. -->
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem('cp-theme') === 'light') {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                }
+            } catch (e) { /* ignore */ }
+        })();
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/tokens.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/typography.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+
+    <!-- MOBILE TOP BAR -->
+    <div class="mobile-bar">
+        <button class="mobile-btn mobile-menu-btn" onclick="toggleSidebar()" title="Menu" aria-label="Open menu">&#9776;</button>
+        <span class="mobile-logo" onclick="switchSection('home')">The Complete Pianist</span>
+        <div class="mobile-btns">
+            <button class="mobile-btn" onclick="toggleMobileSearch()" title="Search"><span class="ui-ico" id="searchIconMobile"></span></button>
+            <button class="mobile-btn" id="themeBtnMobile" onclick="toggleTheme()" title="Toggle theme"><span class="ui-ico" id="toggleIconMobile"></span></button>
+        </div>
+    </div>
+    <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+        <div class="sidebar-header">
+            <h2 class="home-link" onclick="switchSection('home')" title="Home">The Complete Pianist</h2>
+            <p>Technique &times; Sight-Reading</p>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-title">Foundations</div>
+            <button class="nav-item" onclick="switchSection('home')">Home</button>
+            <button class="nav-item" onclick="switchSection('how-to-use')">Introduction</button>
+            <button class="nav-item" onclick="switchSection('methodology')">How This Method Works</button>
+            <button class="nav-item" onclick="switchSection('blueprint')">The Core Mindset</button>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-title">The 8-Level Curriculum</div>
+            <button class="nav-item" onclick="switchSection('pre-staff')">Pre-Staff (Arm Weight &amp; Ear)</button>
+            <button class="nav-item" onclick="switchSection('level-0')">Level 0 (Linear Reading)</button>
+            <button class="nav-item" onclick="switchSection('level-1')">Level 1 (Intervals + Chords)</button>
+            <button class="nav-item" onclick="switchSection('level-2')">Level 2 (Voices + Geometry)</button>
+            <button class="nav-item" onclick="switchSection('level-3')">Level 3 (Positional Shifting)</button>
+            <button class="nav-item" onclick="switchSection('level-4')">Level 4 (Inversions + Speed)</button>
+            <button class="nav-item" onclick="switchSection('level-5')">Level 5 (Early Polyphony)</button>
+            <button class="nav-item" onclick="switchSection('level-6')">Level 6 (Counterpoint + Phrasing)</button>
+            <button class="nav-item" onclick="switchSection('level-7')">Level 7 (Polytonal Independence)</button>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-title">Harmony &amp; Keyboard Track</div>
+            <button class="nav-item" onclick="switchSection('lead-sheets-l1')">Lead Sheets (Level 1)</button>
+            <button class="nav-item" onclick="switchSection('comp-patterns')">Comping &amp; Styles</button>
+            <button class="nav-item" onclick="switchSection('jazz-resources')">Modern / Jazz Harmony</button>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-title">Technique &amp; Tools</div>
+            <button class="nav-item" onclick="switchSection('ear-training')">Play By Ear / Apps</button>
+            <button class="nav-item" onclick="switchSection('reading-music')">How To Read Music</button>
+            <button class="nav-item" onclick="switchSection('decoding')">Decoding &amp; Clef Trainers</button>
+            <button class="nav-item" onclick="switchSection('rhythm-clefs')">Rhythm &amp; Clefs</button>
+            <button class="nav-item" onclick="switchSection('scales-chords')">Keyboard Geometry</button>
+            <button class="nav-item" onclick="switchSection('piano-technique')">Posture &amp; Biomechanics</button>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-title">Discovery &amp; Reference</div>
+            <button class="nav-item" onclick="switchSection('youtube')">YouTube Masterclasses</button>
+            <button class="nav-item" onclick="switchSection('extra-resources')">Curated Roadmaps</button>
+            <button class="nav-item" onclick="switchSection('about-guide')">Credits &amp; Contributions</button>
+            <button class="nav-item" onclick="switchSection('references')">Reference Library</button>
+        </div>
+    </aside>
+
+    <!-- MAIN PANEL -->
+    <main>
+
+        <!-- Sticky top bar: search + theme, always accessible -->
+        <div class="topbar" id="topbar">
+            <p class="topbar-label home-link" onclick="switchSection('home')" title="Home">The Complete Pianist</p>
+            <div class="topbar-right">
+                <div class="search-wrapper">
+                    <span class="ui-ico search-ico-left" id="searchIconDesktop" aria-hidden="true"></span>
+                    <input type="text" id="global-search" class="search-bar" placeholder="Search lessons, terms, authors, or links..." oninput="performSearch(this.value)">
+                    <button id="clear-search-btn" class="clear-btn" onclick="clearSearch()">&#10005;</button>
+                </div>
+                <button class="theme-btn" onclick="toggleTheme()" title="Toggle light / dark mode"><span class="ui-ico" id="toggleIcon"></span></button>
+            </div>
+        </div>
+
+        <div class="page-shell">
+            <div class="page-main">
+
+                <!-- SEARCH RESULTS PANEL (populated by search.js) -->
+                <section id="search-results" class="content-section">
+                    <h1 id="search-count">Search Results</h1>
+                    <p>Scanning matching entries from the guide...</p>
+                    <div id="search-results-grid" class="grid-layout"></div>
+                </section>
+
+                <!-- TAB FRAGMENTS are fetched from /tabs/*.html and injected here -->
+                <div id="tab-mount"></div>
+
+            </div><!-- /.page-main -->
+            <nav class="toc-rail" id="tocRail" aria-label="On this page"></nav>
+        </div><!-- /.page-shell -->
+
+    </main>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
