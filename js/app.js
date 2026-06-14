@@ -22,33 +22,49 @@ const DEFAULT_TAB = 'home';
 const isTab = id => TAB_ORDER.includes(id);
 const ACTIVE_KEY = 'cp-active-section';
 
-// Resolve a fragment URL relative to THIS module, so it works regardless of
-// the current hash (the hash never changes the document path).
+// Create a unique session timestamp on boot. Appending this to the template URLs 
+// forces the browser to fetch fresh, complete copies of edited fragments instead 
+// of serving truncated, broken cached copies from Firefox's disk cache.
+const BOOT_TIME = Date.now();
+
+// Resolve a fragment URL relative to the document root.
 function fragmentUrl(id) {
-  return new URL(`../tabs/${id}.html`, import.meta.url).href;
+  return `tabs/${id}.html?cb=${BOOT_TIME}`;
 }
 
-// Fetch every fragment up front and inject ONLY its <section>. Parsing through
-// DOMParser and taking the section element discards anything a dev server may
-// have appended to the file (e.g. Live Server's live-reload <script>), so that
-// injected code can never pollute search results or corrupt the page.
+// Fetch every fragment sequentially and inject ONLY its <section>. Sequential loading
+// prevents the browser from hitting HTTP/1.1 concurrent connection limits (maximum of 6)
+// which causes queued fetches to time out and get aborted (DOMException) in Firefox.
 async function loadAllTabs(mount) {
   const parser = new DOMParser();
-  const parts = await Promise.all(TAB_ORDER.map(async (id) => {
+  const parts = [];
+  
+  for (const id of TAB_ORDER) {
     try {
       const res = await fetch(fragmentUrl(id));
       if (!res.ok) throw new Error(res.status + '');
       const doc = parser.parseFromString(await res.text(), 'text/html');
-      const sec = doc.querySelector('section.content-section') || doc.getElementById(id);
-      if (sec) return sec.outerHTML;
-      throw new Error('no section');
+      
+      // Strict check: find the specific section matching this tab's id.
+      // This prevents capturing generic or incorrect layout sections (like search-results)
+      // if a server configuration rewrites or redirects a missing asset to index.html.
+      const sec = doc.getElementById(id) || 
+                  doc.querySelector(`section#${id}`) || 
+                  doc.querySelector(`section.content-section[id="${id}"]`);
+                  
+      if (sec) {
+        parts.push(sec.outerHTML);
+      } else {
+        throw new Error('no matching section found');
+      }
     } catch (e) {
       console.error(`Tab "${id}" failed to load:`, e);
-      return `<section id="${id}" class="content-section"><h1>${id}</h1>` +
-             `<p>This tab could not be loaded. Make sure the site is opened ` +
-             `through your local server.</p></section>`;
+      parts.push(`<section id="${id}" class="content-section"><h1>${id}</h1>` +
+                 `<p>This tab could not be loaded. Make sure the site is opened ` +
+                 `through your local server.</p></section>`);
     }
-  }));
+  }
+  
   mount.innerHTML = parts.join('\n');
 }
 
@@ -138,6 +154,7 @@ function pickInitialTab() {
 }
 
 // Read the current hash and make the page match it.
+// Read the current hash and make the page match it.
 function applyRoute({ scroll = true } = {}) {
   const r = parseHash();
   if (r.kind === 'search') {
@@ -205,6 +222,14 @@ function initShortcuts() {
 
 // ---- Boot -----------------------------------------------------------------
 ready(async () => {
+  // Expose globals immediately so that any early clicks (e.g. while templates are loading)
+  // do not throw "ReferenceError: switchSection is not defined".
+  exposeGlobals();
+  initShortcuts();
+
+  // Load tabs sequentially to completely avoid hitting the browser's HTTP/1.1 limit
+  // of 6 concurrent connections per domain. This prevents network congestion and 
+  // eliminates "DOMException: The operation was aborted" errors in Firefox.
   await loadAllTabs(document.getElementById('tab-mount'));
 
   buildSectionNames();
@@ -213,8 +238,6 @@ ready(async () => {
   initMedia();     // audio keyboard, intro chord, tooltips
   initTheme();
 
-  exposeGlobals();
-  initShortcuts();
   initRoute();
   initScrollSpy();
 });

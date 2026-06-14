@@ -1,4 +1,4 @@
-        :root {
+:root {
             --gold: #C9A84C;
             --gold-light: #E2C47A;
             --rose: #D4768A;
@@ -15,11 +15,11 @@
             --bg-card: #1C1F30;
             --bg-card2: #252840;
             --bg-sidebar: #0c0e1c;
-            --border-color: rgba(245,240,232,0.09);
+            --border-color: rgba(245,240,232,0.14);
             --border-hover: var(--gold);
-            --text-main: #F5F0E8;
-            --text-muted: #8E8880;
-            --text-faint: rgba(245,240,232,0.25);
+            --text-main: #FAF8F5;
+            --text-muted: #B6B0A6;
+            --text-faint: rgba(245,240,232,0.36);
             --accent-blue: #C9A84C;       /* gold (was blue) */
             --accent-blue-rgb: 201,168,76;
             --accent-pink: #D4768A;        /* rose (was pink) */
@@ -47,11 +47,11 @@
             --bg-card: #EDE8DF;
             --bg-card2: #E4DDD3;
             --bg-sidebar: #EDE8DF;
-            --border-color: rgba(30,20,10,0.12);
+            --border-color: rgba(30,20,10,0.2);
             --border-hover: #9a7420;
             --text-main: #1A1824;
-            --text-muted: #6B6358;
-            --text-faint: rgba(30,20,10,0.3);
+            --text-muted: #4B4339;
+            --text-faint: rgba(30,20,10,0.48);
             --accent-blue: #9a7420;
             --accent-blue-rgb: 154,116,32;
             --accent-pink: #A85069;

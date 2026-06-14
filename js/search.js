@@ -3,12 +3,12 @@
 //   - in-page match    -> href="#/<tab>/<target>". Left-click changes the hash
 //     and the router jumps + flashes the match in place; middle-click /
 //     Ctrl-click / "Open in new tab" open that same hash in a new browser tab,
-//     which loads already centered on the match.
-//   - external resource -> the resource URL, opened in a new tab.
+//     which loads already centred on the match.
 // Because the links are declarative, search needs no router import (and there
 // is no module cycle): the hashchange handler in app.js does all the work.
 
 import { escHtml, routeUrl, searchUrl, LS } from './util.js';
+import { refreshTOC } from './content.js';
 
 const SNIP_SELECTOR = 'p,li,h1,h2,h3,h4,h5,summary,.card-desc,.card-title,.blueprint-desc,.blueprint-title,.row-desc,.row-title,.obj-desc,.obj-title,.res-tagline,.res-name,.rc-text,.grade-pill,.board-card div,td';
 
@@ -111,6 +111,7 @@ export function performSearch(query) {
     const saved = LS.get('cp-active-section') || 'home';
     const back = routeUrl(saved);
     if (location.hash !== back) location.hash = back;   // routes via hashchange
+    refreshTOC();
     return;
   }
 
@@ -142,30 +143,15 @@ export function performSearch(query) {
       total++;
       const where = headingFor(container, sec);
 
-      // Prefer an external resource link if the match sits inside one.
-      let resUrl = '';
-      const resEl = container.closest && container.closest('details.res');
-      if (resEl) {
-        const a = resEl.querySelector('a.res-open[href^="http"]') || resEl.querySelector('.res-more a[href^="http"]');
-        if (a) resUrl = a.href;
-      }
-      if (!resUrl && container.querySelector) {
-        const a2 = container.querySelector('a[href^="http"]');
-        if (a2) resUrl = a2.href;
-      }
+      // Always deep-link to the internal element within the tab
+      if (!container.id) container.id = 'm-' + secId + '-x' + total;
 
       const item = document.createElement('a');
       item.className = 'sr-item sr-item-link';
-      if (resUrl) {
-        item.href = resUrl; item.target = '_blank'; item.rel = 'noopener';
-      } else {
-        if (!container.id) container.id = 'm-' + secId + '-x' + total;
-        // Declarative deep link: the router handles every kind of click.
-        item.href = routeUrl(secId, container.id);
-      }
+      item.href = routeUrl(secId, container.id);
 
       item.innerHTML =
-        '<span class="sr-arrow">' + (resUrl ? '\u2197' : '\u21b5') + '</span>' +
+        '<span class="sr-arrow">\u21b5</span>' +
         '<span class="sr-where">in ' + escHtml(name) + (where ? ' \u203a ' + escHtml(where) : '') + '</span>' +
         '<span class="sr-snippet">' + snippetFor(container.textContent, q) + '</span>';
       group.appendChild(item);
@@ -177,6 +163,8 @@ export function performSearch(query) {
     grid.innerHTML = '<p class="sr-empty">No matches for "' + escHtml(q) + '" anywhere in the guide. Try a shorter or different term.</p>';
   }
   if (countEl) countEl.textContent = 'Found ' + total + ' result' + (total !== 1 ? 's' : '') + ' for "' + q + '"';
+  
+  refreshTOC();
 }
 
 // Hide the search view's chrome without routing (called when a tab opens).

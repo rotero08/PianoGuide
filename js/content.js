@@ -251,9 +251,47 @@ function getHeadings(sec) {
   return out;
 }
 
+let isTOCClickScrolling = false;
+
 function gotoHeading(id, drawer) {
   const el = document.getElementById(id);
-  if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); setHeadingHash(id); }
+  if (el) { 
+    isTOCClickScrolling = true;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' }); 
+    setHeadingHash(id);
+    
+    // Force direct highlight on click immediately
+    const rail = document.getElementById('tocRail');
+    if (rail) {
+      const links = [...rail.querySelectorAll('.toc-link')];
+      const targetLink = links.find(a => a.dataset.tid === id);
+      if (targetLink) {
+        const activeIdx = links.indexOf(targetLink);
+        links.forEach((a, idx) => {
+          a.classList.toggle('active', a === targetLink);
+          a.classList.toggle('passed', idx < activeIdx);
+        });
+
+        // Also sync mobile view directly
+        const mobileRail = document.querySelector('.nav-toc');
+        if (mobileRail) {
+          const mLinks = [...mobileRail.querySelectorAll('a')];
+          const mCur = mLinks.find(a => a.dataset.tid === id);
+          if (mCur) {
+            const mActiveIdx = mLinks.indexOf(mCur);
+            mLinks.forEach((a, idx) => {
+              a.classList.toggle('active', a === mCur);
+              a.classList.toggle('passed', idx < mActiveIdx);
+            });
+          }
+        }
+      }
+    }
+
+    setTimeout(() => {
+      isTOCClickScrolling = false;
+    }, 800);
+  }
   if (drawer) closeDrawer();
 }
 
@@ -285,6 +323,7 @@ function decorateNav(headings) {
   headings.forEach(h => {
     const a = document.createElement('a');
     a.className = 'lvl' + h.level; a.href = '#'; a.textContent = h.text;
+    a.dataset.tid = h.id;
     a.addEventListener('click', e => { e.preventDefault(); gotoHeading(h.id, true); });
     toc.appendChild(a);
   });
@@ -308,20 +347,61 @@ export function refreshTOC() {
 export function initScrollSpy() {
   let raf = null, lastHash = '';
   window.addEventListener('scroll', () => {
-    if (raf) return;
+    if (raf || isTOCClickScrolling) return;
     raf = requestAnimationFrame(() => {
       raf = null;
       const rail = document.getElementById('tocRail');
       if (!rail || rail.classList.contains('empty')) return;
       const links = [...rail.querySelectorAll('.toc-link')];
+      if (!links.length) return;
+
       let cur = null;
-      links.forEach(a => {
+      let closestDist = Infinity;
+
+      // Only apply sweeping threshold when near the very bottom of the document
+      let sweepLine = 140;
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      if (maxScroll > 0 && window.scrollY >= maxScroll - 150) {
+        const scrollPct = (window.scrollY - (maxScroll - 150)) / 150;
+        sweepLine = 140 + Math.max(0, Math.min(1, scrollPct)) * (window.innerHeight - 220);
+      }
+
+      links.forEach((a) => {
         const el = document.getElementById(a.dataset.tid);
-        if (el && el.getBoundingClientRect().top <= 120) cur = a;
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const dist = Math.abs(rect.top - sweepLine);
+        if (dist < closestDist) {
+          closestDist = dist;
+          cur = a;
+        }
       });
+
       if (!cur && links.length) cur = links[0];
-      links.forEach(a => a.classList.toggle('active', a === cur));
-      if (cur && cur.dataset.tid !== lastHash) { lastHash = cur.dataset.tid; setHeadingHash(cur.dataset.tid); }
+
+      // Update active and passed states on the desktop TOC rail
+      const activeIdx = links.indexOf(cur);
+      links.forEach((a, idx) => {
+        a.classList.toggle('active', a === cur);
+        a.classList.toggle('passed', idx < activeIdx);
+      });
+
+      // Update the exact same active and passed states on the mobile TOC menu
+      const mobileRail = document.querySelector('.nav-toc');
+      if (mobileRail) {
+        const mLinks = [...mobileRail.querySelectorAll('a')];
+        const mCur = mLinks.find(a => a.dataset.tid === (cur ? cur.dataset.tid : ''));
+        const mActiveIdx = mLinks.indexOf(mCur);
+        mLinks.forEach((a, idx) => {
+          a.classList.toggle('active', a === mCur);
+          a.classList.toggle('passed', idx < mActiveIdx);
+        });
+      }
+
+      if (cur && cur.dataset.tid !== lastHash) { 
+        lastHash = cur.dataset.tid; 
+        setHeadingHash(cur.dataset.tid); 
+      }
     });
   }, { passive: true });
 }
