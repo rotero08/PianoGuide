@@ -413,131 +413,196 @@ export function initContent() {
   initProgress();
   initCollapsibles();
   initResourceLists();
+
+  // Find active level tab and run benchmark pinning safely during tab mount
+  const activeSection = document.querySelector('#tab-mount > .content-section');
+  if (activeSection) {
+    setupBenchmarkPinning(activeSection);
+  }
+
   window.toggleCollapse = toggleCollapse;
   window.filterLibrary = filterLibrary;
 }
-/**
- * BENCHMARK PINNING, INITIAL SELECTION & DRAWER MOVEMENT SYSTEM
- */
-document.addEventListener('click', (e) => {
-    const pinBtn = e.target.closest('.bench-pin-btn');
-    if (!pinBtn) return;
-    
-    const card = pinBtn.closest('.uv-bench-item');
-    if (!card) return;
-    
-    const tabEl = card.closest('.content-section');
-    if (!tabEl) return;
-    
-    const mainGrid = tabEl.querySelector('.uv-benchmarks');
-    const hasPrompt = mainGrid && mainGrid.querySelector('.bench-selection-prompt');
-    const benchId = card.getAttribute('data-bench-id');
-    const pinnableCards = Array.from(tabEl.querySelectorAll('.uv-bench-item')).filter(c => c.hasAttribute('data-pinned'));
-    
-    if (hasPrompt) {
-        // Selection Phase: Pin the chosen piece and automatically set all others to unpinned
-        pinnableCards.forEach(c => {
-            const cId = c.getAttribute('data-bench-id');
-            if (cId === benchId) {
-                c.setAttribute('data-pinned', 'true');
-                localStorage.setItem(`bench-pinned-${cId}`, 'true');
-            } else {
-                c.setAttribute('data-pinned', 'false');
-                localStorage.setItem(`bench-pinned-${cId}`, 'false');
-            }
-        });
-    } else {
-        // Standard toggle pinning/unpinning after initial selection
-        const isCurrentlyPinned = card.getAttribute('data-pinned') === 'true';
-        const nextPinnedState = !isCurrentlyPinned;
-        card.setAttribute('data-pinned', nextPinnedState ? 'true' : 'false');
-        localStorage.setItem(`bench-pinned-${benchId}`, nextPinnedState ? 'true' : 'false');
-    }
-    
-    organizeBenchmarks(tabEl);
-    e.preventDefault();
-    e.stopPropagation();
-});
 
-export function organizeBenchmarks(tabEl) {
-    if (!tabEl) return;
-    const mainGrid = tabEl.querySelector('.uv-benchmarks');
-    const altDrawer = tabEl.querySelector('.alt-bench-drawer');
-    const altList = tabEl.querySelector('.alt-bench-list');
-    if (!mainGrid || !altDrawer || !altList) return;
+/**
+ * Setup and manage era benchmark selections and pinning states cleanly.
+ * Displays selection onboarding options for first-time visits, automatically
+ * moving alternatives to the correct drawer to prevent state conflicts.
+ * If all items are unpinned, the selection flow correctly resets.
+ */
+export function setupBenchmarkPinning(tabElement) {
+    const levelId = tabElement.id;
+    if (!levelId || (!levelId.startsWith('level-') && levelId !== 'pre-staff')) return;
+
+    const uvBenchmarksContainer = tabElement.querySelector('.uv-benchmarks');
+    const altDrawer = tabElement.querySelector('.alt-bench-drawer');
+    const altList = tabElement.querySelector('.alt-bench-list');
+    if (!uvBenchmarksContainer || !altList) return;
+
+    // Get only the selectable era items, excluding Method Audition cards
+    const allItems = Array.from(tabElement.querySelectorAll('.uv-benchmarks .uv-bench-item[data-bench-id], .alt-bench-list .uv-bench-item[data-bench-id]'));
+    if (allItems.length === 0) return;
+
+    const storageKey = `cp-pinned-benchmarks-${levelId}`;
+    const hasSelectedKey = `cp-has-selected-${levelId}`;
     
-    const allCards = Array.from(tabEl.querySelectorAll('.uv-bench-item'));
-    const pinnableCards = allCards.filter(card => card.hasAttribute('data-pinned'));
+    let pinnedIds = [];
+    const savedPinned = localStorage.getItem(storageKey);
     
-    // Check if the user has ever pinned or selected any benchmark in this tab
-    let anySavedPinned = false;
-    pinnableCards.forEach(card => {
-        const benchId = card.getAttribute('data-bench-id');
-        const savedState = localStorage.getItem(`bench-pinned-${benchId}`);
-        if (savedState === 'true') {
-            anySavedPinned = true;
+    if (savedPinned) {
+        pinnedIds = JSON.parse(savedPinned);
+    }
+
+    // Reset onboarding selection flow if everything is unpinned
+    let hasSelected = localStorage.getItem(hasSelectedKey) === 'true';
+    if (pinnedIds.length === 0) {
+        hasSelected = false;
+        localStorage.setItem(hasSelectedKey, 'false');
+    }
+
+    let banner = tabElement.querySelector('.uv-bench-onboarding-banner');
+
+    function render() {
+        if (pinnedIds.length === 0) {
+            localStorage.setItem(hasSelectedKey, 'false');
+            hasSelected = false;
         }
-    });
-    
-    let promptMsg = mainGrid.querySelector('.bench-selection-prompt');
-    
-    if (!anySavedPinned && pinnableCards.length > 0) {
-        // First Visit: Render Selection Prompt and keep all cards selectable in main view
-        if (!promptMsg) {
-            promptMsg = document.createElement('div');
-            promptMsg.className = 'bench-selection-prompt info-callout';
-            promptMsg.style.margin = '0 0 1rem 0';
-            promptMsg.style.padding = '0.9rem 1.1rem';
-            promptMsg.style.background = 'rgba(var(--accent-blue-rgb), 0.05)';
-            promptMsg.style.borderLeft = '3px solid var(--gold)';
-            promptMsg.innerHTML = `
-                <span class="callout-label" style="font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold);">Select a Benchmark</span>
-                <p style="margin:0; font-size:0.86rem; color:var(--text-muted); line-height:1.5;">
-                    Choose an Era Benchmark below by clicking its pin button to make it your active goal. The other options will automatically move to the alternatives drawer. (You can always pin/unpin more later!)
-                </p>
-            `;
-        }
-        if (promptMsg.parentNode !== mainGrid) {
-            mainGrid.insertBefore(promptMsg, mainGrid.firstChild);
-        }
-        
-        pinnableCards.forEach(card => {
-            card.setAttribute('data-pinned', 'false');
-            if (card.parentNode !== mainGrid) {
-                mainGrid.appendChild(card);
+
+        if (!hasSelected && allItems.length > 1) {
+            if (!banner) {
+                banner = document.createElement('div');
+                banner.className = 'uv-bench-onboarding-banner';
+                banner.innerHTML = `
+                    <div style="background: rgba(201, 168, 76, 0.08); border: 1px solid var(--gold); border-radius: 8px; padding: 1.1rem; margin-bottom: 1.25rem;">
+                        <h5 style="margin: 0 0 0.5rem; color: var(--gold); font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; font-family: 'Space Grotesk', sans-serif;">
+                            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; color: var(--gold);"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                            Choose Your Primary Era Benchmark
+                        </h5>
+                        <p style="margin: 0; font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;">
+                            Please select <strong>one</strong> era piece to focus on for this level. Once chosen, the alternative pieces will automatically move to the "Alternative Era Benchmark Pieces" drawer below. You can change this selection later using the pin icon.
+                        </p>
+                    </div>
+                `;
+                uvBenchmarksContainer.parentNode.insertBefore(banner, uvBenchmarksContainer);
             }
-        });
-        altDrawer.style.display = 'none';
-    } else {
-        // Not in Selection Phase: Remove prompt and organize pinned/unpinned pieces
-        if (promptMsg) promptMsg.remove();
-        
+
+            allItems.forEach(item => {
+                item.style.cursor = 'pointer';
+                item.classList.add('onboarding-selectable');
+                
+                let selectBtn = item.querySelector('.bench-select-helper-btn');
+                if (!selectBtn) {
+                    selectBtn = document.createElement('button');
+                    selectBtn.className = 'bench-select-helper-btn widget-btn';
+                    selectBtn.style.marginTop = '0.75rem';
+                    selectBtn.style.width = '100%';
+                    selectBtn.style.textAlign = 'center';
+                    selectBtn.style.display = 'block';
+                    selectBtn.innerHTML = `
+                        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px; margin-right: 4px; vertical-align: -1px;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
+                        Select This Benchmark
+                    `;
+                    item.appendChild(selectBtn);
+                }
+            });
+        } else {
+            if (banner) {
+                banner.remove();
+                banner = null;
+            }
+            allItems.forEach(item => {
+                item.style.cursor = '';
+                item.classList.remove('onboarding-selectable');
+                const selectBtn = item.querySelector('.bench-select-helper-btn');
+                if (selectBtn) selectBtn.remove();
+            });
+        }
+
         let hasUnpinned = false;
-        pinnableCards.forEach(card => {
-            const benchId = card.getAttribute('data-bench-id');
-            const savedState = localStorage.getItem(`bench-pinned-${benchId}`);
-            const isPinned = savedState === 'true';
-            
-            card.setAttribute('data-pinned', isPinned ? 'true' : 'false');
-            
+        allItems.forEach(item => {
+            const id = item.getAttribute('data-bench-id');
+            const isPinned = !hasSelected || pinnedIds.includes(id);
+            item.setAttribute('data-pinned', isPinned ? 'true' : 'false');
+
             if (isPinned) {
-                if (card.parentNode !== mainGrid) {
-                    mainGrid.appendChild(card);
+                if (item.parentNode !== uvBenchmarksContainer) {
+                    uvBenchmarksContainer.appendChild(item);
                 }
             } else {
-                if (card.parentNode !== altList) {
-                    altList.appendChild(card);
+                if (item.parentNode !== altList) {
+                    altList.appendChild(item);
                 }
                 hasUnpinned = true;
             }
         });
-        
-        altDrawer.style.display = hasUnpinned ? 'block' : 'none';
+
+        if (altDrawer) {
+            altDrawer.style.display = hasUnpinned ? 'block' : 'none';
+        }
     }
+
+    render();
 }
 
-// Hook into your custom tab-render/tab-changed pipeline
-document.addEventListener('tabChanged', (e) => {
-    const tabEl = document.getElementById(e.detail.tabId);
-    if (tabEl) organizeBenchmarks(tabEl);
+// Delegated event listener for pinning and selecting benchmarks globally
+document.addEventListener('click', (e) => {
+    // 1. Handle selection button or card click during onboarding
+    const selectableCard = e.target.closest('.onboarding-selectable');
+    if (selectableCard) {
+        if (e.target.closest('a')) return;
+        
+        const pinBtnClicked = e.target.closest('.bench-pin-btn');
+        if (pinBtnClicked) return;
+
+        const tabElement = selectableCard.closest('.content-section');
+        if (!tabElement) return;
+        const levelId = tabElement.id;
+        const storageKey = `cp-pinned-benchmarks-${levelId}`;
+        const hasSelectedKey = `cp-has-selected-${levelId}`;
+
+        if (localStorage.getItem(hasSelectedKey) === 'true') {
+            const savedPinned = localStorage.getItem(storageKey);
+            if (savedPinned && JSON.parse(savedPinned).length > 0) return;
+        }
+
+        const selectedId = selectableCard.getAttribute('data-bench-id');
+        localStorage.setItem(storageKey, JSON.stringify([selectedId]));
+        localStorage.setItem(hasSelectedKey, 'true');
+
+        setupBenchmarkPinning(tabElement);
+        return;
+    }
+
+    // 2. Handle pin button click
+    const pinBtn = e.target.closest('.bench-pin-btn');
+    if (pinBtn) {
+        const item = pinBtn.closest('.uv-bench-item');
+        const tabElement = pinBtn.closest('.content-section');
+        if (!item || !tabElement) return;
+
+        e.stopPropagation();
+        e.preventDefault();
+
+        const levelId = tabElement.id;
+        const storageKey = `cp-pinned-benchmarks-${levelId}`;
+        const hasSelectedKey = `cp-has-selected-${levelId}`;
+        const id = item.getAttribute('data-bench-id');
+
+        let pinnedIds = [];
+        const savedPinned = localStorage.getItem(storageKey);
+        if (savedPinned) {
+            pinnedIds = JSON.parse(savedPinned);
+        }
+
+        localStorage.setItem(hasSelectedKey, 'true');
+
+        if (pinnedIds.includes(id)) {
+            pinnedIds = pinnedIds.filter(pId => pId !== id);
+        } else {
+            pinnedIds.push(id);
+        }
+
+        localStorage.setItem(storageKey, JSON.stringify(pinnedIds));
+        setupBenchmarkPinning(tabElement);
+    }
 });
