@@ -417,7 +417,7 @@ export function initContent() {
   window.filterLibrary = filterLibrary;
 }
 /**
- * DYNAMIC BENCHMARK PINNING & ALTERNATIVE DRAWER SYSTEM
+ * BENCHMARK PINNING, INITIAL SELECTION & DRAWER MOVEMENT SYSTEM
  */
 document.addEventListener('click', (e) => {
     const pinBtn = e.target.closest('.bench-pin-btn');
@@ -429,19 +429,32 @@ document.addEventListener('click', (e) => {
     const tabEl = card.closest('.content-section');
     if (!tabEl) return;
     
+    const mainGrid = tabEl.querySelector('.uv-benchmarks');
+    const hasPrompt = mainGrid && mainGrid.querySelector('.bench-selection-prompt');
     const benchId = card.getAttribute('data-bench-id');
-    const isCurrentlyPinned = card.getAttribute('data-pinned') === 'true';
-    const nextPinnedState = !isCurrentlyPinned;
+    const pinnableCards = Array.from(tabEl.querySelectorAll('.uv-bench-item')).filter(c => c.hasAttribute('data-pinned'));
     
-    // Update state attribute
-    card.setAttribute('data-pinned', nextPinnedState ? 'true' : 'false');
+    if (hasPrompt) {
+        // Selection Phase: Pin the chosen piece and automatically set all others to unpinned
+        pinnableCards.forEach(c => {
+            const cId = c.getAttribute('data-bench-id');
+            if (cId === benchId) {
+                c.setAttribute('data-pinned', 'true');
+                localStorage.setItem(`bench-pinned-${cId}`, 'true');
+            } else {
+                c.setAttribute('data-pinned', 'false');
+                localStorage.setItem(`bench-pinned-${cId}`, 'false');
+            }
+        });
+    } else {
+        // Standard toggle pinning/unpinning after initial selection
+        const isCurrentlyPinned = card.getAttribute('data-pinned') === 'true';
+        const nextPinnedState = !isCurrentlyPinned;
+        card.setAttribute('data-pinned', nextPinnedState ? 'true' : 'false');
+        localStorage.setItem(`bench-pinned-${benchId}`, nextPinnedState ? 'true' : 'false');
+    }
     
-    // Persist choice to localStorage
-    localStorage.setItem(`bench-pinned-${benchId}`, nextPinnedState ? 'true' : 'false');
-    
-    // Re-organize benchmarks dynamically
     organizeBenchmarks(tabEl);
-    
     e.preventDefault();
     e.stopPropagation();
 });
@@ -454,34 +467,73 @@ export function organizeBenchmarks(tabEl) {
     if (!mainGrid || !altDrawer || !altList) return;
     
     const allCards = Array.from(tabEl.querySelectorAll('.uv-bench-item'));
-    let hasUnpinned = false;
+    const pinnableCards = allCards.filter(card => card.hasAttribute('data-pinned'));
     
-    allCards.forEach(card => {
-        // Safe Check: Skip static cards like Method Audition that don't have pinning attributes
-        if (!card.hasAttribute('data-pinned')) return;
-        
+    // Check if the user has ever pinned or selected any benchmark in this tab
+    let anySavedPinned = false;
+    pinnableCards.forEach(card => {
         const benchId = card.getAttribute('data-bench-id');
-        // Restore from localStorage if present
         const savedState = localStorage.getItem(`bench-pinned-${benchId}`);
-        if (savedState !== null) {
-            card.setAttribute('data-pinned', savedState);
-        }
-        
-        const isPinned = card.getAttribute('data-pinned') === 'true';
-        if (isPinned) {
-            if (card.parentNode !== mainGrid) {
-                mainGrid.appendChild(card);
-            }
-        } else {
-            if (card.parentNode !== altList) {
-                altList.appendChild(card);
-            }
-            hasUnpinned = true;
+        if (savedState === 'true') {
+            anySavedPinned = true;
         }
     });
     
-    // Display the alternative drawer only if there are unpinned items
-    altDrawer.style.display = hasUnpinned ? 'block' : 'none';
+    let promptMsg = mainGrid.querySelector('.bench-selection-prompt');
+    
+    if (!anySavedPinned && pinnableCards.length > 0) {
+        // First Visit: Render Selection Prompt and keep all cards selectable in main view
+        if (!promptMsg) {
+            promptMsg = document.createElement('div');
+            promptMsg.className = 'bench-selection-prompt info-callout';
+            promptMsg.style.margin = '0 0 1rem 0';
+            promptMsg.style.padding = '0.9rem 1.1rem';
+            promptMsg.style.background = 'rgba(var(--accent-blue-rgb), 0.05)';
+            promptMsg.style.borderLeft = '3px solid var(--gold)';
+            promptMsg.innerHTML = `
+                <span class="callout-label" style="font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold);">Select a Benchmark</span>
+                <p style="margin:0; font-size:0.86rem; color:var(--text-muted); line-height:1.5;">
+                    Choose an Era Benchmark below by clicking its pin button to make it your active goal. The other options will automatically move to the alternatives drawer. (You can always pin/unpin more later!)
+                </p>
+            `;
+        }
+        if (promptMsg.parentNode !== mainGrid) {
+            mainGrid.insertBefore(promptMsg, mainGrid.firstChild);
+        }
+        
+        pinnableCards.forEach(card => {
+            card.setAttribute('data-pinned', 'false');
+            if (card.parentNode !== mainGrid) {
+                mainGrid.appendChild(card);
+            }
+        });
+        altDrawer.style.display = 'none';
+    } else {
+        // Not in Selection Phase: Remove prompt and organize pinned/unpinned pieces
+        if (promptMsg) promptMsg.remove();
+        
+        let hasUnpinned = false;
+        pinnableCards.forEach(card => {
+            const benchId = card.getAttribute('data-bench-id');
+            const savedState = localStorage.getItem(`bench-pinned-${benchId}`);
+            const isPinned = savedState === 'true';
+            
+            card.setAttribute('data-pinned', isPinned ? 'true' : 'false');
+            
+            if (isPinned) {
+                if (card.parentNode !== mainGrid) {
+                    mainGrid.appendChild(card);
+                }
+            } else {
+                if (card.parentNode !== altList) {
+                    altList.appendChild(card);
+                }
+                hasUnpinned = true;
+            }
+        });
+        
+        altDrawer.style.display = hasUnpinned ? 'block' : 'none';
+    }
 }
 
 // Hook into your custom tab-render/tab-changed pipeline
