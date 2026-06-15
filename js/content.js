@@ -25,6 +25,7 @@ function toggleCompletedState(cb) {
   if (row) row.classList.toggle('completed', cb.checked);
 }
 
+// Global checklist progress alignment
 function updateLevelProgress(level) {
   const total = document.querySelectorAll(`input[data-level="${level}"]`).length;
   const checked = document.querySelectorAll(`input[data-level="${level}"]:checked`).length;
@@ -133,13 +134,27 @@ function initResourceLists() {
       det.addEventListener('toggle', () => LS.set('cp-open-' + rid, det.open));
 
       const summary = det.querySelector(':scope > summary');
-      if (summary && !summary.querySelector('.res-done-toggle')) {
-        const tog = document.createElement('button');
-        tog.type = 'button'; tog.className = 'res-done-toggle';
-        tog.setAttribute('aria-label', 'Mark resource as done');
-        tog.innerHTML = CHECK_SVG;
-        tog.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); setResDone(det, !det.classList.contains('res-done')); });
-        summary.appendChild(tog);
+      if (summary) {
+        let controls = summary.querySelector('.res-controls');
+        if (!controls) {
+            controls = document.createElement('div');
+            controls.className = 'res-controls';
+            summary.appendChild(controls);
+        }
+
+        if (!controls.querySelector('.res-done-toggle')) {
+            const tog = document.createElement('button');
+            tog.type = 'button'; tog.className = 'res-done-toggle';
+            tog.setAttribute('aria-label', 'Mark resource as done');
+            tog.innerHTML = CHECK_SVG;
+            tog.style.marginLeft = '0'; // Clear custom CSS margin-left
+            tog.addEventListener('click', (e) => { 
+                e.preventDefault(); 
+                e.stopPropagation(); 
+                setResDone(det, !det.classList.contains('res-done')); 
+            });
+            controls.appendChild(tog);
+        }
       }
 
       const more = det.querySelector(':scope > .res-more');
@@ -230,6 +245,7 @@ function setHeadingHash(id) {
   try { history.replaceState(null, '', routeUrl(sec.id, id)); } catch (e) {}
 }
 
+// Ensure unique header IDs
 function getHeadings(sec) {
   const out = [], seen = {};
   const ensureId = (el, txt) => {
@@ -415,10 +431,66 @@ export function initContent() {
   initResourceLists();
 
   // Find active level tab and run benchmark pinning safely during tab mount
-  const activeSection = document.querySelector('#tab-mount > .content-section');
+  const activeSection = document.querySelector('#tab-mount > .content-section.active') || document.querySelector('#tab-mount > .content-section');
   if (activeSection) {
     setupBenchmarkPinning(activeSection);
   }
+
+  // Inject style block to clean backgrounds, borders, and align controls perfectly [2.3]
+  const altStyle = document.createElement('style');
+  altStyle.textContent = `
+    /* Clear custom/legacy backgrounds, shadows and border duplicates */
+    .alternatives-content .res, 
+    .alternatives-content .res[open], 
+    .alternatives-content .res > summary,
+    .alternatives-content .res-more,
+    .alternatives-content .res-cell {
+        background: transparent !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
+    }
+    .alternatives-content .res-cell {
+        border: none !important;
+        padding: 0 !important;
+    }
+
+    /* Force absolute top-right positioning for resource controls */
+    details.res > summary {
+        position: relative !important;
+        padding-right: 95px !important; /* Safe zone for pin and checkbox */
+        display: flex !important;
+        align-items: flex-start !important;
+    }
+    details.res > summary .res-chev {
+        margin-top: 3px !important;
+    }
+    .res-controls {
+        position: absolute !important;
+        right: 12px !important;
+        top: 11px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+        z-index: 10 !important;
+    }
+    .res-controls .res-pin-btn,
+    .res-controls .res-done-toggle {
+        margin: 0 !important;
+        position: static !important;
+    }
+    /* Style overrides for custom checkbox in resources controls */
+    .res-controls .res-done-toggle {
+        width: 20px !important;
+        height: 20px !important;
+        border-radius: 50% !important;
+        border: 2px solid var(--border-color) !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: transparent !important;
+    }
+  `;
+  document.head.appendChild(altStyle);
 
   window.toggleCollapse = toggleCollapse;
   window.filterLibrary = filterLibrary;
@@ -439,8 +511,9 @@ export function setupBenchmarkPinning(tabElement) {
     const altList = tabElement.querySelector('.alt-bench-list');
     if (!uvBenchmarksContainer || !altList) return;
 
-    // Get only the selectable era items, excluding Method Audition cards
-    const allItems = Array.from(tabElement.querySelectorAll('.uv-benchmarks .uv-bench-item[data-bench-id], .alt-bench-list .uv-bench-item[data-bench-id]'));
+    // Get only selectable era items (excluding Method Audition cards by checking for pin buttons)
+    const allItems = Array.from(tabElement.querySelectorAll('.uv-bench-item[data-bench-id]'))
+                          .filter(item => item.querySelector('.bench-pin-btn'));
     if (allItems.length === 0) return;
 
     const storageKey = `cp-pinned-benchmarks-${levelId}`;
@@ -460,9 +533,8 @@ export function setupBenchmarkPinning(tabElement) {
         localStorage.setItem(hasSelectedKey, 'false');
     }
 
-    let banner = tabElement.querySelector('.uv-bench-onboarding-banner');
-
     function render() {
+        const banner = tabElement.querySelector('.uv-bench-onboarding-banner');
         if (pinnedIds.length === 0) {
             localStorage.setItem(hasSelectedKey, 'false');
             hasSelected = false;
@@ -470,20 +542,20 @@ export function setupBenchmarkPinning(tabElement) {
 
         if (!hasSelected && allItems.length > 1) {
             if (!banner) {
-                banner = document.createElement('div');
-                banner.className = 'uv-bench-onboarding-banner';
-                banner.innerHTML = `
+                const newBanner = document.createElement('div');
+                newBanner.className = 'uv-bench-onboarding-banner';
+                newBanner.innerHTML = `
                     <div style="background: rgba(201, 168, 76, 0.08); border: 1px solid var(--gold); border-radius: 8px; padding: 1.1rem; margin-bottom: 1.25rem;">
                         <h5 style="margin: 0 0 0.5rem; color: var(--gold); font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; font-family: 'Space Grotesk', sans-serif;">
                             <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; color: var(--gold);"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                             Choose Your Primary Era Benchmark
                         </h5>
                         <p style="margin: 0; font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;">
-                            Please select <strong>one</strong> era piece to focus on for this level. Once chosen, the alternative pieces will automatically move to the "Alternative Era Benchmark Pieces" drawer below. You can change this selection later using the pin icon.
+                            Please select <strong>one</strong> era piece to focus on for this level. Once chosen, the alternative pieces will automatically move to the "Alternative Era Benchmark Pieces" drawer below. You can change this selection later or pin additional pieces using the pin icons.
                         </p>
                     </div>
                 `;
-                uvBenchmarksContainer.parentNode.insertBefore(banner, uvBenchmarksContainer);
+                uvBenchmarksContainer.parentNode.insertBefore(newBanner, uvBenchmarksContainer);
             }
 
             allItems.forEach(item => {
@@ -508,7 +580,6 @@ export function setupBenchmarkPinning(tabElement) {
         } else {
             if (banner) {
                 banner.remove();
-                banner = null;
             }
             allItems.forEach(item => {
                 item.style.cursor = '';
@@ -521,10 +592,13 @@ export function setupBenchmarkPinning(tabElement) {
         let hasUnpinned = false;
         allItems.forEach(item => {
             const id = item.getAttribute('data-bench-id');
-            const isPinned = !hasSelected || pinnedIds.includes(id);
+            const isPinned = pinnedIds.includes(id);
+            
+            // Set data-pinned attribute based strictly on state
             item.setAttribute('data-pinned', isPinned ? 'true' : 'false');
+            const shouldShowInMain = !hasSelected || isPinned;
 
-            if (isPinned) {
+            if (shouldShowInMain) {
                 if (item.parentNode !== uvBenchmarksContainer) {
                     uvBenchmarksContainer.appendChild(item);
                 }
@@ -534,6 +608,25 @@ export function setupBenchmarkPinning(tabElement) {
                 }
                 hasUnpinned = true;
             }
+
+            // Upgrade pin button structure to hold pin-icon-on and pin-icon-off for slashed hover state
+            const pinBtn = item.querySelector('.bench-pin-btn');
+            if (pinBtn && !pinBtn.querySelector('.pin-icon-off')) {
+                pinBtn.innerHTML = `
+                    <svg class="ic pin-icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="17" x2="12" y2="22"></line>
+                        <path d="M5 17h14v-1.76a2 2 0 0 0-.44-1.24l-2.12-2.65A1 1 0 0 1 16 10.76V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v5.76a1 1 0 0 1-.44.59l-2.12 2.65a2 2 0 0 0-.44 1.24Z"></path>
+                    </svg>
+                    <svg class="ic pin-icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="17" x2="12" y2="22"></line>
+                        <path d="M5 17h14v-1.76a2 2 0 0 0-.44-1.24l-2.12-2.65A1 1 0 0 1 16 10.76V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v5.76a1 1 0 0 1-.44.59l-2.12 2.65a2 2 0 0 0-.44 1.24Z"></path>
+                        <line x1="2" y1="2" x2="22" y2="22" stroke="currentColor" stroke-width="2"></line>
+                    </svg>
+                `;
+            }
+            if (pinBtn) {
+                pinBtn.title = isPinned ? 'Unpin from main list' : 'Pin to main list';
+            }
         });
 
         if (altDrawer) {
@@ -541,68 +634,112 @@ export function setupBenchmarkPinning(tabElement) {
         }
     }
 
+    // Set up Controls (Pin Button Wrapper and Checkbox) once for each item
+    allItems.forEach(item => {
+        const topRow = item.querySelector('.uv-bench-top');
+        if (topRow && !item._controlsInitialized) {
+            item._controlsInitialized = true;
+            
+            let controls = item.querySelector('.bench-controls');
+            let pinBtn = item.querySelector('.bench-pin-btn');
+            
+            if (!controls) {
+                controls = document.createElement('div');
+                controls.className = 'bench-controls';
+                
+                // Keep layout clean and align pin controls completely to the right edge of the card [1.4]
+                controls.style.marginLeft = 'auto';
+                controls.style.display = 'flex';
+                controls.style.alignItems = 'center';
+                controls.style.gap = '12px';
+
+                topRow.style.display = 'flex';
+                topRow.style.alignItems = 'center';
+                topRow.style.width = '100%';
+                
+                if (pinBtn) {
+                    controls.appendChild(pinBtn);
+                }
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'bench-done-checkbox';
+                checkbox.id = `check-bench-${item.getAttribute('data-bench-id')}`;
+                controls.appendChild(checkbox);
+                
+                topRow.appendChild(controls);
+            }
+        }
+
+        // Restore checkbox checked state and class
+        const checkbox = item.querySelector('.bench-done-checkbox');
+        if (checkbox) {
+            const isChecked = localStorage.getItem(checkbox.id) === 'true';
+            checkbox.checked = isChecked;
+            item.classList.toggle('completed', isChecked);
+        }
+
+        // Setup Event Listeners
+        const pinBtn = item.querySelector('.bench-pin-btn');
+        if (pinBtn && !pinBtn._pinHandlerAdded) {
+            pinBtn._pinHandlerAdded = true;
+            pinBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const id = item.getAttribute('data-bench-id');
+                const idx = pinnedIds.indexOf(id);
+
+                if (idx > -1) {
+                    pinnedIds.splice(idx, 1);
+                } else {
+                    pinnedIds.push(id);
+                }
+                
+                if (pinnedIds.length === 0) {
+                    hasSelected = false;
+                    localStorage.setItem(hasSelectedKey, 'false');
+                } else {
+                    hasSelected = true;
+                    localStorage.setItem(hasSelectedKey, 'true');
+                }
+                
+                localStorage.setItem(storageKey, JSON.stringify(pinnedIds));
+                if (hasSelected && altDrawer) {
+                    altDrawer.open = false; // Collapse alternatives drawer immediately [2.1]
+                }
+                render();
+            });
+        }
+
+        if (!item._cardHandlerAdded) {
+            item._cardHandlerAdded = true;
+            item.addEventListener('click', (e) => {
+                if (item.classList.contains('onboarding-selectable')) {
+                    // Avoid catching direct links clicked on the card text
+                    if (e.target.tagName === 'A' || e.target.closest('a')) {
+                        return;
+                    }
+                    e.preventDefault();
+                    const id = item.getAttribute('data-bench-id');
+                    pinnedIds = [id];
+                    hasSelected = true;
+                    localStorage.setItem(hasSelectedKey, 'true');
+                    localStorage.setItem(storageKey, JSON.stringify(pinnedIds));
+                    if (altDrawer) {
+                        altDrawer.open = false; // Collapse alternatives drawer immediately [2.1]
+                    }
+                    render();
+                }
+            });
+        }
+    });
+
+    if (altList) {
+        altList.style.display = 'flex';
+        altList.style.flexDirection = 'column';
+        altList.style.gap = '1.25rem'; // Increased gap between alternative benchmarks [2.2]
+    }
+
     render();
 }
-
-// Delegated event listener for pinning and selecting benchmarks globally
-document.addEventListener('click', (e) => {
-    // 1. Handle selection button or card click during onboarding
-    const selectableCard = e.target.closest('.onboarding-selectable');
-    if (selectableCard) {
-        if (e.target.closest('a')) return;
-        
-        const pinBtnClicked = e.target.closest('.bench-pin-btn');
-        if (pinBtnClicked) return;
-
-        const tabElement = selectableCard.closest('.content-section');
-        if (!tabElement) return;
-        const levelId = tabElement.id;
-        const storageKey = `cp-pinned-benchmarks-${levelId}`;
-        const hasSelectedKey = `cp-has-selected-${levelId}`;
-
-        if (localStorage.getItem(hasSelectedKey) === 'true') {
-            const savedPinned = localStorage.getItem(storageKey);
-            if (savedPinned && JSON.parse(savedPinned).length > 0) return;
-        }
-
-        const selectedId = selectableCard.getAttribute('data-bench-id');
-        localStorage.setItem(storageKey, JSON.stringify([selectedId]));
-        localStorage.setItem(hasSelectedKey, 'true');
-
-        setupBenchmarkPinning(tabElement);
-        return;
-    }
-
-    // 2. Handle pin button click
-    const pinBtn = e.target.closest('.bench-pin-btn');
-    if (pinBtn) {
-        const item = pinBtn.closest('.uv-bench-item');
-        const tabElement = pinBtn.closest('.content-section');
-        if (!item || !tabElement) return;
-
-        e.stopPropagation();
-        e.preventDefault();
-
-        const levelId = tabElement.id;
-        const storageKey = `cp-pinned-benchmarks-${levelId}`;
-        const hasSelectedKey = `cp-has-selected-${levelId}`;
-        const id = item.getAttribute('data-bench-id');
-
-        let pinnedIds = [];
-        const savedPinned = localStorage.getItem(storageKey);
-        if (savedPinned) {
-            pinnedIds = JSON.parse(savedPinned);
-        }
-
-        localStorage.setItem(hasSelectedKey, 'true');
-
-        if (pinnedIds.includes(id)) {
-            pinnedIds = pinnedIds.filter(pId => pId !== id);
-        } else {
-            pinnedIds.push(id);
-        }
-
-        localStorage.setItem(storageKey, JSON.stringify(pinnedIds));
-        setupBenchmarkPinning(tabElement);
-    }
-});

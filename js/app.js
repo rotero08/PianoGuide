@@ -4,7 +4,7 @@
 // feature module once the content is in the DOM.
 
 import { ready, LS, routeUrl, parseHash } from './util.js';
-import { initContent, refreshTOC, initScrollSpy } from './content.js';
+import { initContent, refreshTOC, initScrollSpy, setupBenchmarkPinning } from './content.js';
 import { buildSectionNames, assignAnchors, performSearch, resetSearchUI } from './search.js';
 import { initMedia } from './media.js';
 
@@ -340,7 +340,7 @@ ready(async () => {
 
         // Render and Align Pinning Mechanics
         initializePinning(tabId, activeTabSection);
-        initializeBenchmarkPinning(tabId, activeTabSection);
+        setupBenchmarkPinning(activeTabSection);
     }
 
     function updateProgress(levelId) {
@@ -412,37 +412,46 @@ ready(async () => {
             res.setAttribute('data-pinned', isPinned ? 'true' : 'false');
 
             const summary = res.querySelector('summary');
-            if (summary && !summary.querySelector('.res-pin-btn')) {
-                const pinBtn = document.createElement('button');
-                pinBtn.type = 'button';
-                pinBtn.className = 'res-pin-btn';
-                pinBtn.title = 'Pin or unpin this resource';
-                
-                // Thumbtack SVG icon [1.4]
-                pinBtn.innerHTML = `
-                    <svg class="pin-icon-on" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true" style="pointer-events: none;">
-                        <line x1="12" y1="17" x2="12" y2="22"></line>
-                        <path d="M5 17h14v-1.76a2 2 0 0 0-.44-1.24l-2.33-2.71A1 1 0 0 1 15.5 10.5V5a1 1 0 0 0-1-1h-5a1 1 0 0 0-1 1v5.5a1 1 0 0 1-.73.74l-2.33 2.71a2 2 0 0 0-.44 1.24V17z"></path>
-                    </svg>
-                    <svg class="pin-icon-off" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true" style="pointer-events: none; display: none;">
-                        <line x1="12" y1="17" x2="12" y2="22"></line>
-                        <path d="M5 17h14v-1.76a2 2 0 0 0-.44-1.24l-2.33-2.71A1 1 0 0 1 15.5 10.5V5a1 1 0 0 0-1-1h-5a1 1 0 0 0-1 1v5.5a1 1 0 0 1-.73.74l-2.33 2.71a2 2 0 0 0-.44 1.24V17z"></path>
-                        <line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" stroke-width="2.5"></line>
-                    </svg>
-                `;
-
-                const doneToggle = summary.querySelector('.res-done-toggle');
-                if (doneToggle) {
-                    summary.insertBefore(pinBtn, doneToggle);
-                } else {
-                    summary.appendChild(pinBtn);
+            if (summary) {
+                let controls = summary.querySelector('.res-controls');
+                if (!controls) {
+                    controls = document.createElement('div');
+                    controls.className = 'res-controls';
+                    summary.appendChild(controls);
                 }
 
-                pinBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    togglePin(tabId, resId, activeTabSection);
-                });
+                if (!controls.querySelector('.res-pin-btn')) {
+                    const pinBtn = document.createElement('button');
+                    pinBtn.type = 'button';
+                    pinBtn.className = 'res-pin-btn';
+                    pinBtn.title = 'Pin or unpin this resource';
+                    pinBtn.style.margin = '0'; // Clear margins
+                    
+                    pinBtn.innerHTML = `
+                        <svg class="pin-icon-on" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true" style="pointer-events: none;">
+                            <line x1="12" y1="17" x2="12" y2="22"></line>
+                            <path d="M5 17h14v-1.76a2 2 0 0 0-.44-1.24l-2.33-2.71A1 1 0 0 1 15.5 10.5V5a1 1 0 0 0-1-1h-5a1 1 0 0 0-1 1v5.5a1 1 0 0 1-.73.74l-2.33 2.71a2 2 0 0 0-.44 1.24V17z"></path>
+                        </svg>
+                        <svg class="pin-icon-off" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true" style="pointer-events: none; display: none;">
+                            <line x1="12" y1="17" x2="12" y2="22"></line>
+                            <path d="M5 17h14v-1.76a2 2 0 0 0-.44-1.24l-2.33-2.71A1 1 0 0 1 15.5 10.5V5a1 1 0 0 0-1-1h-5a1 1 0 0 0-1 1v5.5a1 1 0 0 1-.73.74l-2.33 2.71a2 2 0 0 0-.44 1.24V17z"></path>
+                            <line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" stroke-width="2.5"></line>
+                        </svg>
+                    `;
+
+                    const doneToggle = controls.querySelector('.res-done-toggle');
+                    if (doneToggle) {
+                        controls.insertBefore(pinBtn, doneToggle);
+                    } else {
+                        controls.appendChild(pinBtn);
+                    }
+
+                    pinBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        togglePin(tabId, resId, activeTabSection);
+                    });
+                }
             }
 
             const pinBtn = res.querySelector('.res-pin-btn');
@@ -479,126 +488,6 @@ ready(async () => {
         
         localStorage.setItem(savedKey, JSON.stringify(pinnedIds));
         initializePinning(tabId, activeTabSection);
-    }
-
-    function initializeBenchmarkPinning(tabId, activeTabSection) {
-        const mainBenchList = activeTabSection.querySelector('.uv-benchmarks');
-        if (!mainBenchList) return;
-
-        const allBench = Array.from(mainBenchList.querySelectorAll('.uv-bench-item'));
-        
-        // Benchmark pinning only triggers if alternatives options actually exist (total pieces > 1) [1.4]
-        if (allBench.length <= 1) return;
-
-        let altBenchDrawer = activeTabSection.querySelector('.alt-bench-drawer');
-        if (!altBenchDrawer) {
-            altBenchDrawer = document.createElement('details');
-            altBenchDrawer.className = 'alternatives-drawer alt-bench-drawer';
-            altBenchDrawer.innerHTML = `
-                <summary>Alternative Era Benchmark Pieces</summary>
-                <div class="alternatives-content">
-                    <div class="uv-benchmarks alt-bench-list"></div>
-                </div>
-            `;
-            mainBenchList.parentElement.appendChild(altBenchDrawer);
-        }
-
-        const altBenchList = altBenchDrawer.querySelector('.alt-bench-list');
-        const savedBenchPinnedKey = `cp-pinned-bench-${tabId}`;
-        let pinnedBenchIds = JSON.parse(localStorage.getItem(savedBenchPinnedKey));
-
-        if (!pinnedBenchIds) {
-            pinnedBenchIds = allBench.map(el => el.getAttribute('data-bench-id'));
-            localStorage.setItem(savedBenchPinnedKey, JSON.stringify(pinnedBenchIds));
-        }
-
-        allBench.forEach(bench => {
-            const benchId = bench.getAttribute('data-bench-id');
-            const isPinned = pinnedBenchIds.includes(benchId);
-            bench.setAttribute('data-pinned', isPinned ? 'true' : 'false');
-
-            let pinBtn = bench.querySelector('.bench-pin-btn');
-            if (!pinBtn) {
-                const topRow = bench.querySelector('.uv-bench-top');
-                if (topRow) {
-                    pinBtn = document.createElement('button');
-                    pinBtn.className = 'bench-pin-btn';
-                    
-                    // Embed thumbtack SVG alongside cross-out unpin hover states [1.4]
-                    pinBtn.innerHTML = `
-                        <svg class="pin-icon-on" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true" style="pointer-events: none;">
-                            <line x1="12" y1="17" x2="12" y2="22"></line>
-                            <path d="M5 17h14v-1.76a2 2 0 0 0-.44-1.24l-2.33-2.71A1 1 0 0 1 15.5 10.5V5a1 1 0 0 0-1-1h-5a1 1 0 0 0-1 1v5.5a1 1 0 0 1-.73.74l-2.33 2.71a2 2 0 0 0-.44 1.24V17z"></path>
-                        </svg>
-                        <svg class="pin-icon-off" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true" style="pointer-events: none; display: none;">
-                            <line x1="12" y1="17" x2="12" y2="22"></line>
-                            <path d="M5 17h14v-1.76a2 2 0 0 0-.44-1.24l-2.33-2.71A1 1 0 0 1 15.5 10.5V5a1 1 0 0 0-1-1h-5a1 1 0 0 0-1 1v5.5a1 1 0 0 1-.73.74l-2.33 2.71a2 2 0 0 0-.44 1.24V17z"></path>
-                            <line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" stroke-width="2.5"></line>
-                        </svg>
-                    `;
-
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.className = 'bench-done-checkbox';
-                    checkbox.id = `check-bench-${benchId}`;
-
-                    const doneKey = `cp-bench-done-${benchId}`;
-                    checkbox.checked = localStorage.getItem(doneKey) === 'true';
-                    checkbox.addEventListener('change', () => {
-                        localStorage.setItem(doneKey, checkbox.checked);
-                        if (checkbox.checked) {
-                            bench.classList.add('completed');
-                        } else {
-                            bench.classList.remove('completed');
-                        }
-                    });
-                    if (checkbox.checked) bench.classList.add('completed');
-
-                    const controls = document.createElement('div');
-                    controls.className = 'bench-controls';
-                    controls.appendChild(pinBtn);
-                    controls.appendChild(checkbox);
-                    topRow.appendChild(controls);
-
-                    pinBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        toggleBenchPin(benchId, activeTabSection, mainBenchList);
-                    });
-                }
-            }
-
-            const currentPinBtn = bench.querySelector('.bench-pin-btn');
-            if (currentPinBtn) {
-                currentPinBtn.title = isPinned ? 'Unpin from main list' : 'Pin to main list';
-            }
-
-            if (isPinned) {
-                if (bench.parentElement !== mainBenchList) {
-                    mainBenchList.appendChild(bench);
-                }
-            } else {
-                if (bench.parentElement !== altBenchList) {
-                    altBenchList.appendChild(bench);
-                }
-            }
-        });
-
-        altBenchDrawer.style.display = altBenchList.children.length === 0 ? 'none' : 'block';
-    }
-
-    function toggleBenchPin(benchId, activeTabSection, mainBenchList) {
-        const savedBenchPinnedKey = `cp-pinned-bench-${activeTabSection.id}`;
-        let pinnedBenchIds = JSON.parse(localStorage.getItem(savedBenchPinnedKey)) || [];
-        const index = pinnedBenchIds.indexOf(benchId);
-
-        if (index > -1) {
-            pinnedBenchIds.splice(index, 1);
-        } else {
-            pinnedBenchIds.push(benchId);
-        }
-
-        localStorage.setItem(savedBenchPinnedKey, JSON.stringify(pinnedBenchIds));
-        initializeBenchmarkPinning(activeTabSection.id, activeTabSection);
     }
 
     // Dynamic Curriculum Progress Grid Renderer
