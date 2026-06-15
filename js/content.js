@@ -239,6 +239,8 @@ function closeDrawer() {
 
 // Record the current heading in the hash (route format) without adding a
 // history entry and without re-triggering the router.
+// Record the current heading in the hash (route format) without adding a
+// history entry and without re-triggering the router.
 function setHeadingHash(id) {
   const sec = document.querySelector('.content-section.active');
   if (!sec || sec.id === 'search-results') return;
@@ -453,30 +455,8 @@ export function initContent() {
         border: none !important;
         padding: 0 !important;
     }
-
-    /* Force absolute top-right positioning for resource controls */
-    details.res > summary {
-        position: relative !important;
-        padding-right: 95px !important; /* Safe zone for pin and checkbox */
-        display: flex !important;
-        align-items: flex-start !important;
-    }
-    details.res > summary .res-chev {
-        margin-top: 3px !important;
-    }
-    .res-controls {
-        position: absolute !important;
-        right: 12px !important;
-        top: 11px !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        gap: 12px !important;
-        z-index: 10 !important;
-    }
-    .res-controls .res-pin-btn,
     .res-controls .res-done-toggle {
-        margin: 0 !important;
-        position: static !important;
+        margin-left: 0 !important;
     }
     /* Style overrides for custom checkbox in resources controls */
     .res-controls .res-done-toggle {
@@ -521,26 +501,26 @@ export function setupBenchmarkPinning(tabElement) {
     
     let pinnedIds = [];
     const savedPinned = localStorage.getItem(storageKey);
+    const hasSelectedVal = localStorage.getItem(hasSelectedKey);
     
-    if (savedPinned) {
+    // Defensive reset logic: if they have stale selection arrays but never completed 
+    // onboarding selection flow, force them into the onboarding flow cleanly [1.4]
+    if (savedPinned && hasSelectedVal === 'true') {
         pinnedIds = JSON.parse(savedPinned);
-    }
-
-    // Reset onboarding selection flow if everything is unpinned
-    let hasSelected = localStorage.getItem(hasSelectedKey) === 'true';
-    if (pinnedIds.length === 0) {
-        hasSelected = false;
+    } else {
+        pinnedIds = [];
+        localStorage.setItem(storageKey, JSON.stringify([]));
         localStorage.setItem(hasSelectedKey, 'false');
     }
 
     function render() {
         const banner = tabElement.querySelector('.uv-bench-onboarding-banner');
-        if (pinnedIds.length === 0) {
-            localStorage.setItem(hasSelectedKey, 'false');
-            hasSelected = false;
-        }
+        
+        // Derive selection state strictly from pinned benchmark IDs [1.4]
+        const currentHasSelected = pinnedIds.length > 0;
+        localStorage.setItem(hasSelectedKey, currentHasSelected ? 'true' : 'false');
 
-        if (!hasSelected && allItems.length > 1) {
+        if (!currentHasSelected && allItems.length > 1) {
             if (!banner) {
                 const newBanner = document.createElement('div');
                 newBanner.className = 'uv-bench-onboarding-banner';
@@ -596,7 +576,7 @@ export function setupBenchmarkPinning(tabElement) {
             
             // Set data-pinned attribute based strictly on state
             item.setAttribute('data-pinned', isPinned ? 'true' : 'false');
-            const shouldShowInMain = !hasSelected || isPinned;
+            const shouldShowInMain = !currentHasSelected || isPinned;
 
             if (shouldShowInMain) {
                 if (item.parentNode !== uvBenchmarksContainer) {
@@ -696,16 +676,8 @@ export function setupBenchmarkPinning(tabElement) {
                     pinnedIds.push(id);
                 }
                 
-                if (pinnedIds.length === 0) {
-                    hasSelected = false;
-                    localStorage.setItem(hasSelectedKey, 'false');
-                } else {
-                    hasSelected = true;
-                    localStorage.setItem(hasSelectedKey, 'true');
-                }
-                
                 localStorage.setItem(storageKey, JSON.stringify(pinnedIds));
-                if (hasSelected && altDrawer) {
+                if (pinnedIds.length > 0 && altDrawer) {
                     altDrawer.open = false; // Collapse alternatives drawer immediately [2.1]
                 }
                 render();
@@ -723,8 +695,6 @@ export function setupBenchmarkPinning(tabElement) {
                     e.preventDefault();
                     const id = item.getAttribute('data-bench-id');
                     pinnedIds = [id];
-                    hasSelected = true;
-                    localStorage.setItem(hasSelectedKey, 'true');
                     localStorage.setItem(storageKey, JSON.stringify(pinnedIds));
                     if (altDrawer) {
                         altDrawer.open = false; // Collapse alternatives drawer immediately [2.1]
