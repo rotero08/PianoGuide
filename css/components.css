@@ -223,6 +223,18 @@
             cursor: help;
         }
 
+        /* Perfect alignment for badge headers and controls */
+        .uv-bench-top {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.35rem;
+            width: 100%;
+        }
+        .uv-bench-top .badge {
+            margin-right: auto !important; /* Forces the pin/checkbox controls to align on the far right */
+        }
+
         /* Badge Colors */
         .badge.free { background-color: rgba(111, 181, 138, 0.12); color: var(--badge-free); border: 1px solid rgba(111, 181, 138, 0.3); }
         .badge.paid { background-color: rgba(201, 168, 76, 0.12); color: var(--badge-paid); border: 1px solid rgba(201, 168, 76, 0.3); }

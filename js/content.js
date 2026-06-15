@@ -416,3 +416,76 @@ export function initContent() {
   window.toggleCollapse = toggleCollapse;
   window.filterLibrary = filterLibrary;
 }
+/**
+ * DYNAMIC BENCHMARK PINNING & ALTERNATIVE DRAWER SYSTEM
+ */
+document.addEventListener('click', (e) => {
+    const pinBtn = e.target.closest('.bench-pin-btn');
+    if (!pinBtn) return;
+    
+    const card = pinBtn.closest('.uv-bench-item');
+    if (!card) return;
+    
+    const tabEl = card.closest('.content-section');
+    if (!tabEl) return;
+    
+    const benchId = card.getAttribute('data-bench-id');
+    const isCurrentlyPinned = card.getAttribute('data-pinned') === 'true';
+    const nextPinnedState = !isCurrentlyPinned;
+    
+    // Update state attribute
+    card.setAttribute('data-pinned', nextPinnedState ? 'true' : 'false');
+    
+    // Persist choice to localStorage
+    localStorage.setItem(`bench-pinned-${benchId}`, nextPinnedState ? 'true' : 'false');
+    
+    // Re-organize benchmarks dynamically
+    organizeBenchmarks(tabEl);
+    
+    e.preventDefault();
+    e.stopPropagation();
+});
+
+export function organizeBenchmarks(tabEl) {
+    if (!tabEl) return;
+    const mainGrid = tabEl.querySelector('.uv-benchmarks');
+    const altDrawer = tabEl.querySelector('.alt-bench-drawer');
+    const altList = tabEl.querySelector('.alt-bench-list');
+    if (!mainGrid || !altDrawer || !altList) return;
+    
+    const allCards = Array.from(tabEl.querySelectorAll('.uv-bench-item'));
+    let hasUnpinned = false;
+    
+    allCards.forEach(card => {
+        // Safe Check: Skip static cards like Method Audition that don't have pinning attributes
+        if (!card.hasAttribute('data-pinned')) return;
+        
+        const benchId = card.getAttribute('data-bench-id');
+        // Restore from localStorage if present
+        const savedState = localStorage.getItem(`bench-pinned-${benchId}`);
+        if (savedState !== null) {
+            card.setAttribute('data-pinned', savedState);
+        }
+        
+        const isPinned = card.getAttribute('data-pinned') === 'true';
+        if (isPinned) {
+            if (card.parentNode !== mainGrid) {
+                mainGrid.appendChild(card);
+            }
+        } else {
+            if (card.parentNode !== altList) {
+                altList.appendChild(card);
+            }
+            hasUnpinned = true;
+        }
+    });
+    
+    // Display the alternative drawer only if there are unpinned items
+    altDrawer.style.display = hasUnpinned ? 'block' : 'none';
+}
+
+// Hook into your custom tab-render/tab-changed pipeline
+document.addEventListener('tabChanged', (e) => {
+    const tabEl = document.getElementById(e.detail.tabId);
+    if (tabEl) organizeBenchmarks(tabEl);
+});
