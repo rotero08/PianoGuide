@@ -13,7 +13,7 @@ import { initMedia } from './media.js';
 // the matching file in /tabs. Nothing else needs to change.
 export const TAB_ORDER = [
   'home', 'how-to-use', 'methodology', 'blueprint',
-  'technique-1', 'technique-2', 'piano-technique',
+  'technique-1', 'technique-2',
   'pre-staff', 'level-0', 'level-1', 'level-2', 'level-3', 'level-4', 'level-5', 'level-6', 'level-7',
   'lead-sheets-l1', 'comp-patterns', 'jazz-resources', 'ear-training', 'reading-music',
   'rhythm-clefs', 'scales-chords', 'extra-resources',

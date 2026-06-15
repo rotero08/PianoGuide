@@ -885,7 +885,7 @@ html[data-theme="light"] details.res > summary:hover .res-name { color: #9a7420;
 .res-more p { font-size: 0.87rem; color: var(--text-muted); margin: 0 0 0.6rem; line-height: 1.6; }
 .res-dose { font-size: 0.8rem; background: rgba(var(--accent-blue-rgb),0.06); border-left: 2px solid var(--gold); border-radius: 0 5px 5px 0; padding: 0.5rem 0.7rem; margin-bottom: 0.6rem; color: var(--text-main); }
 .res-dose .rd-label { font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); }
-html[data-theme="light"] .res-dose .rd-label { color: #9a7420; }
+html[data-theme="light"] .res-dose .rd-label { color:#9a7420; }
 .res-open { display: inline-flex; align-items: center; gap: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.66rem; letter-spacing: 0.04em; font-weight: 500; color: var(--gold-light); background: rgba(var(--accent-blue-rgb),0.06); text-decoration: none; border: 1px solid rgba(var(--accent-blue-rgb),0.35); border-radius: 999px; padding: 0.5rem 1rem; transition: all 0.18s; cursor: pointer; }
 .res-open:hover { border-color: var(--gold); color: var(--gold); background: rgba(var(--accent-blue-rgb),0.13); }
 html[data-theme="light"] .res-open { color: #9a7420; }
