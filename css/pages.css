@@ -117,13 +117,15 @@
             font-family: 'Space Grotesk', sans-serif;
         }
         .alternatives-drawer summary::-webkit-details-marker { display: none; }
-        .alternatives-drawer summary::after {
+        
+        /* Direct Child Selector Fixes Accidental Arrows on Nested Resources */
+        .alternatives-drawer > summary::after {
             content: "▲";
             font-size: 0.7rem;
             transition: transform 0.2s ease;
             transform: rotate(180deg);
         }
-        .alternatives-drawer[open] summary::after {
+        .alternatives-drawer[open] > summary::after {
             transform: rotate(0deg);
         }
         .alternatives-content {

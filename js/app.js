@@ -135,6 +135,13 @@ function showTab(sectionId, { scroll = true, save = true } = {}) {
   closeSidebar();
   closeMobileSearch();
   refreshTOC();
+
+  // Unified synchronization point: updates the levels pinning state, progress values,
+  // and checkbox caches dynamically after routing is established.
+  if (typeof window.initializeTabState === 'function') {
+    window.initializeTabState();
+  }
+
   if (scroll) window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
@@ -154,7 +161,6 @@ function pickInitialTab() {
   return (saved && isTab(saved)) ? saved : DEFAULT_TAB;
 }
 
-// Read the current hash and make the page match it.
 // Read the current hash and make the page match it.
 function applyRoute({ scroll = true } = {}) {
   const r = parseHash();
@@ -242,3 +248,393 @@ ready(async () => {
   initRoute();
   initScrollSpy();
 });
+
+// Global Piano Guide Controller & Dynamic Interaction Engine
+(function() {
+    // 1. Event Delegation for Checkbox Changes (main checklist & benchmark list checkboxes)
+    document.addEventListener('change', function(e) {
+        if (e.target && e.target.type === 'checkbox') {
+            const cb = e.target;
+            localStorage.setItem(cb.id, cb.checked);
+            
+            // Highlight row if completed
+            const row = cb.closest('.obj-row, .uv-checkbox-row, .uv-bench-item');
+            if (row) {
+                if (cb.checked) {
+                    row.classList.add('completed');
+                } else {
+                    row.classList.remove('completed');
+                }
+            }
+
+            // Update level progress automatically
+            const levelId = cb.getAttribute('data-level');
+            if (levelId) {
+                updateProgress(levelId);
+            }
+        }
+    });
+
+    // 2. Event Delegation for Done Toggles on Resources
+    document.addEventListener('click', function(e) {
+        const toggle = e.target.closest('.res-done-toggle');
+        if (toggle) {
+            e.stopPropagation();
+            e.preventDefault();
+            const res = toggle.closest('.res');
+            if (res) {
+                const resId = res.getAttribute('data-res-id');
+                const isDone = !res.classList.contains('res-done');
+                res.classList.toggle('res-done', isDone);
+                localStorage.setItem(`cp-res-done-${resId}`, isDone);
+            }
+        }
+    });
+
+    // 3. Setup Observers & Listeners to Capture Tab Injections
+    const mount = document.getElementById('tab-mount');
+    if (mount) {
+        const observer = new MutationObserver(() => initializeTabState());
+        observer.observe(mount, { childList: true });
+    }
+
+    window.addEventListener('DOMContentLoaded', initializeTabState);
+    window.addEventListener('hashchange', initializeTabState);
+
+    // Make initializeTabState globally accessible so it can be safely called during route triggers
+    window.initializeTabState = initializeTabState;
+
+    function initializeTabState() {
+        const activeTabSection = document.querySelector('.content-section.active');
+        if (!activeTabSection) return;
+        const tabId = activeTabSection.id;
+
+        // Restore Checkbox States
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        const levelsToUpdate = new Set();
+        checkboxes.forEach(cb => {
+            const saved = localStorage.getItem(cb.id);
+            if (saved !== null) {
+                cb.checked = saved === 'true';
+                const row = cb.closest('.obj-row, .uv-checkbox-row, .uv-bench-item');
+                if (row) {
+                    if (cb.checked) row.classList.add('completed');
+                    else row.classList.remove('completed');
+                }
+            }
+            const levelId = cb.getAttribute('data-level');
+            if (levelId) levelsToUpdate.add(levelId);
+        });
+
+        // Restore Resource Done States
+        document.querySelectorAll('.res').forEach(res => {
+            const resId = res.getAttribute('data-res-id');
+            if (resId) {
+                const isDone = localStorage.getItem(`cp-res-done-${resId}`) === 'true';
+                res.classList.toggle('res-done', isDone);
+            }
+        });
+
+        // Update active progress percentages
+        levelsToUpdate.forEach(levelId => updateProgress(levelId));
+
+        // Render and Align Pinning Mechanics
+        initializePinning(tabId, activeTabSection);
+        initializeBenchmarkPinning(tabId, activeTabSection);
+    }
+
+    function updateProgress(levelId) {
+        const checkboxes = document.querySelectorAll(`input[data-level="${levelId}"]`);
+        if (checkboxes.length === 0) return;
+        
+        let checkedCount = 0;
+        checkboxes.forEach(cb => {
+            if (cb.checked) checkedCount++;
+        });
+
+        const pct = Math.round((checkedCount / checkboxes.length) * 100);
+
+        // Update elements in active viewport
+        const pctText = document.getElementById(`percent-${levelId}`);
+        const progressFill = document.getElementById(`progress-${levelId}`);
+        
+        if (pctText) pctText.textContent = `${pct}%`;
+        if (progressFill) progressFill.style.width = `${pct}%`;
+
+        localStorage.setItem(`progress-pct-${levelId}`, pct);
+        
+        // Live updates for home/intro navigation dashboards
+        renderCurriculumOverview();
+    }
+
+    // Pinning and Swapping Engine
+    function initializePinning(tabId, activeTabSection) {
+        // Strictly target only resources belonging to the reading pillar (which holds the alternatives drawer)
+        const readingPillar = activeTabSection.querySelector('.pillar.reading');
+        if (!readingPillar) return;
+
+        const mainResList = readingPillar.querySelector('.res-list');
+        const altDrawer = activeTabSection.querySelector('.alternatives-drawer');
+        if (!mainResList || !altDrawer) return;
+
+        const altResList = altDrawer.querySelector('.res-list');
+        if (!altResList) return;
+
+        const savedKey = `cp-pinned-res-${tabId}`;
+        let pinnedIds = JSON.parse(localStorage.getItem(savedKey));
+        const allRes = Array.from(readingPillar.querySelectorAll('.res'));
+
+        // Cache original parent list containers to prevent different pillar items
+        // from crossing over or getting emptied [1.4].
+        allRes.forEach(res => {
+            if (!res._originalParent) {
+                const parent = res.parentElement;
+                if (parent && !parent.closest('.alternatives-drawer')) {
+                    res._originalParent = parent;
+                } else {
+                    // Fallback to main reading list container if it was initially inside alternatives drawer [1.4]
+                    res._originalParent = mainResList;
+                }
+            }
+        });
+
+        // Establish default pinning parameters if none exist in localStorage
+        if (!pinnedIds) {
+            pinnedIds = allRes
+                .filter(el => el.getAttribute('data-pinned') === 'true')
+                .map(el => el.getAttribute('data-res-id'));
+            localStorage.setItem(savedKey, JSON.stringify(pinnedIds));
+        }
+
+        allRes.forEach(res => {
+            const resId = res.getAttribute('data-res-id');
+            const isPinned = pinnedIds.includes(resId);
+            res.setAttribute('data-pinned', isPinned ? 'true' : 'false');
+
+            const summary = res.querySelector('summary');
+            if (summary && !summary.querySelector('.res-pin-btn')) {
+                const pinBtn = document.createElement('button');
+                pinBtn.type = 'button';
+                pinBtn.className = 'res-pin-btn';
+                pinBtn.title = 'Pin or unpin this resource';
+                
+                // Thumbtack SVG icon [1.4]
+                pinBtn.innerHTML = `
+                    <svg class="pin-icon-on" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true" style="pointer-events: none;">
+                        <line x1="12" y1="17" x2="12" y2="22"></line>
+                        <path d="M5 17h14v-1.76a2 2 0 0 0-.44-1.24l-2.33-2.71A1 1 0 0 1 15.5 10.5V5a1 1 0 0 0-1-1h-5a1 1 0 0 0-1 1v5.5a1 1 0 0 1-.73.74l-2.33 2.71a2 2 0 0 0-.44 1.24V17z"></path>
+                    </svg>
+                    <svg class="pin-icon-off" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true" style="pointer-events: none; display: none;">
+                        <line x1="12" y1="17" x2="12" y2="22"></line>
+                        <path d="M5 17h14v-1.76a2 2 0 0 0-.44-1.24l-2.33-2.71A1 1 0 0 1 15.5 10.5V5a1 1 0 0 0-1-1h-5a1 1 0 0 0-1 1v5.5a1 1 0 0 1-.73.74l-2.33 2.71a2 2 0 0 0-.44 1.24V17z"></path>
+                        <line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" stroke-width="2.5"></line>
+                    </svg>
+                `;
+
+                const doneToggle = summary.querySelector('.res-done-toggle');
+                if (doneToggle) {
+                    summary.insertBefore(pinBtn, doneToggle);
+                } else {
+                    summary.appendChild(pinBtn);
+                }
+
+                pinBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    togglePin(tabId, resId, activeTabSection);
+                });
+            }
+
+            const pinBtn = res.querySelector('.res-pin-btn');
+            if (pinBtn) {
+                pinBtn.title = isPinned ? 'Unpin from main list' : 'Pin to main list';
+            }
+
+            // Physically move elements into the correct list container
+            if (isPinned) {
+                if (res._originalParent && res.parentElement !== res._originalParent) {
+                    res._originalParent.appendChild(res);
+                }
+            } else {
+                if (res.parentElement !== altResList) {
+                    altResList.insertBefore(res, altResList.firstChild);
+                }
+            }
+        });
+
+        // Hide alternatives drawer if there are no unpinned items
+        altDrawer.style.display = altResList.children.length === 0 ? 'none' : 'block';
+    }
+
+    function togglePin(tabId, resId, activeTabSection) {
+        const savedKey = `cp-pinned-res-${tabId}`;
+        let pinnedIds = JSON.parse(localStorage.getItem(savedKey)) || [];
+        const index = pinnedIds.indexOf(resId);
+        
+        if (index > -1) {
+            pinnedIds.splice(index, 1); // Unpin and move to alternatives
+        } else {
+            pinnedIds.push(resId); // Pin and restore to main list
+        }
+        
+        localStorage.setItem(savedKey, JSON.stringify(pinnedIds));
+        initializePinning(tabId, activeTabSection);
+    }
+
+    function initializeBenchmarkPinning(tabId, activeTabSection) {
+        const mainBenchList = activeTabSection.querySelector('.uv-benchmarks');
+        if (!mainBenchList) return;
+
+        const allBench = Array.from(mainBenchList.querySelectorAll('.uv-bench-item'));
+        
+        // Benchmark pinning only triggers if alternatives options actually exist (total pieces > 1) [1.4]
+        if (allBench.length <= 1) return;
+
+        let altBenchDrawer = activeTabSection.querySelector('.alt-bench-drawer');
+        if (!altBenchDrawer) {
+            altBenchDrawer = document.createElement('details');
+            altBenchDrawer.className = 'alternatives-drawer alt-bench-drawer';
+            altBenchDrawer.innerHTML = `
+                <summary>Alternative Era Benchmark Pieces</summary>
+                <div class="alternatives-content">
+                    <div class="uv-benchmarks alt-bench-list"></div>
+                </div>
+            `;
+            mainBenchList.parentElement.appendChild(altBenchDrawer);
+        }
+
+        const altBenchList = altBenchDrawer.querySelector('.alt-bench-list');
+        const savedBenchPinnedKey = `cp-pinned-bench-${tabId}`;
+        let pinnedBenchIds = JSON.parse(localStorage.getItem(savedBenchPinnedKey));
+
+        if (!pinnedBenchIds) {
+            pinnedBenchIds = allBench.map(el => el.getAttribute('data-bench-id'));
+            localStorage.setItem(savedBenchPinnedKey, JSON.stringify(pinnedBenchIds));
+        }
+
+        allBench.forEach(bench => {
+            const benchId = bench.getAttribute('data-bench-id');
+            const isPinned = pinnedBenchIds.includes(benchId);
+            bench.setAttribute('data-pinned', isPinned ? 'true' : 'false');
+
+            let pinBtn = bench.querySelector('.bench-pin-btn');
+            if (!pinBtn) {
+                const topRow = bench.querySelector('.uv-bench-top');
+                if (topRow) {
+                    pinBtn = document.createElement('button');
+                    pinBtn.className = 'bench-pin-btn';
+                    
+                    // Embed thumbtack SVG alongside cross-out unpin hover states [1.4]
+                    pinBtn.innerHTML = `
+                        <svg class="pin-icon-on" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true" style="pointer-events: none;">
+                            <line x1="12" y1="17" x2="12" y2="22"></line>
+                            <path d="M5 17h14v-1.76a2 2 0 0 0-.44-1.24l-2.33-2.71A1 1 0 0 1 15.5 10.5V5a1 1 0 0 0-1-1h-5a1 1 0 0 0-1 1v5.5a1 1 0 0 1-.73.74l-2.33 2.71a2 2 0 0 0-.44 1.24V17z"></path>
+                        </svg>
+                        <svg class="pin-icon-off" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true" style="pointer-events: none; display: none;">
+                            <line x1="12" y1="17" x2="12" y2="22"></line>
+                            <path d="M5 17h14v-1.76a2 2 0 0 0-.44-1.24l-2.33-2.71A1 1 0 0 1 15.5 10.5V5a1 1 0 0 0-1-1h-5a1 1 0 0 0-1 1v5.5a1 1 0 0 1-.73.74l-2.33 2.71a2 2 0 0 0-.44 1.24V17z"></path>
+                            <line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" stroke-width="2.5"></line>
+                        </svg>
+                    `;
+
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.className = 'bench-done-checkbox';
+                    checkbox.id = `check-bench-${benchId}`;
+
+                    const doneKey = `cp-bench-done-${benchId}`;
+                    checkbox.checked = localStorage.getItem(doneKey) === 'true';
+                    checkbox.addEventListener('change', () => {
+                        localStorage.setItem(doneKey, checkbox.checked);
+                        if (checkbox.checked) {
+                            bench.classList.add('completed');
+                        } else {
+                            bench.classList.remove('completed');
+                        }
+                    });
+                    if (checkbox.checked) bench.classList.add('completed');
+
+                    const controls = document.createElement('div');
+                    controls.className = 'bench-controls';
+                    controls.appendChild(pinBtn);
+                    controls.appendChild(checkbox);
+                    topRow.appendChild(controls);
+
+                    pinBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        toggleBenchPin(benchId, activeTabSection, mainBenchList);
+                    });
+                }
+            }
+
+            const currentPinBtn = bench.querySelector('.bench-pin-btn');
+            if (currentPinBtn) {
+                currentPinBtn.title = isPinned ? 'Unpin from main list' : 'Pin to main list';
+            }
+
+            if (isPinned) {
+                if (bench.parentElement !== mainBenchList) {
+                    mainBenchList.appendChild(bench);
+                }
+            } else {
+                if (bench.parentElement !== altBenchList) {
+                    altBenchList.appendChild(bench);
+                }
+            }
+        });
+
+        altBenchDrawer.style.display = altBenchList.children.length === 0 ? 'none' : 'block';
+    }
+
+    function toggleBenchPin(benchId, activeTabSection, mainBenchList) {
+        const savedBenchPinnedKey = `cp-pinned-bench-${activeTabSection.id}`;
+        let pinnedBenchIds = JSON.parse(localStorage.getItem(savedBenchPinnedKey)) || [];
+        const index = pinnedBenchIds.indexOf(benchId);
+
+        if (index > -1) {
+            pinnedBenchIds.splice(index, 1);
+        } else {
+            pinnedBenchIds.push(benchId);
+        }
+
+        localStorage.setItem(savedBenchPinnedKey, JSON.stringify(pinnedBenchIds));
+        initializeBenchmarkPinning(activeTabSection.id, activeTabSection);
+    }
+
+    // Dynamic Curriculum Progress Grid Renderer
+    function renderCurriculumOverview() {
+        const overviewContainer = document.getElementById('curriculumOverview');
+        if (!overviewContainer) return;
+
+        const levels = [
+            { id: 'tech1', name: 'Technique 1: Posture & Arm Weight' },
+            { id: 'tech2', name: 'Technique 2: Hand Shapes' },
+            { id: 'prestaff', name: 'Pre-Staff: Arm Weight & Ear' },
+            { id: 'lvl0', name: 'Level 0: Linear Reading' },
+            { id: 'lvl1', name: 'Level 1: Intervals & Chords' },
+            { id: 'lvl2', name: 'Level 2: Voices & Geometry' },
+            { id: 'lvl3', name: 'Level 3: Positional Shifting' },
+            { id: 'lvl4', name: 'Level 4: Inversions & Speed' },
+            { id: 'lvl5', name: 'Level 5: Early Polyphony' },
+            { id: 'lvl6', name: 'Level 6: Phrasing & Counterpoint' },
+            { id: 'lvl7', name: 'Level 7: Polytonal Independence' }
+        ];
+
+        let html = '';
+        levels.forEach(lvl => {
+            const pct = localStorage.getItem(`progress-pct-${lvl.id}`) || 0;
+            html += `
+                <div class="po-row" onclick="switchSection('${lvl.id}')">
+                    <div class="po-top">
+                        <span class="po-name">${lvl.name}</span>
+                        <span class="po-pct">${pct}%</span>
+                    </div>
+                    <div class="po-bar-bg">
+                        <div class="po-bar-fg" style="width: ${pct}%"></div>
+                    </div>
+                </div>
+            `;
+        });
+        overviewContainer.innerHTML = html;
+    }
+})();

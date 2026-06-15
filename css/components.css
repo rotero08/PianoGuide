@@ -1059,3 +1059,320 @@ details summary:focus-visible {
     outline: 3px solid var(--gold) !important;
     outline-offset: 3px !important;
 }
+/* Fix stretched tag badges in flex containers */
+.badge, .res-badge {
+    align-self: flex-start !important;
+    width: max-content !important;
+}
+
+/* Alternatives Box styling: Blend into the card background smoothly */
+.alternatives-content {
+    background: transparent !important;
+    padding: 0.6rem 1rem !important;
+}
+.alternatives-content .res {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    border-radius: 0 !important;
+    padding: 0.4rem 0 !important;
+}
+.alternatives-content .res:last-child {
+    border-bottom: none !important;
+}
+
+/* perfectly integrated Pin/Unpin controls */
+.res-pin-btn, .bench-pin-btn {
+    background: none !important;
+    border: none !important;
+    color: var(--text-faint) !important;
+    cursor: pointer !important;
+    padding: 4px !important;
+    margin-left: 0.6rem !important;
+    margin-right: 0.2rem !important;
+    border-radius: 4px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: color 0.15s, background-color 0.15s !important;
+    flex-shrink: 0 !important;
+}
+.res-pin-btn:hover, .bench-pin-btn:hover {
+    color: var(--accent-blue) !important;
+    background-color: rgba(var(--accent-blue-rgb), 0.1) !important;
+}
+.res[data-pinned="true"] .res-pin-btn, 
+.uv-bench-item[data-pinned="true"] .bench-pin-btn {
+    color: var(--gold) !important;
+}
+html[data-theme="light"] .res[data-pinned="true"] .res-pin-btn,
+html[data-theme="light"] .uv-bench-item[data-pinned="true"] .bench-pin-btn {
+    color: #9a7420 !important;
+}
+
+/* Beautiful, centered circular checkboxes */
+.obj-row input[type="checkbox"], 
+.uv-checkbox-row input[type="checkbox"],
+.bench-done-checkbox {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    margin: 0 !important;
+    width: 20px !important;
+    height: 20px !important;
+    border: 2px solid var(--text-faint) !important;
+    border-radius: 50% !important; /* Forces perfect circles */
+    background: var(--bg-mid) !important;
+    flex-shrink: 0 !important;
+    cursor: pointer !important;
+    position: relative !important;
+    transition: all 0.15s !important;
+    align-self: center !important;
+}
+.obj-row input[type="checkbox"]:hover, 
+.uv-checkbox-row input[type="checkbox"]:hover,
+.bench-done-checkbox:hover {
+    border-color: var(--gold) !important;
+}
+.obj-row input[type="checkbox"]:checked, 
+.uv-checkbox-row input[type="checkbox"]:checked,
+.bench-done-checkbox:checked {
+    background: var(--gold) !important;
+    border-color: var(--gold) !important;
+}
+.obj-row input[type="checkbox"]:checked::after, 
+.uv-checkbox-row input[type="checkbox"]:checked::after,
+.bench-done-checkbox:checked::after {
+    content: "" !important;
+    position: absolute !important;
+    left: 5px !important;
+    top: 2px !important;
+    width: 4.5px !important;
+    height: 9px !important;
+    border: solid var(--on-accent) !important;
+    border-width: 0 2.5px 2.5px 0 !important;
+    transform: rotate(45deg) !important;
+}
+
+/* Align checkmark text properly */
+.uv-checkbox-row {
+    display: flex !important;
+    align-items: center !important; /* Perfect vertical centering */
+    gap: 0.85rem !important;
+    margin-bottom: 0.8rem !important;
+}
+.uv-checkbox-row label {
+    margin: 0 !important;
+    cursor: pointer !important;
+    font-size: 0.95rem !important;
+    line-height: 1.4 !important;
+}
+
+/* Readability and contrast enhancements for the Primary Audition Gate */
+.uv-bench-item {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 8px !important;
+    padding: 1.1rem !important;
+    position: relative !important;
+    transition: transform 0.2s, border-color 0.2s !important;
+}
+.uv-bench-item.completed {
+    opacity: 0.6 !important;
+    border-color: rgba(201, 168, 76, 0.25) !important;
+}
+.uv-bench-item.completed .uv-bench-title {
+    text-decoration: line-through !important;
+}
+.uv-bench-title {
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+    color: var(--text-main) !important; /* Maximum high contrast */
+    margin: 0.4rem 0 !important;
+}
+.uv-bench-item p {
+    font-size: 0.92rem !important;
+    color: var(--text-muted) !important;
+    line-height: 1.5 !important;
+    margin-bottom: 0.8rem !important;
+}
+.bench-controls {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.6rem !important;
+}
+ /* ─── SCOPE CHEVRON ON ALTERNATIVES DRAWERS ─── */
+.alternatives-drawer > summary::after {
+    content: "▲";
+    font-size: 0.7rem;
+    transition: transform 0.2s ease;
+    transform: rotate(180deg);
+}
+.alternatives-drawer[open] > summary::after {
+    transform: rotate(0deg);
+}
+
+/* Remove chevrons or triangles from nested summaries inside alternatives drawers */
+.alternatives-content details.res summary::after,
+.alternatives-content details.res summary::-webkit-details-marker {
+    content: none !important;
+    display: none !important;
+}
+
+/* Clean continuous background alignment for Alternatives Box */
+.alternatives-drawer {
+    border-color: var(--border-color) !important;
+    background: var(--bg-card) !important;
+}
+.alternatives-content {
+    border-top: 1px solid var(--border-color) !important;
+    background: transparent !important;
+    padding: 0.8rem 1rem !important;
+}
+.alternatives-content .res {
+    border-bottom: 1px solid var(--border-color) !important;
+    padding: 0.5rem 0 !important;
+}
+.alternatives-content .res:last-child {
+    border-bottom: none !important;
+}
+
+/* ─── BADGES FLEX ALIGNMENT FIX ─── */
+.badge, .res-badge {
+    align-self: flex-start !important;
+    width: max-content !important;
+    display: inline-block !important;
+}
+
+/* ─── CUSTOM CIRCULAR CHECKBOXES ─── */
+.widget-checkbox, .bench-done-checkbox {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    margin: 0 !important;
+    width: 20px !important;
+    height: 20px !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: 50% !important; /* Circular Checkboxes */
+    background: transparent !important;
+    flex-shrink: 0 !important;
+    cursor: pointer !important;
+    position: relative !important;
+    transition: all 0.15s var(--ease-out) !important;
+}
+.widget-checkbox:hover, .bench-done-checkbox:hover {
+    border-color: var(--accent-blue) !important;
+}
+.widget-checkbox:checked, .bench-done-checkbox:checked {
+    background: var(--accent-blue) !important;
+    border-color: var(--accent-blue) !important;
+}
+.widget-checkbox:checked::after, .bench-done-checkbox:checked::after {
+    content: "" !important;
+    position: absolute !important;
+    left: 6px !important;
+    top: 2px !important;
+    width: 4px !important;
+    height: 9px !important;
+    border: solid var(--on-accent) !important;
+    border-width: 0 2px 2px 0 !important;
+    transform: rotate(45deg) !important;
+}
+
+/* Center alignments of checkmarks with titles */
+.obj-row, .uv-checkbox-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.85rem !important;
+    margin-bottom: 0.85rem !important;
+}
+.obj-row label, .uv-checkbox-row label {
+    margin: 0 !important;
+    cursor: pointer !important;
+    font-size: 0.95rem !important;
+    line-height: 1.45 !important;
+}
+
+/* ─── DETAILED COLLAPSIBLE STYLING FOR SIGHT-READING ─── */
+.bench-how {
+    background: linear-gradient(135deg, rgba(var(--accent-blue-rgb), 0.05) 0%, rgba(19, 27, 46, 0.4) 100%) !important;
+    border: 1px dashed rgba(var(--accent-blue-rgb), 0.3) !important;
+    border-radius: 8px !important;
+    padding: 1.25rem 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+}
+.bench-how summary {
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 0.95rem !important;
+    color: var(--accent-blue) !important;
+    cursor: pointer !important;
+    user-select: none !important;
+    list-style: none !important;
+}
+.bench-how summary::-webkit-details-marker { display: none !important; }
+.bench-how-content {
+    margin-top: 1rem !important;
+}
+.bench-how-content p {
+    font-size: 0.9rem !important;
+    color: var(--text-muted) !important;
+    line-height: 1.6 !important;
+    margin-bottom: 0.8rem !important;
+}
+.bench-how-content ol {
+    margin-left: 1.25rem !important;
+    margin-bottom: 0.8rem !important;
+}
+.bench-how-content li {
+    font-size: 0.88rem !important;
+    color: var(--text-muted) !important;
+    margin-bottom: 0.4rem !important;
+    line-height: 1.5 !important;
+}
+
+/* ─── PINNING SYSTEM CONTROLS ─── */
+.res-pin-btn, .bench-pin-btn {
+    background: none !important;
+    border: none !important;
+    color: var(--text-faint) !important;
+    cursor: pointer !important;
+    padding: 4px !important;
+    margin-left: auto !important;
+    border-radius: 4px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: color 0.15s, background-color 0.15s !important;
+    flex-shrink: 0 !important;
+}
+.res-pin-btn:hover, .bench-pin-btn:hover {
+    color: var(--accent-blue) !important;
+    background-color: rgba(var(--accent-blue-rgb), 0.1) !important;
+}
+.res[data-pinned="true"] .res-pin-btn, .uv-bench-item[data-pinned="true"] .bench-pin-btn {
+    color: var(--accent-blue) !important;
+}
+html[data-theme="light"] .res[data-pinned="true"] .res-pin-btn,
+html[data-theme="light"] .uv-bench-item[data-pinned="true"] .bench-pin-btn {
+    color: #9a7420 !important;
+}
+
+.bench-controls {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+}
+/* ─── PINNING SYSTEM HOVER AND ICON SWAP STATES ─── */
+.res-pin-btn .pin-icon-off,
+.bench-pin-btn .pin-icon-off {
+    display: none !important;
+}
+
+/* When pinned and hovered, swap to the pin-off (slashed) icon */
+.res[data-pinned="true"] .res-pin-btn:hover .pin-icon-on,
+.uv-bench-item[data-pinned="true"] .bench-pin-btn:hover .pin-icon-on {
+    display: none !important;
+}
+.res[data-pinned="true"] .res-pin-btn:hover .pin-icon-off,
+.uv-bench-item[data-pinned="true"] .bench-pin-btn:hover .pin-icon-off {
+    display: block !important;
+}
