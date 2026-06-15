@@ -10,8 +10,9 @@ import { LS, slugify, escHtml, routeUrl } from './util.js';
 
 /* ============================ progress ============================ */
 
-const LEVELS = ['prestaff', 'lvl0', 'lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'leadsheets'];
+const LEVELS = ['tech1', 'tech2', 'prestaff', 'lvl0', 'lvl1', 'lvl2', 'lvl3', 'lvl4', 'lvl5', 'lvl6', 'lvl7', 'leadsheets'];
 const OVERVIEW_LEVELS = [
+  ['tech1', 'Technique 1 \u00b7 Body', 'technique-1'], ['tech2', 'Technique 2 \u00b7 Hands', 'technique-2'],
   ['prestaff', 'Pre-Staff', 'pre-staff'], ['lvl0', 'Level 0 \u00b7 Linear', 'level-0'],
   ['lvl1', 'Level 1 \u00b7 Intervals', 'level-1'], ['lvl2', 'Level 2 \u00b7 Voices', 'level-2'],
   ['lvl3', 'Level 3 \u00b7 Shifting', 'level-3'], ['lvl4', 'Level 4 \u00b7 Inversions', 'level-4'],

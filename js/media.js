@@ -5,9 +5,23 @@
 
 /* ============================== audio ============================= */
 
-let ctx;
+let ctx, master, limiter;
 function getCtx() {
-  if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+  if (!ctx) {
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    // One shared output chain for EVERY note: master gain -> limiter -> speakers.
+    // This keeps the overall level steady and stops overlapping notes from clipping.
+    limiter = ctx.createDynamicsCompressor();
+    limiter.threshold.value = -10;
+    limiter.knee.value = 12;
+    limiter.ratio.value = 14;
+    limiter.attack.value = 0.003;
+    limiter.release.value = 0.25;
+    master = ctx.createGain();
+    master.gain.value = 0.5;
+    master.connect(limiter);
+    limiter.connect(ctx.destination);
+  }
   if (ctx.state === 'suspended') ctx.resume();
   return ctx;
 }
@@ -16,18 +30,12 @@ const SOUNDFONT_BASE = 'https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/a
 const sampleBuffers = {};
 let loadingStarted = false;
 
-// Preload core notes to prevent network latency on initial click
-function prefetchNotes() {
-  if (loadingStarted) return;
-  loadingStarted = true;
-  const initialNotes = ['C4', 'E4', 'G4', 'C5', 'E5', 'G5'];
-  initialNotes.forEach(note => loadNoteBuffer(note));
-}
+// Samples are no longer used (the synth is the single, consistent voice), so
+// there is nothing to prefetch. Kept as a no-op so callers stay unchanged.
+function prefetchNotes() { /* intentionally empty */ }
 
 async function loadNoteBuffer(noteName) {
   if (sampleBuffers[noteName]) return sampleBuffers[noteName];
-  if (sampleBuffers[noteName] === 'loading') return null;
-
   sampleBuffers[noteName] = 'loading';
   try {
     const url = `${SOUNDFONT_BASE}${noteName}.mp3`;
@@ -67,7 +75,7 @@ function freqToNoteName(freq) {
   return closestNote;
 }
 
-// Stretched Inharmonic overtones + Slight Unison Detuning (Synthesizer Fallback)
+// Stretched Inharmonic overtones + Slight Unison Detuning (Realtime Fallback Synthesizer)
 function playSynthesizedNote(ac, freq, duration, vol, now) {
   // Voice Master Gain Node
   const noteGain = ac.createGain();
@@ -122,62 +130,29 @@ function playSynthesizedNote(ac, freq, duration, vol, now) {
   strikeGain.gain.setValueAtTime(0, now);
   strikeGain.gain.linearRampToValueAtTime(0.3, now + 0.001);
   strikeGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.038);
-  
+
   strikeOsc.connect(strikeGain);
   strikeGain.connect(filter);
   strikeOsc.start(now);
   strikeOsc.stop(now + 0.05);
 
-  // Soundboard Resonance Feedback Room Loop
-  const delayNode = ac.createDelay();
-  const feedbackNode = ac.createGain();
-  delayNode.delayTime.value = 0.055;
-  feedbackNode.gain.value = 0.18;
-
+  // Filter -> per-note envelope -> shared master bus. No self-feedback delay
+  // (the old feedback loop never fully died out and made repeated notes pile up
+  // louder and louder, which is what made the volume feel "all over the place").
   filter.connect(noteGain);
-  noteGain.connect(delayNode);
-  delayNode.connect(feedbackNode);
-  feedbackNode.connect(delayNode);
-
-  noteGain.connect(ac.destination);
-  delayNode.connect(ac.destination);
+  noteGain.connect(master);
 }
 
-async function playNote(freq, duration = 1.2, vol = 0.26) {
+function playNote(freq, duration = 1.2, vol = 0.26) {
   const ac = getCtx();
   const now = ac.currentTime;
-  const noteName = freqToNoteName(freq);
+  // Always use the built-in synth so every key sounds identical and never depends
+  // on an external sample CDN (which loaded unevenly and made notes jump in volume).
+  playSynthesizedNote(ac, freq, duration, vol, now);
+}
 
-  // Attempt to fetch and play real pre-recorded acoustic piano samples
-  const buffer = await loadNoteBuffer(noteName);
-
-  if (buffer && buffer !== 'loading') {
-    const source = ac.createBufferSource();
-    const gainNode = ac.createGain();
-    
-    source.buffer = buffer;
-    gainNode.gain.setValueAtTime(0, now);
-    gainNode.gain.linearRampToValueAtTime(vol * 1.5, now + 0.005);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration);
-    
-    const delayNode = ac.createDelay();
-    const feedbackNode = ac.createGain();
-    delayNode.delayTime.value = 0.055;
-    feedbackNode.gain.value = 0.18;
-    
-    source.connect(gainNode);
-    gainNode.connect(delayNode);
-    delayNode.connect(feedbackNode);
-    feedbackNode.connect(delayNode);
-    
-    gainNode.connect(ac.destination);
-    delayNode.connect(ac.destination);
-    
-    source.start(now);
-  } else {
-    // Graceful realtime fallback synthesizer if buffers are still decoding
-    playSynthesizedNote(ac, freq, duration, vol, now);
-  }
+function playChord(freqs, duration = 1.6) {
+  freqs.forEach((f, i) => setTimeout(() => playNote(f, duration, 0.2), i * 12));
 }
 
 /* ============================ keyboard =========================== */

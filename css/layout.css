@@ -6,6 +6,8 @@
             display: flex;
             flex-direction: column;
             position: fixed;
+            top: 0;
+            left: 0;
             height: 100vh;
             overflow-y: auto;
             z-index: 100;
@@ -17,11 +19,14 @@
         }
 
         .sidebar-header {
-            padding: 1.5rem 1.5rem 0.5rem 1.5rem;
             border-bottom: 1px solid var(--border-color);
+            box-sizing: border-box;
+            flex-shrink: 0; /* Never let the long nav squash the header below its set height */
+            padding: 1.5rem 1.5rem 0.5rem 1.5rem; /* Fallback for mobile views */
         }
 
         .sidebar-header h2 {
+            margin: 0; /* Reset default browser margins to enforce exact height alignment */
             font-size: 1.3rem;
             font-weight: 800;
             color: var(--accent-blue);
@@ -74,7 +79,7 @@
         main {
             margin-left: 320px;
             flex-grow: 1;
-            padding: 3rem 0;
+            padding: 0 0 3rem 0; /* Reset top padding to let topbar sit flush at the top */
             max-width: none;
         }
 
@@ -98,7 +103,11 @@
         }
         @media (min-width: 901px) {
             .sidebar-header {
-                display: block;
+                display: flex !important;
+                flex-direction: column;
+                justify-content: center;
+                height: 74px; /* Matches the topbar height so both divider lines align */
+                padding: 0 1.5rem;
             }
             aside {
                 padding-top: 0;

@@ -12,10 +12,11 @@ import { initMedia } from './media.js';
 // Single source of truth. To add / remove / reorder a tab, edit this list and
 // the matching file in /tabs. Nothing else needs to change.
 export const TAB_ORDER = [
-  'home', 'how-to-use', 'methodology', 'blueprint', 'pre-staff',
-  'level-0', 'level-1', 'level-2', 'level-3', 'level-4', 'level-5', 'level-6', 'level-7',
+  'home', 'how-to-use', 'methodology', 'blueprint',
+  'technique-1', 'technique-2', 'piano-technique',
+  'pre-staff', 'level-0', 'level-1', 'level-2', 'level-3', 'level-4', 'level-5', 'level-6', 'level-7',
   'lead-sheets-l1', 'comp-patterns', 'jazz-resources', 'ear-training', 'reading-music',
-  'decoding', 'rhythm-clefs', 'scales-chords', 'piano-technique', 'extra-resources',
+  'rhythm-clefs', 'scales-chords', 'extra-resources',
   'references', 'about-guide', 'youtube'
 ];
 const DEFAULT_TAB = 'home';
