@@ -1,0 +1,283 @@
+---
+// src/components/Resource.astro
+import Icon from './Icon.astro';
+import { getCitationData } from '../utils/citationScanner';
+
+const { numToSlug, slugToNumber } = await getCitationData();
+
+interface Badge {
+  text: string;
+  type: string;
+  tip: string;
+}
+
+/**
+ * Props for the Resource component.
+ */
+interface Props {
+  /**
+   * The primary header title of the resource item.
+   */
+  title: string;
+  /**
+   * Destination URL link opened when the resource's action CTA button is clicked.
+   */
+  link: string;
+  /**
+   * Custom text displayed inside the link anchor CTA button.
+   * @default "Open ↗"
+   */
+  buttonText?: string;
+  /**
+   * If true, applies a 4px left decorative accent border line.
+   * @default false
+   */
+  borderLeft?: boolean;
+  /**
+   * Accent border theme preset color applied when `borderLeft` is active.
+   * @default "rose"
+   */
+  accentColor?: 'gold' | 'rose';
+  /**
+   * Optional identifier name of an icon (from the `Icon.astro` lookup directory) to display next to the title.
+   */
+  icon?: string;
+  /**
+   * Secondary subtitle stats string (e.g., subscriber numbers like "~826K") aligned to the top-right corner.
+   */
+  subs?: string;
+  /**
+   * Descriptive uppercase focus tag details line (e.g., "Classical · performance") displayed above the body.
+   */
+  focus?: string;
+  /**
+   * Space-separated metadata category lookup strings mapping to stylized status badges (e.g., "theory free paid").
+   */
+  tags?: string;
+}
+
+const {
+  title,
+  link,
+  buttonText = "Open ↗",
+  borderLeft = false,
+  accentColor = "rose",
+  icon,
+  subs,
+  focus,
+  tags = ""
+} = Astro.props;
+
+const TAG_DICTIONARY: Record<string, { text: string; type: string; tip: string }> = {
+  acoustics: { 
+    text: "Acoustics & DSP", 
+    type: "accent", 
+    tip: "Acoustics, digital signal processing, and physical modeling resources." 
+  },
+  pedagogy: { 
+    text: "Piano Manuals", 
+    type: "warning", 
+    tip: "Core piano manuals, methods, and anatomical approach books." 
+  },
+  theory: { 
+    text: "Theory & Cognition", 
+    type: "theory", 
+    tip: "Music theory, harmonic analyses, and cognitive research." 
+  },
+  free: { 
+    text: "Free", 
+    type: "success", 
+    tip: "Completely free public domain scores or web tools." 
+  },
+  paid: { 
+    text: "Paid", 
+    type: "paid", 
+    tip: "A physical book or structured paid material. Requires purchase." 
+  },
+  freevideo: { 
+    text: "Free Video", 
+    type: "video", 
+    tip: "High-quality, free instructional video lesson or analysis." 
+  },
+  imslp: { 
+    text: "IMSLP", 
+    type: "alternate", 
+    tip: "International Music Score Library Project (IMSLP). Free public domain sheet music." 
+  },
+  blueprint: { 
+    text: "Blueprint", 
+    type: "blueprint", 
+    tip: "Comprehensive community guides and structured roadmaps." 
+  },
+  alternate: { 
+    text: "Alternate", 
+    type: "alternate", 
+    tip: "Alternative non-classical routes and curriculum options." 
+  },
+  video: { 
+    text: "Video", 
+    type: "video", 
+    tip: "High-quality free instructional video." 
+  },
+  branch: { 
+    text: "Branch", 
+    type: "branch", 
+    tip: "A specialized branching path focused on chording, style, and active improvisation." 
+  },
+  community: { 
+    text: "Community Classic", 
+    type: "free", 
+    tip: "Outstanding community guide or roadmap." 
+  }
+};
+
+const tagList = tags ? tags.trim().split(/\s+/).filter(Boolean) : [];
+
+const resolvedBadges: Badge[] = tagList.map(tag => {
+  const match = TAG_DICTIONARY[tag];
+  if (match) {
+    return match;
+  }
+  const formattedText = tag
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase());
+  return {
+    text: formattedText,
+    type: 'accent',
+    tip: `Tag: ${formattedText}`
+  };
+});
+
+const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(t)) || '';
+---
+
+<div class:list={['resource-card', { 'has-border-left': borderLeft, [accentColor]: borderLeft }]} data-category={category} data-num-to-slug={JSON.stringify(numToSlug)} data-slug-to-number={JSON.stringify(slugToNumber)}>
+  <div class="resource-header">
+    <div class="resource-header-left">
+      {icon && (
+        <span class="resource-icon" aria-hidden="true">
+          <Icon name={icon} class="resource-svg" />
+        </span>
+      )}
+      <span class="resource-title">{title}</span>
+    </div>
+    {subs && <span class="resource-subs">{subs}</span>}
+  </div>
+  
+  {resolvedBadges.length > 0 && (
+    <div class="resource-badges">
+      {resolvedBadges.map(badge => (
+        <span class:list={['badge', badge.type]} data-tip={badge.tip} title={badge.tip}>
+          {badge.text}
+        </span>
+      ))}
+    </div>
+  )}
+
+  {focus && <span class="focus-tag">{focus}</span>}
+
+  <div class="resource-desc">
+    <slot />
+  </div>
+
+  <a href={link} target="_blank" rel="noopener" class="btn-link">
+    {buttonText}
+  </a>
+</div>
+
+<script>
+  import '../utils/citationHelper.client.ts';
+</script>
+
+<style>
+  .resource-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    gap: 0.6rem !important;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box !important;
+    height: 100% !important;
+    position: relative !important;
+  }
+  .resource-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--gold);
+    box-shadow: 0 4px 20px -2px rgba(201, 168, 76, 0.05);
+  }
+  :root[data-theme="light"] .resource-card:hover {
+    border-color: var(--sl-color-accent);
+    box-shadow: 0 4px 20px -2px rgba(154, 116, 32, 0.05);
+  }
+  
+  .resource-card.has-border-left { border-left-width: 4px !important; }
+  .resource-card.has-border-left.rose { border-left-color: var(--rose) !important; }
+  .resource-card.has-border-left.gold { border-left-color: var(--gold) !important; }
+  :root[data-theme="light"] .resource-card.has-border-left.gold { border-left-color: var(--sl-color-accent) !important; }
+
+  .resource-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: baseline !important;
+    gap: 0.5rem !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .resource-header-left {
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 0.5rem !important;
+  }
+  .resource-icon {
+    display: flex !important;
+    align-items: center !important;
+    color: var(--gold) !important;
+  }
+  :root[data-theme="light"] .resource-icon { color: var(--sl-color-accent) !important; }
+  .resource-icon :global(.resource-svg) {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .resource-title {
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+    color: var(--text-main) !important;
+    line-height: 1.4 !important;
+    margin: 0 !important;
+    font-family: 'Playfair Display', serif !important;
+  }
+  .resource-subs {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.62rem !important;
+    color: var(--gold) !important;
+    white-space: nowrap !important;
+  }
+  :root[data-theme="light"] .resource-subs { color: var(--sl-color-accent) !important; }
+
+  .resource-badges { display: flex !important; flex-wrap: wrap !important; gap: 0.4rem !important; margin-bottom: 0.2rem !important; }
+  .focus-tag { font-family: 'JetBrains Mono', monospace !important; font-size: 0.56rem !important; letter-spacing: 0.1em !important; text-transform: uppercase !important; color: var(--rose) !important; display: block !important; margin-bottom: 0.2rem !important; }
+  .resource-desc { font-size: 0.95rem !important; color: var(--text-muted) !important; margin: 0 0 1rem 0 !important; line-height: 1.6 !important; flex-grow: 1 !important; }
+  .resource-desc :global(p) { margin: 0 !important; padding: 0 !important; font-size: inherit !important; line-height: inherit !important; color: inherit !important; }
+  .btn-link { display: inline-block !important; text-align: center !important; background-color: var(--bg-card2) !important; border: 1px solid var(--border-color) !important; color: var(--text-main) !important; padding: 0.6rem 1rem !important; border-radius: 6px !important; font-size: 0.85rem !important; text-decoration: none !important; font-weight: 600 !important; transition: all 0.2s !important; cursor: pointer !important; width: 100% !important; box-sizing: border-box !important; margin-top: auto !important; }
+  .btn-link:hover { background-color: var(--gold) !important; color: var(--sl-color-black) !important; border-color: var(--gold) !important; text-decoration: none !important; }
+  :root[data-theme="light"] .btn-link:hover { background-color: var(--sl-color-accent) !important; color: var(--sl-color-white) !important; border-color: var(--sl-color-accent) !important; }
+
+  .badge { display: inline-block !important; padding: 0.15rem 0.45rem !important; border-radius: 4px !important; font-size: 0.65rem !important; font-weight: 700 !important; text-transform: uppercase !important; letter-spacing: 0.08em !important; white-space: nowrap !important; align-self: flex-start !important; width: max-content !important; font-family: 'JetBrains Mono', monospace !important; position: relative !important; cursor: help !important; }
+  .badge::after { content: attr(data-tip) !important; position: absolute !important; bottom: 130% !important; left: 50% !important; transform: translateX(-50%) !important; background-color: var(--sl-color-bg, #12131F) !important; color: var(--text-main, #FAF8F5) !important; border: 1px solid var(--border-color) !important; border-radius: 4px !important; padding: 0.45rem 0.65rem !important; font-size: 0.72rem !important; font-family: 'Space Grotesk', sans-serif !important; text-transform: none !important; letter-spacing: normal !important; font-weight: 400 !important; white-space: normal !important; width: 210px !important; text-align: center !important; opacity: 0 !important; pointer-events: none !important; transition: opacity 0.15s ease-out !important; z-index: 100 !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important; }
+  .badge:hover::after { opacity: 1 !important; }
+  .badge.free, .badge.blueprint, .badge.success { background: rgba(111, 181, 138, 0.13) !important; color: var(--badge-free) !important; border: 1px solid rgba(111, 181, 138, 0.3) !important; }
+  .badge.alternate { background: rgba(142, 134, 224, 0.13) !important; color: var(--badge-imslp) !important; border: 1px solid rgba(142, 134, 224, 0.3) !important; }
+  .badge.paid { background: rgba(201, 168, 76, 0.13) !important; color: var(--badge-paid) !important; border: 1px solid rgba(201, 168, 76, 0.3) !important; }
+  :root[data-theme="light"] .badge.paid { background-color: rgba(154, 116, 32, 0.13) !important; color: var(--sl-color-accent) !important; border-color: rgba(154, 116, 32, 0.3) !important; }
+  .badge.video { background: rgba(212, 118, 138, 0.13) !important; color: var(--badge-video) !important; border: 1px solid rgba(212, 118, 138, 0.3) !important; }
+  .badge.warning { background: rgba(212, 118, 138, 0.13) !important; color: var(--badge-video) !important; border: 1px solid rgba(212, 118, 138, 0.3) !important; }
+  .badge.theory { background: rgba(181, 138, 212, 0.13) !important; color: var(--badge-theory) !important; border: 1px solid rgba(181, 138, 212, 0.3) !important; }
+  .badge.branch { background: rgba(212, 118, 138, 0.13) !important; color: var(--badge-branch) !important; border: 1px solid rgba(212, 118, 138, 0.3) !important; }
+  .badge.accent { background-color: rgba(201, 168, 76, 0.13); color: var(--gold); border: 1px solid rgba(201, 168, 76, 0.3); }
+  :root[data-theme="light"] .badge.accent { background-color: rgba(154, 116, 32, 0.13); color: var(--sl-color-accent); border-color: rgba(154, 116, 32, 0.3); }
+</style>

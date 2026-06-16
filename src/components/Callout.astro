@@ -1,17 +1,54 @@
 ---
+// src/components/Callout.astro
+import Icon from './Icon.astro';
+import { getCitationData } from '../utils/citationScanner';
+
+const { numToSlug, slugToNumber } = await getCitationData();
+
+/**
+ * Props for the Callout component.
+ */
 interface Props {
+  /**
+   * The main heading text displayed inside the callout block.
+   */
   title?: string;
-  label?: string; // Alias for title
-  bordered?: boolean; // If true, applies the left accent bar and outer outline; if false, no borders are shown
-  
+  /**
+   * An alternative heading or label for the callout. If both `title` and `label` are provided,
+   * the component merges their usage as the primary visual title.
+   */
+  label?: string; 
+  /**
+   * Optional name of an icon (from the `Icon.astro` lookup directory) to display beside the title.
+   */
+  icon?: string; 
+  /**
+   * If true, renders a styled left border using the `accentColor` theme, with subtle border boundaries.
+   * @default false
+   */
+  bordered?: boolean; 
+  /**
+   * The background theme style of the callout container.
+   * Accepts predefined presets ('dark', 'tint', or 'transparent') or custom CSS color values.
+   * @default 'dark'
+   */
   bgColor?: 'dark' | 'tint' | 'transparent' | string;
+  /**
+   * The accent theme color used to style headers and bordered highlights.
+   * Predefined shortcuts are 'gold' and 'rose', but custom CSS color variables or hex codes are supported.
+   * @default 'gold'
+   */
   accentColor?: 'gold' | 'rose' | string;
+  /**
+   * Custom CSS color variable or hex string to style paragraph and typography elements inside the card.
+   */
   textColor?: string;
 }
 
 const { 
   title, 
   label,
+  icon,
   bordered = false,
   bgColor = "dark",
   accentColor = "gold",
@@ -20,7 +57,6 @@ const {
 
 const displayTitle = title || label;
 
-// Resolve accent color dynamically (supporting presets & raw strings)
 const presetAccents: Record<string, string> = {
   gold: "var(--gold)",
   rose: "var(--rose)"
@@ -29,33 +65,26 @@ const resolvedAccent = presetAccents[accentColor] || accentColor;
 
 const presetBackgrounds: Record<string, string> = {
   transparent: "transparent",
-  // If "tint", resolve to a subtle accent color background
   tint: accentColor === 'rose' ? "rgba(212, 118, 138, 0.07)" : "rgba(201, 168, 76, 0.07)"
 };
 
-// If using default "dark" preset, let the responsive CSS stylesheet handle it
 const isDefaultBg = bgColor === 'dark';
 const isTintBg = bgColor === 'tint';
 const resolvedBg = (isDefaultBg || isTintBg) ? undefined : (presetBackgrounds[bgColor] || bgColor);
 
-// Manage all borders strictly based on the bordered state
 const containerStyle = {
   ...(resolvedBg && { backgroundColor: resolvedBg }),
   ...(textColor && { color: textColor }),
-  
   ...(bordered ? {
     borderLeftWidth: "4px",
     borderLeftStyle: "solid",
     borderLeftColor: resolvedAccent,
-    
     borderTopWidth: "1px",
     borderTopStyle: "solid",
     borderTopColor: "var(--border-color)",
-    
     borderRightWidth: "1px",
     borderRightStyle: "solid",
     borderRightColor: "var(--border-color)",
-    
     borderBottomWidth: "1px",
     borderBottomStyle: "solid",
     borderBottomColor: "var(--border-color)"
@@ -67,18 +96,14 @@ const containerStyle = {
   })
 };
 
-const labelStyle = {
-  color: resolvedAccent
-};
-
-const contentStyle = {
-  ...(textColor && { color: textColor })
-};
+const labelStyle = { color: resolvedAccent };
+const contentStyle = { ...(textColor && { color: textColor }) };
 ---
 
-<div class:list={['callout-container', { bordered, tint: isTintBg }, accentColor]} style={containerStyle}>
+<div class:list={['callout-container', { bordered, tint: isTintBg }, accentColor]} style={containerStyle} data-num-to-slug={JSON.stringify(numToSlug)} data-slug-to-number={JSON.stringify(slugToNumber)}>
   {displayTitle && (
     <span class="callout-label" style={labelStyle}>
+      {icon && <Icon name={icon} class="callout-svg" />}
       {displayTitle}
     </span>
   )}
@@ -87,6 +112,10 @@ const contentStyle = {
   </div>
 </div>
 
+<script>
+  import '../utils/citationHelper.client.ts';
+</script>
+
 <style>
   .callout-container {
     border-radius: 0 8px 8px 0;
@@ -94,45 +123,29 @@ const contentStyle = {
     margin: 2rem 0;
     box-sizing: border-box;
   }
-  
-  /* --- Default "dark" background mappings --- */
-  .callout-container {
-    background-color: rgba(30, 41, 59, 0.3);
-  }
-  
-  /* --- Subtle "tint" background mappings --- */
-  .callout-container.tint.gold {
-    background-color: rgba(201, 168, 76, 0.07);
-  }
-  .callout-container.tint.rose {
-    background-color: rgba(212, 118, 138, 0.07);
-  }
+  .callout-container { background-color: rgba(30, 41, 59, 0.3); }
+  .callout-container.tint.gold { background-color: rgba(201, 168, 76, 0.07); }
+  .callout-container.tint.rose { background-color: rgba(212, 118, 138, 0.07); }
 
-  /* --- Light Theme responsive mappings --- */
-  :root[data-theme="light"] .callout-container {
-    background-color: rgba(30, 41, 59, 0.08);
-  }
-  :root[data-theme="light"] .callout-container.tint.gold {
-    background-color: rgba(201, 168, 76, 0.05);
-  }
-  :root[data-theme="light"] .callout-container.tint.rose {
-    background-color: rgba(212, 118, 138, 0.05);
-  }
+  :root[data-theme="light"] .callout-container { background-color: rgba(30, 41, 59, 0.08); }
+  :root[data-theme="light"] .callout-container.tint.gold { background-color: rgba(201, 168, 76, 0.05); }
+  :root[data-theme="light"] .callout-container.tint.rose { background-color: rgba(212, 118, 138, 0.05); }
 
-  /* When fully bordered, apply legacy padding */
-  .callout-container.bordered {
-    padding: 1.1rem 1.4rem;
-  }
+  .callout-container.bordered { padding: 1.1rem 1.4rem; }
   
-  /* Typography */
   .callout-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
     font-family: 'Space Grotesk', var(--sl-font), sans-serif;
     font-size: 1.05rem;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
     margin-bottom: 0.6rem;
-    display: block;
+  }
+
+  .callout-label :global(.callout-svg) {
+    width: 18px;
+    height: 18px;
   }
   
   .callout-content :global(p) {

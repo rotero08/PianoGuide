@@ -4,72 +4,33 @@ description: Academic bibliography and auxiliary reading listings.
 ---
 
 import Bibliography from '../../../components/Bibliography.astro';
-import BibEntry from '../../../components/BibEntry.astro';
 import Grid from '../../../components/Grid.astro';
-import Card from '../../../components/Card.astro';
+import Resource from '../../../components/Resource.astro';
 
 Every claim in this guide about how the brain reads, how the hands move, and how skills consolidate traces back to published research. The full bibliography is collected here, followed by an auxiliary library of theory, pedagogy, and acoustics resources you can search and filter.
 
 ## Scientific Bibliography
 
 <Bibliography>
-  <BibEntry id="ref-rubin">
-    **Rubin-Rabson, G. (1940).** *Studies in the psychology of memorizing piano music.* Journal of Educational Psychology. Early evidence that spaced, distributed practice beats massed repetition for keyboard retention.
-  </BibEntry>
-  <BibEntry id="ref-schmidt">
-    **Schmidt, R. A., &amp; Lee, T. D. (2011).** *Motor Control and Learning: A Behavioral Emphasis (5th ed.).* Human Kinetics. Distributed practice and the decoupling of the two hands during skill acquisition.
-  </BibEntry>
-  <BibEntry id="ref-gordon">
-    **Gordon, E. E. (1975).** *Learning Sequences in Music.* GIA Publications. Defines audiation, the inner hearing of music.
-  </BibEntry>
-  <BibEntry id="ref-brodsky">
-    **Brodsky, W., et al. (2008).** *The Mental Representation of Music Notation: Notational Audiation.* JEP: HPP, 34(2), 427-445. Silent reading of notation triggers measurable vocal subvocalization.
-  </BibEntry>
-  <BibEntry id="ref-sloboda">
-    **Sloboda, J. A. (1984).** *The Musical Mind.* Oxford University Press. Foundational work on gaze tracking and visual chunking in reading.
-  </BibEntry>
-  <BibEntry id="ref-sweller">
-    **Sweller, J. (1988).** *Cognitive Load Theory.* Journal of Educational Psychology, 80(2), 162-185. The four to seven item working-memory limit and the split-attention effect.
-  </BibEntry>
-  <BibEntry id="ref-walker">
-    **Walker, M. P., Brakefield, T., Hobson, J. A., &amp; Stickgold, R. (2002).** *Sleep-dependent learning and motor cortical plasticity.* Neuron, 34(1), 141-145. Motor gains consolidate during sleep, not the practice session.
-  </BibEntry>
-  <BibEntry id="ref-ericsson">
-    **Ericsson, K. A., Krampe, R. T., &amp; Tesch-Romer, C. (1993).** *The role of deliberate practice in the acquisition of expert performance.* Psychological Review, 100(3), 363-406.
-  </BibEntry>
-  <BibEntry id="ref-goebl">
-    **Goebl, W., &amp; Palmer, C. (2008).** *Tactile feedback in piano performance.* Journal of the Acoustical Society of America, 124(1), 1-11. Saccades and feedforward eye-hand coordination.
-  </BibEntry>
-  <BibEntry id="ref-highben">
-    **Highben, Z., &amp; Palmer, C. (2004).** *Effects of Auditory and Motor Mental Practice in Memorized Piano Performance.* Bulletin of CRME, 159, 58-65. Aural skill predicts accuracy when feedback is removed.
-  </BibEntry>
-  <BibEntry id="ref-furuya">
-    **Furuya, S., &amp; Altenmuller, E. (2013).** *Flexibility of motor organization in pianists.* Frontiers in Human Neuroscience, 7, 201. Co-contraction and antagonistic muscle firing.
-  </BibEntry>
-  <BibEntry id="ref-finney">
-    **Finney, S. A. (1997).** *Auditory feedback in piano performance.* Journal of Experimental Psychology: HPP, 23(1), 242-259.
-  </BibEntry>
-  <BibEntry id="ref-pfordresher">
-    **Pfordresher, P. Q. (2003).** *Sensory-motor coordination in music performance.* Acta Psychologica, 113(3), 269-291.
-  </BibEntry>
-  <BibEntry id="ref-goolsby">
-    **Goolsby, T. W. (1994).** *Eye Movement in Music Reading.* Music Perception, 12(1), 77-96.
-  </BibEntry>
-  <BibEntry id="ref-furneaux">
-    **Furneaux, S., &amp; Land, M. F. (1999).** *The effects of skill on the eye-hand span during musical sight-reading.* Proc. R. Soc. Lond. B, 266(1436), 2435-2440.
-  </BibEntry>
-  <BibEntry id="ref-waters">
-    **Waters, A., Townsend, E., &amp; Underwood, G. (1998).** *Expertise in musical sight reading.* British Journal of Psychology, 89(1), 123-149.
-  </BibEntry>
-  <BibEntry id="ref-drake">
-    **Drake, C., &amp; Palmer, C. (2000).** *Skill acquisition in music performance.* Psychology of Music, 28(2), 150-168.
-  </BibEntry>
-  <BibEntry id="ref-kopiez">
-    **Kopiez, R., &amp; Lee, J. I. (2008).** *Towards a general model of skills involved in sight reading music.* Music Education Research, 10(1), 41-62.
-  </BibEntry>
-  <BibEntry id="ref-wristen">
-    **Wristen, B. (2005).** *Cognition and Motor Execution in Piano Sight-Reading.* Cognitive Science, 29(4), 112-131.
-  </BibEntry>
+  * #ref-1 **Rubin-Rabson, G. (1940).** *Studies in the psychology of memorizing piano music.* Journal of Educational Psychology. Early evidence that spaced, distributed practice beats massed repetition for keyboard retention.
+  * #ref-2 **Schmidt, R. A., &amp; Lee, T. D. (2011).** *Motor Control and Learning: A Behavioral Emphasis (5th ed.).* Human Kinetics. Distributed practice and the decoupling of the two hands during skill acquisition.
+  * #ref-3 **Gordon, E. E. (1975).** *Learning Sequences in Music.* GIA Publications. Defines audiation, the inner hearing of music.
+  * #ref-4 **Brodsky, W., et al. (2008).** *The Mental Representation of Music Notation: Notational Audiation.* JEP: HPP, 34(2), 427-445. Silent reading of notation triggers measurable vocal subvocalization.
+  * #ref-5 **Sloboda, J. A. (1984).** *The Musical Mind.* Oxford University Press. Foundational work on gaze tracking and visual chunking in reading.
+  * #ref-6 **Sweller, J. (1988).** *Cognitive Load Theory.* Journal of Educational Psychology, 80(2), 162-185. The four to seven item working-memory limit and the split-attention effect.
+  * #ref-7 **Walker, M. P., Brakefield, T., Hobson, J. A., &amp; Stickgold, R. (2002).** *Sleep-dependent learning and motor cortical plasticity.* Neuron, 34(1), 141-145. Motor gains consolidate during sleep, not the practice session.
+  * #ref-8 **Ericsson, K. A., Krampe, R. T., &amp; Tesch-Romer, C. (1993).** *The role of deliberate practice in the acquisition of expert performance.* Psychological Review, 100(3), 363-406.
+  * #ref-9 **Goebl, W., &amp; Palmer, C. (2008).** *Tactile feedback in piano performance.* Journal of the Acoustical Society of America, 124(1), 1-11. Saccades and feedforward eye-hand coordination.
+  * #ref-10 **Highben, Z., &amp; Palmer, C. (2004).** *Effects of Auditory and Motor Mental Practice in Memorized Piano Performance.* Bulletin of CRME, 159, 58-65. Aural skill predicts accuracy when feedback is removed.
+  * #ref-11 **Furuya, S., &amp; Altenmuller, E. (2013).** *Flexibility of motor organization in pianists.* Frontiers in Human Neuroscience, 7, 201. Co-contraction and antagonistic muscle firing.
+  * #ref-12 **Finney, S. A. (1997).** *Auditory feedback in piano performance.* Journal of Experimental Psychology: HPP, 23(1), 242-259.
+  * #ref-13 **Pfordresher, P. Q. (2003).** *Sensory-motor coordination in music performance.* Acta Psychologica, 113(3), 269-291.
+  * #ref-14 **Goolsby, T. W. (1994).** *Eye Movement in Music Reading.* Music Perception, 12(1), 77-96.
+  * #ref-15 **Furneaux, S., &amp; Land, M. F. (1999).** *The effects of skill on the eye-hand span during musical sight-reading.* Proc. R. Soc. Lond. B, 266(1436), 2435-2440.
+  * #ref-16 **Waters, A., Townsend, E., &amp; Underwood, G. (1998).** *Expertise in musical sight reading.* British Journal of Psychology, 89(1), 123-149.
+  * #ref-17 **Drake, C., &amp; Palmer, C. (2000).** *Skill acquisition in music performance.* Psychology of Music, 28(2), 150-168.
+  * #ref-18 **Kopiez, R., &amp; Lee, J. I. (2008).** *Towards a general model of skills involved in sight reading music.* Music Education Research, 10(1), 41-62.
+  * #ref-19 **Wristen, B. (2005).** *Cognition and Motor Execution in Piano Sight-Reading.* Cognitive Science, 29(4), 112-131.
 </Bibliography>
 
 ## Reference Library & Auxiliary Resources
@@ -84,46 +45,46 @@ Every claim in this guide about how the brain reads, how the hands move, and how
     { value: 'theory', label: 'MUSIC THEORY & COGNITION' }
   ]}
 >
-  <Card title="Physical Audio Signal Processing" link="https://ccrma.stanford.edu/~jos/pasp/" tags="acoustics free">
+  <Resource title="Physical Audio Signal Processing" link="https://ccrma.stanford.edu/~jos/pasp/" tags="acoustics free">
     Julius O. Smith III (Stanford). The mechanics and physics of musical instrument sound synthesis.
-  </Card>
-  <Card title="Mathematics of the DFT" link="https://ccrma.stanford.edu/~jos/mdft/" tags="acoustics free">
+  </Resource>
+  <Resource title="Mathematics of the DFT" link="https://ccrma.stanford.edu/~jos/mdft/" tags="acoustics free">
     Julius O. Smith III. The algorithms that analyze and transform digital audio waveforms.
-  </Card>
-  <Card title="Introduction to Digital Filters" link="https://ccrma.stanford.edu/~jos/filters/" tags="acoustics free">
+  </Resource>
+  <Resource title="Introduction to Digital Filters" link="https://ccrma.stanford.edu/~jos/filters/" tags="acoustics free">
     Julius O. Smith III. Digital audio filter design, the basis of virtual piano modeling.
-  </Card>
-  <Card title="Spectral Audio Signal Processing" link="https://ccrma.stanford.edu/~jos/sasp/" tags="acoustics free">
+  </Resource>
+  <Resource title="Spectral Audio Signal Processing" link="https://ccrma.stanford.edu/~jos/sasp/" tags="acoustics free">
     Julius O. Smith III. Spectral representation and transformation of audio waves.
-  </Card>
-  <Card title="The Scientist &amp; Engineer's Guide to DSP" link="http://www.dspguide.com/" tags="acoustics free">
+  </Resource>
+  <Resource title="The Scientist &amp; Engineer's Guide to DSP" link="http://www.dspguide.com/" tags="acoustics free">
     Steven W. Smith. Practical, industry-standard reference for self-studying digital signals.
-  </Card>
-  <Card title="Introduction to Signal Processing" link="https://www.ece.rutgers.edu/~orfanidi/intro2sp/" tags="acoustics free">
+  </Resource>
+  <Resource title="Introduction to Signal Processing" link="https://www.ece.rutgers.edu/~orfanidi/intro2sp/" tags="acoustics free">
     Sophocles J. Orfanidis. Formula-focused textbook on analog and digital signal transforms.
-  </Card>
-  <Card title="Fundamentals of Piano Practice" link="https://www.pianopractice.org/" tags="pedagogy free">
+  </Resource>
+  <Resource title="Fundamentals of Piano Practice" link="https://www.pianopractice.org/" tags="pedagogy free">
     Chuan C. Chang. The free textbook behind HS practice, parallel sets, and Post-Practice Improvement.
-  </Card>
-  <Card title="The Art of Piano Playing" link="https://www.amazon.com/Art-Piano-Playing-Heinrich-Neuhaus/dp/1871082455" tags="pedagogy paid">
+  </Resource>
+  <Resource title="The Art of Piano Playing" link="https://www.amazon.com/Art-Piano-Playing-Heinrich-Neuhaus/dp/1871082455" tags="pedagogy paid">
     Heinrich Neuhaus. Philosophical exploration of the "artistic image" and musical projection.
-  </Card>
-  <Card title="Rational Principles of Piano Technique" link="https://www.amazon.com/Rational-Principles-Piano-Technique-Alfred/dp/0150015502" tags="pedagogy paid">
+  </Resource>
+  <Resource title="Rational Principles of Piano Technique" link="https://www.amazon.com/Rational-Principles-Piano-Technique-Alfred/dp/0150015502" tags="pedagogy paid">
     Alfred Cortot. Analytical guide to isolating and solving advanced mechanical issues.
-  </Card>
-  <Card title="Harmony and Theory" link="https://www.amazon.com/Harmony-Theory-Comprehensive-Source-Musicians/dp/0793579910" tags="theory paid">
+  </Resource>
+  <Resource title="Harmony and Theory" link="https://www.amazon.com/Harmony-Theory-Comprehensive-Source-Musicians/dp/0793579910" tags="theory paid">
     Keith Wyatt. Style-neutral workbook covering scales, chord spelling, and pop/jazz harmony.
-  </Card>
-  <Card title="Music Theory For Dummies" link="https://www.amazon.com/Music-Theory-Dummies-Michael-Pilhofer/dp/1119575522" tags="theory paid">
+  </Resource>
+  <Resource title="Music Theory For Dummies" link="https://www.amazon.com/Music-Theory-Dummies-Michael-Pilhofer/dp/1119575522" tags="theory paid">
     Michael Pilhofer. Plain-English reference, ideal for resolving basic chord-spelling doubts.
-  </Card>
-  <Card title="The Complete Musician" link="https://www.amazon.com/Complete-Musician-Integrated-Listening-Workbook/dp/0199742718" tags="theory paid">
+  </Resource>
+  <Resource title="The Complete Musician" link="https://www.amazon.com/Complete-Musician-Integrated-Listening-Workbook/dp/0199742718" tags="theory paid">
     Steven Laitz. University-level textbook on theory, formal analysis, and score reading.
-  </Card>
-  <Card title="Tonal Harmony" link="https://www.amazon.com/Tonal-Harmony-Stefan-Kostka/dp/125944709X" tags="theory paid">
+  </Resource>
+  <Resource title="Tonal Harmony" link="https://www.amazon.com/Tonal-Harmony-Stefan-Kostka/dp/125944709X" tags="theory paid">
     Stefan Kostka. The standard conservatory text on voice-leading and harmonic movement.
-  </Card>
-  <Card title="Collaborative Open-Source Music Directory" link="https://github.com/vpavlenko/study-music" tags="theory free">
+  </Resource>
+  <Resource title="Collaborative Open-Source Music Directory" link="https://github.com/vpavlenko/study-music" tags="theory free">
     A crowd-sourced warehouse of web tools, software, and reading materials for musicians.
-  </Card>
+  </Resource>
 </Grid>

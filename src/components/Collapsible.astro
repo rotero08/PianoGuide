@@ -1,0 +1,187 @@
+---
+// src/components/Collapsible.astro
+import Icon from './Icon.astro';
+
+/**
+ * Props for the Collapsible component.
+ */
+interface Props {
+  /**
+   * The primary title text displayed inside the summary details header.
+   */
+  title: string;
+  /**
+   * If true, renders the widget expanded and open by default.
+   * @default false
+   */
+  open?: boolean;
+  /**
+   * Optional icon lookup identifier name (from the `Icon.astro` catalog) to display next to the header text.
+   * @default 'play-box'
+   */
+  icon?: string; 
+}
+
+const { title, open = false, icon = 'play-box' } = Astro.props;
+---
+
+<details class="collapsible-widget" open={open}>
+  <summary class="collapsible-header">
+    <h3>
+      <Icon name={icon} class="collapsible-svg" />
+      {title}
+    </h3>
+    <span class="collapse-arrow">
+      <Icon name="chevron-down" />
+    </span>
+  </summary>
+  <div class="collapsible-content">
+    <slot />
+  </div>
+</details>
+
+<style>
+  :global(.collapsible-widget) {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius) !important;
+    margin: 2rem 0 !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    padding: 0 !important; /* Removes padding/inset gaps around the header and content container */
+  }
+  
+  :global(.collapsible-header) {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 0.9rem 1rem !important; /* Symmetric vertical padding for proper centering */
+    background-color: transparent !important; /* Removes the separate gray background fill */
+    margin: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    cursor: pointer !important;
+    user-select: none !important;
+    list-style: none !important; /* Hides default list indicators on modern Firefox */
+    list-style-type: none !important;
+    transition: background-color 0.2s !important;
+  }
+  
+  /* Completely hide native summary markers, pseudo elements, and remove spacing blocks */
+  :global(.collapsible-header::-webkit-details-marker) {
+    display: none !important;
+  }
+  :global(.collapsible-header::marker) {
+    display: none !important;
+    content: "" !important; /* Strips Firefox's default indicator container space */
+  }
+  :global(.collapsible-header::before),
+  :global(.collapsible-header::after) {
+    display: none !important;
+    content: none !important; /* Strips theme-level pseudo-elements to preserve left-alignment */
+  }
+  
+  :global(.collapsible-header:hover) {
+    background-color: rgba(255, 255, 255, 0.02) !important; /* Subtle tactile hover feedback */
+  }
+  
+  :global(.collapsible-header h3) {
+    margin: 0 !important;
+    font-size: 1.05rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.45rem !important; /* Tight spacing between the speech bubble and title text */
+    color: var(--gold) !important;
+    font-family: 'Space Grotesk', var(--sl-font), sans-serif !important;
+    font-weight: 700 !important;
+  }
+  
+  :global([data-theme="light"] .collapsible-header h3) {
+    color: var(--sl-color-accent) !important;
+  }
+  
+  :global(.collapsible-header h3 .collapsible-svg) {
+    width: 18px !important;
+    height: 18px !important;
+    color: inherit !important;
+  }
+
+  :global(.collapse-arrow) {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 18px !important; /* Standard chevron size */
+    height: 18px !important;
+    color: var(--text-muted) !important;
+    transition: transform 0.2s ease !important;
+  }
+  :global(.collapse-arrow svg) {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  :global(.collapsible-widget[open] .collapse-arrow) {
+    transform: rotate(180deg) !important;
+  }
+  
+  /* Collapsible content area */
+  :global(.collapsible-content) {
+    border-top: none !important; /* Removes the horizontal dividing line above content */
+    padding: 0.2rem 1rem 1.2rem 1rem !important; /* Unified 1rem horizontal padding to align with the header */
+  }
+
+  /* Style standard H4 headings as item titles */
+  :global(.collapsible-content h4) {
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    color: var(--text-main) !important;
+    margin-top: 1.3rem !important;
+    margin-bottom: 0.35rem !important;
+    font-family: 'Space Grotesk', var(--sl-font), sans-serif !important;
+  }
+  
+  /* Ensure the absolute first item in the content box never renders a line */
+  :global(.collapsible-content h4:first-of-type) {
+    border-top: none !important;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+  
+  /* Automatically injects a row separator between subsequent items */
+  :global(.collapsible-content h4 ~ h4) {
+    border-top: 1px solid var(--border-color) !important;
+    padding-top: 1.3rem !important;
+  }
+
+  /* Style standard paragraphs as item descriptions */
+  :global(.collapsible-content p) {
+    font-size: 0.88rem !important;
+    color: var(--text-muted) !important;
+    line-height: 1.55 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Turn Markdown links inside H4 elements into beautiful citation tags */
+  :global(.collapsible-content h4 a) {
+    color: var(--gold) !important;
+    font-weight: 700 !important;
+    font-size: 0.8rem !important;
+    text-decoration: none !important;
+    margin-left: 0.25rem !important;
+    display: inline-block !important;
+    transition: color 0.15s ease !important;
+  }
+  :global([data-theme="light"] .collapsible-content h4 a) {
+    color: var(--sl-color-accent) !important;
+  }
+  :global(.collapsible-content h4 a:hover) {
+    text-decoration: underline !important;
+  }
+
+  /* Hide Starlight heading self-links */
+  :global(.collapsible-content :is(h1, h2, h3, h4, h5, h6) + a),
+  :global(.collapsible-content .anchor),
+  :global(.collapsible-content .heading-link) {
+    display: none !important;
+  }
+</style>

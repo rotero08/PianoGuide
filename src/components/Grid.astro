@@ -1,26 +1,77 @@
 ---
+// src/components/Grid.astro
+
+/**
+ * Defines an option inside the category selection dropdown list of interactive, searchable Grids.
+ */
 interface FilterOption {
+  /**
+   * The programmatic option identifier, matching card element classification attributes (e.g., `data-category`).
+   */
   value: string;
+  /**
+   * The user-facing label text populated inside the select dropdown item.
+   */
   label: string;
 }
 
+/**
+ * Props for the Grid component.
+ */
 interface Props {
+  /**
+   * Force grid items into a strict column layout count (e.g., `cols={2}` for dual splits).
+   * Overrides automatic layout wrapping. Mobile viewports will dynamically fall back to a single column.
+   */
+  cols?: number;
+  /**
+   * Minimum responsive item width before wrapping to another row. Ignored if `cols` is specified.
+   * @default "320px"
+   */
+  minWidth?: string; 
+  /**
+   * Grid layout gap spacing.
+   * @default "1.5rem"
+   */
+  gap?: string;
+  /**
+   * Activates interactive client-side query search bars and optional category filters.
+   * @default false
+   */
   searchable?: boolean;
+  /**
+   * Placeholder placeholder text populated inside search text input boxes.
+   * @default "Search..."
+   */
   placeholder?: string;
+  /**
+   * List of filter metadata categories. Only used if `searchable` is true.
+   * @default []
+   */
   filterOptions?: FilterOption[];
 }
 
 const {
+  cols,
+  minWidth = "320px",
+  gap = "1.5rem",
   searchable = false,
   placeholder = "Search...",
   filterOptions = []
 } = Astro.props;
 
-// Generate a scoped ID for this specific grid instance
 const gridId = `grid-${Math.random().toString(36).substring(2, 11)}`;
+
+// Compute CSS variables for clean integration with styles
+const gridStyle = {
+  gap,
+  gridTemplateColumns: cols 
+    ? `repeat(${cols}, minmax(0, 1fr))` 
+    : `repeat(auto-fill, minmax(${minWidth}, 1fr))`
+};
 ---
 
-<div id={gridId} class="grid-container" data-searchable={searchable ? "true" : "false"}>
+<div id={gridId} class:list={['grid-container', { 'cols-forced': !!cols }]} data-searchable={searchable ? "true" : "false"}>
   {searchable && (
     <div class="filter-group">
       <input 
@@ -38,7 +89,7 @@ const gridId = `grid-${Math.random().toString(36).substring(2, 11)}`;
     </div>
   )}
 
-  <div class="grid-layout">
+  <div class="grid-layout" style={gridStyle}>
     <slot />
   </div>
 </div>
@@ -115,10 +166,16 @@ const gridId = `grid-${Math.random().toString(36).substring(2, 11)}`;
 
   .grid-layout {
     display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
-    gap: 1.5rem !important;
     align-items: stretch !important;
   }
+
+  /* Responsively override forced multi-column parameters on mobile */
+  @media (max-width: 720px) {
+    .cols-forced .grid-layout {
+      grid-template-columns: 1fr !important;
+    }
+  }
+
   .grid-layout :global(*) {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
@@ -144,7 +201,7 @@ const gridId = `grid-${Math.random().toString(36).substring(2, 11)}`;
       
       const searchInput = container.querySelector('.input-filter');
       const filterSelect = container.querySelector('.select-filter');
-      const cards = container.querySelectorAll('.card');
+      const cards = container.querySelectorAll('.resource-card');
 
       function performFilter() {
         const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
@@ -158,21 +215,15 @@ const gridId = `grid-${Math.random().toString(36).substring(2, 11)}`;
           const matchesCategory = category === 'all' || cardCategory === category;
 
           if (matchesSearch && matchesCategory) {
-            // Removes inline display overrides to fall back to flex stylesheet defaults
             card.style.removeProperty('display');
           } else {
-            // Inline !important overrides the stylesheet flex styles to hide components reliably
             card.style.setProperty('display', 'none', 'important');
           }
         });
       }
 
-      if (searchInput) {
-        searchInput.addEventListener('input', performFilter);
-      }
-      if (filterSelect) {
-        filterSelect.addEventListener('change', performFilter);
-      }
+      if (searchInput) searchInput.addEventListener('input', performFilter);
+      if (filterSelect) filterSelect.addEventListener('change', performFilter);
     })();
   </script>
 )}
