@@ -1,6 +1,59 @@
 ---
-title: Modern / Jazz Harmony
+title: Modern & Jazz Harmony
 description: Seventh chords, secondary dominants, and open voicings.
 ---
 
-Placeholder content for Modern / Jazz Harmony.
+import Grid from '../../../components/Grid.astro';
+import Card from '../../../components/Card.astro';
+import Resource from '../../../components/Resource.astro';
+import Callout from '../../../components/Callout.astro';
+import BranchFlag from '../../../components/BranchFlag.astro';
+
+<BranchFlag text="Optional branch · unlocks after Level 4" />
+
+For players whose goal is pop, rock, or jazz, classical training is generally regarded as only part of the picture. The modern and jazz resources below are commonly recommended for learning to build extended chords (7ths, 9ths) and read standard lead sheets.
+
+These guides help you understand the circle of fifths and advanced keyboard harmony, giving you the tools to improvise and play confidently in any modern style.
+
+<Grid>
+  <Resource title="The Pop Piano Book (Mark Harrison)" link="https://www.amazon.com/Pop-Piano-Book-Mark-Harrison/dp/0793598788" tags="paid" buttonText="View on Amazon">
+    An outstanding, detailed guide to pop keyboard styles. It covers basic rhythmic patterns, chord voicings, and genre-specific accompaniment.
+  </Resource>
+  <Resource title="Jazz Keyboard Harmony (Phil DeGreg)" link="https://www.amazon.com/Jazz-Keyboard-Harmony-Practical-Spiral-Bound/dp/1562240692" tags="paid" buttonText="View on Amazon">
+    A classic, systematic workbook for practicing shell voicings and common jazz chord progressions in all keys.
+  </Resource>
+  <Resource title="The Vanilla Book (Ralph Patt)" link="http://claymoore.com/The-Vanilla-Book-Chord-Changes-to-Jazz-Standards.pdf" tags="free" buttonText="Get PDF Charts">
+    An outstanding collection of simple, basic chord charts for hundreds of standard jazz tunes, perfect for practicing accompaniment.
+  </Resource>
+</Grid>
+
+<Callout bordered={true} accentColor="rose" label="Decoding secondary dominants" bgColor="tint">
+  A common stumbling block in pop and modern scores. A secondary dominant is a major/dominant-7th chord borrowed from a foreign key to push toward a target chord (written V/X). Spot the accidentals that resolve down a perfect fifth and you can read these progressions at a glance.
+
+  <Grid cols={1}>
+    <Card border="left" accentColor="rose" title="Secondary Dominants, a plain-English explainer" link="https://www.reddit.com/r/musictheory/comments/eyl7h/please_could_anyone_please_explain_a_easy/" buttonText="Open Thread">
+      Community thread breaking down how borrowed dominants create tension and resolve toward a target chord.
+      
+      **How it works & mechanical advantage:** Recognising V/X chords turns a wall of accidentals into a predictable tension-and-release shape, which is how experienced readers chunk modern harmony.
+      
+      **Exit benchmark:** Identify and voice a secondary dominant inside a lead sheet and resolve it smoothly.
+    </Card>
+  </Grid>
+</Callout>
+
+## More free jazz tools
+
+<Grid>
+  <Resource title="Jamey Aebersold: Jazz Handbook ('Red Book')" link="https://www.jazzbooks.com/jazz/fqbk" tags="free">
+    The free classic handbook of scales, theory, and practice advice for jazz players.
+  </Resource>
+  <Resource title="Ralph Patt: Song Index" link="http://www.ralphpatt.com/Song.html" tags="free">
+    A large index of standards with simple chord changes, paired with the Vanilla Book.
+  </Resource>
+  <Resource title="Ralph Patt: Backing Tracks" link="http://www.ralphpatt.com/Backing.html" tags="free">
+    Free backing tracks to practise comping and improvising over standards.
+  </Resource>
+  <Resource title="Ralph Patt: Tonal Centers" link="http://www.ralphpatt.com/Tonal.html" tags="free">
+    A reference for the tonal centres of standards, useful for soloing and reharmonisation.
+  </Resource>
+</Grid>

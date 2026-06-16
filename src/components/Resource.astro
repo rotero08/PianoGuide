@@ -22,33 +22,30 @@ interface Props {
   link: string;
   /**
    * Custom text displayed inside the link anchor CTA button.
-   * @default "Open ↗"
    */
   buttonText?: string;
   /**
    * If true, applies a 4px left decorative accent border line.
-   * @default false
    */
   borderLeft?: boolean;
   /**
    * Accent border theme preset color applied when `borderLeft` is active.
-   * @default "rose"
    */
   accentColor?: 'gold' | 'rose';
   /**
-   * Optional icon lookup identifier name (from the `Icon.astro` lookup dictionary) to display next to the title.
+   * Optional icon lookup identifier name to display next to the title.
    */
   icon?: string;
   /**
-   * Secondary subtitle stats string (e.g., subscriber numbers like "~826K") aligned to the top-right corner.
+   * Secondary subtitle stats string aligned to the top-right corner.
    */
   subs?: string;
   /**
-   * Descriptive uppercase focus tag details line (e.g., "Classical · performance") displayed above the body.
+   * Descriptive uppercase focus tag details line displayed above the body.
    */
   focus?: string;
   /**
-   * Space-separated metadata category lookup strings mapping to stylized status badges (e.g., "theory free paid").
+   * Space-separated metadata category lookup strings mapping to stylized status badges.
    */
   tags?: string;
 }
@@ -164,7 +161,7 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
   {resolvedBadges.length > 0 && (
     <div class="resource-badges">
       {resolvedBadges.map(badge => (
-        <span class:list={['badge', badge.type]} data-tip={badge.tip} title={badge.tip}>
+        <span class:list={['badge', badge.type]} data-tip={badge.tip}>
           {badge.text}
         </span>
       ))}
@@ -215,20 +212,21 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
   .resource-header {
     display: flex !important;
     justify-content: space-between !important;
-    align-items: baseline !important;
+    align-items: center !important;
     gap: 0.5rem !important;
     margin: 0 !important;
     padding: 0 !important;
   }
   .resource-header-left {
     display: flex !important;
-    align-items: baseline !important;
+    align-items: center !important;
     gap: 0.5rem !important;
   }
   .resource-icon {
     display: flex !important;
     align-items: center !important;
     color: var(--gold) !important;
+    transform: translateY(1.5px) !important; /* Visual optical alignment nudge */
   }
   :root[data-theme="light"] .resource-icon { color: var(--sl-color-accent) !important; }
   .resource-icon :global(.resource-svg) {
