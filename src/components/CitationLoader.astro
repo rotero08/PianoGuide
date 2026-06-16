@@ -1,0 +1,24 @@
+---
+// src/components/CitationLoader.astro
+import Default from '@astrojs/starlight/components/Head.astro';
+import { getCitationData } from '../utils/citationScanner';
+
+const { backlinks, numToSlug, slugToNumber } = await getCitationData();
+---
+
+<Default {...Astro.props} />
+
+<!-- Inject citation metadata globally once per page in the <head> -->
+<script 
+  type="application/json" 
+  id="global-citation-metadata" 
+  data-num-to-slug={JSON.stringify(numToSlug)} 
+  data-slug-to-number={JSON.stringify(slugToNumber)}
+  data-backlinks={JSON.stringify(backlinks)}
+>
+</script>
+
+<!-- Global client-side citation handler script -->
+<script>
+  import '../utils/citationHelper.client.ts';
+</script>

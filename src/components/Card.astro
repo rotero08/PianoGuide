@@ -1,9 +1,6 @@
 ---
 // src/components/Card.astro
 import Icon from './Icon.astro';
-import { getCitationData } from '../utils/citationScanner';
-
-const { numToSlug, slugToNumber } = await getCitationData();
 
 /**
  * Props for the Card component.
@@ -58,7 +55,7 @@ const {
 } = Astro.props;
 ---
 
-<div class:list={['unified-card', border !== 'none' ? `border-${border}` : '', accentColor]} data-category={category} data-num-to-slug={JSON.stringify(numToSlug)} data-slug-to-number={JSON.stringify(slugToNumber)}>
+<div class:list={['unified-card', border !== 'none' ? `border-${border}` : '', accentColor]} data-category={category}>
   {subtitle && <div class="card-subtitle">{subtitle}</div>}
   
   <div class="card-header">
@@ -80,10 +77,6 @@ const {
     </a>
   )}
 </div>
-
-<script>
-  import '../utils/citationHelper.client.ts';
-</script>
 
 <style>
   .unified-card {

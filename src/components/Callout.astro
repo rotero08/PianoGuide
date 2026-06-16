@@ -1,9 +1,6 @@
 ---
 // src/components/Callout.astro
 import Icon from './Icon.astro';
-import { getCitationData } from '../utils/citationScanner';
-
-const { numToSlug, slugToNumber } = await getCitationData();
 
 /**
  * Props for the Callout component.
@@ -100,7 +97,7 @@ const labelStyle = { color: resolvedAccent };
 const contentStyle = { ...(textColor && { color: textColor }) };
 ---
 
-<div class:list={['callout-container', { bordered, tint: isTintBg }, accentColor]} style={containerStyle} data-num-to-slug={JSON.stringify(numToSlug)} data-slug-to-number={JSON.stringify(slugToNumber)}>
+<div class:list={['callout-container', { bordered, tint: isTintBg }, accentColor]} style={containerStyle}>
   {displayTitle && (
     <span class="callout-label" style={labelStyle}>
       {icon && <Icon name={icon} class="callout-svg" />}
@@ -111,10 +108,6 @@ const contentStyle = { ...(textColor && { color: textColor }) };
     <slot />
   </div>
 </div>
-
-<script>
-  import '../utils/citationHelper.client.ts';
-</script>
 
 <style>
   .callout-container {

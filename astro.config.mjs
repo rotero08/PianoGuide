@@ -6,6 +6,9 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'The Complete Pianist',
+			components: {
+				Head: './src/components/CitationLoader.astro',
+			},
 			customCss: [
 				'./src/styles/custom.css',
 			],

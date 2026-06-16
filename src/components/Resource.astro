@@ -1,9 +1,6 @@
 ---
 // src/components/Resource.astro
 import Icon from './Icon.astro';
-import { getCitationData } from '../utils/citationScanner';
-
-const { numToSlug, slugToNumber } = await getCitationData();
 
 interface Badge {
   text: string;
@@ -39,7 +36,7 @@ interface Props {
    */
   accentColor?: 'gold' | 'rose';
   /**
-   * Optional identifier name of an icon (from the `Icon.astro` lookup directory) to display next to the title.
+   * Optional icon lookup identifier name (from the `Icon.astro` lookup dictionary) to display next to the title.
    */
   icon?: string;
   /**
@@ -151,7 +148,7 @@ const resolvedBadges: Badge[] = tagList.map(tag => {
 const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(t)) || '';
 ---
 
-<div class:list={['resource-card', { 'has-border-left': borderLeft, [accentColor]: borderLeft }]} data-category={category} data-num-to-slug={JSON.stringify(numToSlug)} data-slug-to-number={JSON.stringify(slugToNumber)}>
+<div class:list={['resource-card', { 'has-border-left': borderLeft, [accentColor]: borderLeft }]} data-category={category}>
   <div class="resource-header">
     <div class="resource-header-left">
       {icon && (
@@ -184,10 +181,6 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
     {buttonText}
   </a>
 </div>
-
-<script>
-  import '../utils/citationHelper.client.ts';
-</script>
 
 <style>
   .resource-card {
