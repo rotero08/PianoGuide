@@ -1,0 +1,52 @@
+---
+// src/components/ScreenTrap.astro
+---
+<div class="screen-trap">
+  <div class="screen-trap-head">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3 2.5 20h19L12 3Z"/>
+      <line x1="12" y1="9.5" x2="12" y2="14.5"/>
+      <circle cx="12" cy="17.4" r="0.7" fill="currentColor" stroke="none"/>
+    </svg>
+    <h3>The Screen / Device Trap</h3>
+  </div>
+  <slot />
+</div>
+
+<style>
+  .screen-trap {
+    background: linear-gradient(135deg, rgba(212, 118, 138, 0.10), rgba(212, 118, 138, 0.02)) !important;
+    border: 1px solid rgba(212, 118, 138, 0.35) !important;
+    border-radius: var(--radius);
+    padding: 1.8rem 2rem !important;
+    margin: 2rem 0 !important;
+  }
+  .screen-trap-head {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.6rem !important;
+    margin-bottom: 0.8rem !important;
+  }
+  .screen-trap-head h3 {
+    margin: 0 !important;
+    color: var(--rose) !important;
+    font-family: 'Playfair Display', serif !important;
+    font-size: 1.3rem !important;
+    font-weight: 700 !important;
+  }
+  .ic {
+    width: 1.5em;
+    height: 1.5em;
+    flex-shrink: 0;
+    color: var(--rose);
+  }
+  .screen-trap :global(p) {
+    font-size: 0.92rem !important;
+    line-height: 1.6 !important;
+    color: var(--text-muted) !important;
+    margin: 0 !important;
+  }
+  .screen-trap :global(strong) {
+    color: var(--text-main) !important;
+  }
+</style>

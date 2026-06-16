@@ -5,8 +5,8 @@ description: Academic bibliography and auxiliary reading listings.
 
 import Bibliography from '../../../components/Bibliography.astro';
 import BibEntry from '../../../components/BibEntry.astro';
-import LibraryGrid from '../../../components/LibraryGrid.astro';
-import ResourceCard from '../../../components/ResourceCard.astro';
+import Grid from '../../../components/Grid.astro';
+import Card from '../../../components/Card.astro';
 
 Every claim in this guide about how the brain reads, how the hands move, and how skills consolidate traces back to published research. The full bibliography is collected here, followed by an auxiliary library of theory, pedagogy, and acoustics resources you can search and filter.
 
@@ -74,47 +74,56 @@ Every claim in this guide about how the brain reads, how the hands move, and how
 
 ## Reference Library & Auxiliary Resources
 
-<LibraryGrid>
-  <ResourceCard category="acoustics" title="Physical Audio Signal Processing" link="https://ccrma.stanford.edu/~jos/pasp/">
+<Grid
+  searchable={true}
+  placeholder="Search references by title, keyword, or author..."
+  filterOptions={[
+    { value: 'all', label: 'ALL CATEGORIES' },
+    { value: 'acoustics', label: 'ACOUSTICS & DSP' },
+    { value: 'pedagogy', label: 'PIANO MANUALS & PEDAGOGY' },
+    { value: 'theory', label: 'MUSIC THEORY & COGNITION' }
+  ]}
+>
+  <Card title="Physical Audio Signal Processing" link="https://ccrma.stanford.edu/~jos/pasp/" tags="acoustics free">
     Julius O. Smith III (Stanford). The mechanics and physics of musical instrument sound synthesis.
-  </ResourceCard>
-  <ResourceCard category="acoustics" title="Mathematics of the DFT" link="https://ccrma.stanford.edu/~jos/mdft/">
+  </Card>
+  <Card title="Mathematics of the DFT" link="https://ccrma.stanford.edu/~jos/mdft/" tags="acoustics free">
     Julius O. Smith III. The algorithms that analyze and transform digital audio waveforms.
-  </ResourceCard>
-  <ResourceCard category="acoustics" title="Introduction to Digital Filters" link="https://ccrma.stanford.edu/~jos/filters/">
+  </Card>
+  <Card title="Introduction to Digital Filters" link="https://ccrma.stanford.edu/~jos/filters/" tags="acoustics free">
     Julius O. Smith III. Digital audio filter design, the basis of virtual piano modeling.
-  </ResourceCard>
-  <ResourceCard category="acoustics" title="Spectral Audio Signal Processing" link="https://ccrma.stanford.edu/~jos/sasp/">
+  </Card>
+  <Card title="Spectral Audio Signal Processing" link="https://ccrma.stanford.edu/~jos/sasp/" tags="acoustics free">
     Julius O. Smith III. Spectral representation and transformation of audio waves.
-  </ResourceCard>
-  <ResourceCard category="acoustics" title="The Scientist &amp; Engineer's Guide to DSP" link="http://www.dspguide.com/">
+  </Card>
+  <Card title="The Scientist &amp; Engineer's Guide to DSP" link="http://www.dspguide.com/" tags="acoustics free">
     Steven W. Smith. Practical, industry-standard reference for self-studying digital signals.
-  </ResourceCard>
-  <ResourceCard category="acoustics" title="Introduction to Signal Processing" link="https://www.ece.rutgers.edu/~orfanidi/intro2sp/">
+  </Card>
+  <Card title="Introduction to Signal Processing" link="https://www.ece.rutgers.edu/~orfanidi/intro2sp/" tags="acoustics free">
     Sophocles J. Orfanidis. Formula-focused textbook on analog and digital signal transforms.
-  </ResourceCard>
-  <ResourceCard category="pedagogy" title="Fundamentals of Piano Practice" link="https://www.pianopractice.org/">
+  </Card>
+  <Card title="Fundamentals of Piano Practice" link="https://www.pianopractice.org/" tags="pedagogy free">
     Chuan C. Chang. The free textbook behind HS practice, parallel sets, and Post-Practice Improvement.
-  </ResourceCard>
-  <ResourceCard category="pedagogy" title="The Art of Piano Playing" link="https://www.amazon.com/Art-Piano-Playing-Heinrich-Neuhaus/dp/1871082455" isPaid={true}>
+  </Card>
+  <Card title="The Art of Piano Playing" link="https://www.amazon.com/Art-Piano-Playing-Heinrich-Neuhaus/dp/1871082455" tags="pedagogy paid">
     Heinrich Neuhaus. Philosophical exploration of the "artistic image" and musical projection.
-  </ResourceCard>
-  <ResourceCard category="pedagogy" title="Rational Principles of Piano Technique" link="https://www.amazon.com/Rational-Principles-Piano-Technique-Alfred/dp/0150015502" isPaid={true}>
+  </Card>
+  <Card title="Rational Principles of Piano Technique" link="https://www.amazon.com/Rational-Principles-Piano-Technique-Alfred/dp/0150015502" tags="pedagogy paid">
     Alfred Cortot. Analytical guide to isolating and solving advanced mechanical issues.
-  </ResourceCard>
-  <ResourceCard category="theory" title="Harmony and Theory" link="https://www.amazon.com/Harmony-Theory-Comprehensive-Source-Musicians/dp/0793579910" isPaid={true}>
+  </Card>
+  <Card title="Harmony and Theory" link="https://www.amazon.com/Harmony-Theory-Comprehensive-Source-Musicians/dp/0793579910" tags="theory paid">
     Keith Wyatt. Style-neutral workbook covering scales, chord spelling, and pop/jazz harmony.
-  </ResourceCard>
-  <ResourceCard category="theory" title="Music Theory For Dummies" link="https://www.amazon.com/Music-Theory-Dummies-Michael-Pilhofer/dp/1119575522" isPaid={true}>
+  </Card>
+  <Card title="Music Theory For Dummies" link="https://www.amazon.com/Music-Theory-Dummies-Michael-Pilhofer/dp/1119575522" tags="theory paid">
     Michael Pilhofer. Plain-English reference, ideal for resolving basic chord-spelling doubts.
-  </ResourceCard>
-  <ResourceCard category="theory" title="The Complete Musician" link="https://www.amazon.com/Complete-Musician-Integrated-Listening-Workbook/dp/0199742718" isPaid={true}>
+  </Card>
+  <Card title="The Complete Musician" link="https://www.amazon.com/Complete-Musician-Integrated-Listening-Workbook/dp/0199742718" tags="theory paid">
     Steven Laitz. University-level textbook on theory, formal analysis, and score reading.
-  </ResourceCard>
-  <ResourceCard category="theory" title="Tonal Harmony" link="https://www.amazon.com/Tonal-Harmony-Stefan-Kostka/dp/125944709X" isPaid={true}>
+  </Card>
+  <Card title="Tonal Harmony" link="https://www.amazon.com/Tonal-Harmony-Stefan-Kostka/dp/125944709X" tags="theory paid">
     Stefan Kostka. The standard conservatory text on voice-leading and harmonic movement.
-  </ResourceCard>
-  <ResourceCard category="theory" title="Collaborative Open-Source Music Directory" link="https://github.com/vpavlenko/study-music">
+  </Card>
+  <Card title="Collaborative Open-Source Music Directory" link="https://github.com/vpavlenko/study-music" tags="theory free">
     A crowd-sourced warehouse of web tools, software, and reading materials for musicians.
-  </ResourceCard>
-</LibraryGrid>
+  </Card>
+</Grid>

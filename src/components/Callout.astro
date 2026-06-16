@@ -1,0 +1,147 @@
+---
+interface Props {
+  title?: string;
+  label?: string; // Alias for title
+  bordered?: boolean; // If true, applies the left accent bar and outer outline; if false, no borders are shown
+  
+  bgColor?: 'dark' | 'tint' | 'transparent' | string;
+  accentColor?: 'gold' | 'rose' | string;
+  textColor?: string;
+}
+
+const { 
+  title, 
+  label,
+  bordered = false,
+  bgColor = "dark",
+  accentColor = "gold",
+  textColor
+} = Astro.props;
+
+const displayTitle = title || label;
+
+// Resolve accent color dynamically (supporting presets & raw strings)
+const presetAccents: Record<string, string> = {
+  gold: "var(--gold)",
+  rose: "var(--rose)"
+};
+const resolvedAccent = presetAccents[accentColor] || accentColor;
+
+const presetBackgrounds: Record<string, string> = {
+  transparent: "transparent",
+  // If "tint", resolve to a subtle accent color background
+  tint: accentColor === 'rose' ? "rgba(212, 118, 138, 0.07)" : "rgba(201, 168, 76, 0.07)"
+};
+
+// If using default "dark" preset, let the responsive CSS stylesheet handle it
+const isDefaultBg = bgColor === 'dark';
+const isTintBg = bgColor === 'tint';
+const resolvedBg = (isDefaultBg || isTintBg) ? undefined : (presetBackgrounds[bgColor] || bgColor);
+
+// Manage all borders strictly based on the bordered state
+const containerStyle = {
+  ...(resolvedBg && { backgroundColor: resolvedBg }),
+  ...(textColor && { color: textColor }),
+  
+  ...(bordered ? {
+    borderLeftWidth: "4px",
+    borderLeftStyle: "solid",
+    borderLeftColor: resolvedAccent,
+    
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: "var(--border-color)",
+    
+    borderRightWidth: "1px",
+    borderRightStyle: "solid",
+    borderRightColor: "var(--border-color)",
+    
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: "var(--border-color)"
+  } : {
+    borderLeftWidth: "0px",
+    borderTopWidth: "0px",
+    borderRightWidth: "0px",
+    borderBottomWidth: "0px"
+  })
+};
+
+const labelStyle = {
+  color: resolvedAccent
+};
+
+const contentStyle = {
+  ...(textColor && { color: textColor })
+};
+---
+
+<div class:list={['callout-container', { bordered, tint: isTintBg }, accentColor]} style={containerStyle}>
+  {displayTitle && (
+    <span class="callout-label" style={labelStyle}>
+      {displayTitle}
+    </span>
+  )}
+  <div class="callout-content" style={contentStyle}>
+    <slot />
+  </div>
+</div>
+
+<style>
+  .callout-container {
+    border-radius: 0 8px 8px 0;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    box-sizing: border-box;
+  }
+  
+  /* --- Default "dark" background mappings --- */
+  .callout-container {
+    background-color: rgba(30, 41, 59, 0.3);
+  }
+  
+  /* --- Subtle "tint" background mappings --- */
+  .callout-container.tint.gold {
+    background-color: rgba(201, 168, 76, 0.07);
+  }
+  .callout-container.tint.rose {
+    background-color: rgba(212, 118, 138, 0.07);
+  }
+
+  /* --- Light Theme responsive mappings --- */
+  :root[data-theme="light"] .callout-container {
+    background-color: rgba(30, 41, 59, 0.08);
+  }
+  :root[data-theme="light"] .callout-container.tint.gold {
+    background-color: rgba(201, 168, 76, 0.05);
+  }
+  :root[data-theme="light"] .callout-container.tint.rose {
+    background-color: rgba(212, 118, 138, 0.05);
+  }
+
+  /* When fully bordered, apply legacy padding */
+  .callout-container.bordered {
+    padding: 1.1rem 1.4rem;
+  }
+  
+  /* Typography */
+  .callout-label {
+    font-family: 'Space Grotesk', var(--sl-font), sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.6rem;
+    display: block;
+  }
+  
+  .callout-content :global(p) {
+    margin: 0;
+    font-size: 0.98rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  .callout-content :global(strong) {
+    color: var(--text-main);
+  }
+</style>
