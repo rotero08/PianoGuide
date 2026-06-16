@@ -1,0 +1,26 @@
+---
+// src/components/Bibliography.astro
+---
+<div class="bibliography-card">
+  <slot />
+</div>
+
+<style>
+  .bibliography-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 0.7rem 1.2rem; /* Tightened overall padding */
+    display: flex;
+    flex-direction: column;
+    counter-reset: bib-counter; /* Initializes the sequential bibliography numbering */
+  }
+
+  /* Completely hides parsed empty sibling paragraph tags to prevent visual layout gaps */
+  .bibliography-card :global(p:empty) {
+    display: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 0 !important;
+  }
+</style>

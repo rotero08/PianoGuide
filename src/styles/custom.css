@@ -1,0 +1,262 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --sl-font: 'Space Grotesk', sans-serif;
+  --sl-font-mono: 'JetBrains Mono', monospace;
+  --sl-content-width: 58rem;
+  --sl-sidebar-width: 21rem; /* Slightly wider left sidebar */
+}
+
+/* Base Headings style rule */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', serif !important;
+  font-weight: 700 !important;
+}
+
+/* ==========================================
+   SIDEBAR HEADER TITLE AND SUBTITLE
+   ========================================== */
+.site-title {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 0.4rem !important; /* Increased gap between title and subtitle */
+  text-decoration: none !important;
+  padding-top: 0.8rem !important; /* Bigger top/bottom padding for a premium look */
+  padding-bottom: 0.8rem !important;
+}
+.site-title span {
+  font-family: 'Playfair Display', serif !important;
+  font-style: italic !important;
+  font-weight: 700 !important;
+  font-size: 1.7rem !important; /* Handled as requested */
+  letter-spacing: -0.015em !important;
+  color: var(--sl-color-accent-high) !important;
+  line-height: 1.1 !important;
+}
+.site-title::after {
+  content: "TECHNIQUE \00d7  SIGHT-READING" !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 0.8rem !important; /* Handled as requested */
+  font-style: normal !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: var(--sl-color-gray-2) !important;
+  opacity: 0.85 !important;
+  line-height: 1.2 !important;
+  display: block !important;
+}
+
+/* ==========================================
+   THEME SELECT DROPDOWN OVERRIDES
+   ========================================== */
+starlight-theme-select select {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 0.8rem !important;
+  cursor: pointer !important;
+  outline: none !important;
+  min-width: 6.5rem !important; /* Prevents "Light" text from being truncated */
+  padding-inline-end: 1.8rem !important; /* Prevents text from overlapping the dropdown arrow */
+}
+
+/* Styles standard browser <select> option popups to follow design where supported */
+select option {
+  background-color: var(--bg-card) !important;
+  color: var(--text-main) !important;
+  font-family: var(--sl-font-mono) !important;
+  font-size: 0.85rem !important;
+}
+[data-theme="light"] select option,
+:root[data-theme="light"] select option {
+  background-color: var(--bg-card) !important;
+  color: var(--text-main) !important;
+}
+
+/* ==========================================
+   MOBILE MENU TOGGLE & PERFORMANCE OVERRIDES
+   ========================================== */
+starlight-menu-button button {
+  background-color: var(--bg-card) !important; /* Premium dark background */
+  color: var(--gold) !important;               /* Theme gold icon bars */
+  border: 1px solid var(--border-color) !important;
+  transition: all 0.12s ease-in-out !important; /* Snappy transition */
+}
+
+starlight-menu-button button:hover,
+starlight-menu-button button:focus,
+starlight-menu-button button[aria-expanded="true"] {
+  background-color: var(--gold) !important;    /* Active gold background */
+  color: var(--sl-color-black) !important;     /* High contrast dark icon bars */
+  border-color: var(--gold) !important;
+}
+
+/* Faster closing/opening drawer animation on mobile viewports to prevent lag */
+@media (max-width: 50rem) {
+  .sidebar-pane,
+  [class*="sidebar-pane"] {
+    transition: transform 0.12s ease-out !important;
+  }
+}
+
+/* ==========================================
+   SIDEBAR SELECTION HIGHLIGHTS (border only)
+   ========================================== */
+/* Set clean starting margins for all links */
+.sidebar-content a {
+  border-left: 3px solid transparent !important;
+  transition: all 0.16s ease !important;
+  padding-left: 1.5rem !important;
+  background: none !important;
+  color: var(--sl-color-gray-2) !important;
+  text-decoration: none !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-weight: 500 !important;
+}
+/* Link Hover states */
+.sidebar-content a:hover {
+  color: var(--sl-color-white) !important;
+  background-color: rgba(201, 168, 76, 0.05) !important;
+  border-left: 3px solid var(--sl-color-accent) !important;
+  padding-left: calc(1.5rem - 3px) !important;
+}
+:root[data-theme="light"] .sidebar-content a:hover,
+[data-theme="light"] .sidebar-content a:hover {
+  background-color: rgba(154, 116, 32, 0.05) !important;
+}
+/* Active current-page states */
+.sidebar-content a[aria-current="page"] {
+  color: var(--sl-color-accent-high) !important;
+  background-color: rgba(201, 168, 76, 0.07) !important;
+  border-left: 3px solid var(--sl-color-accent) !important;
+  padding-left: calc(1.5rem - 3px) !important;
+  font-weight: 600 !important;
+}
+:root[data-theme="light"] .sidebar-content a[aria-current="page"],
+[data-theme="light"] .sidebar-content a[aria-current="page"] {
+  color: var(--sl-color-accent) !important;
+  background-color: rgba(154, 116, 32, 0.07) !important;
+}
+
+/* ==========================================
+   RIGHT SIDEBAR / TABLE OF CONTENTS CONTRAST
+   ========================================== */
+.right-sidebar a {
+  color: var(--sl-color-gray-2) !important; /* Bright silver-white text for strong contrast */
+  opacity: 0.85 !important;
+  transition: color 0.15s ease, opacity 0.15s ease !important;
+}
+.right-sidebar a:hover,
+.right-sidebar a:focus {
+  color: var(--sl-color-white) !important;
+  opacity: 1 !important;
+  text-decoration: none !important;
+}
+.right-sidebar a[aria-current="true"],
+.right-sidebar a[aria-current="page"] {
+  color: var(--gold) !important; /* High contrast gold highlight for active section */
+  opacity: 1 !important;
+  font-weight: 600 !important;
+}
+:root[data-theme="light"] .right-sidebar a[aria-current="true"],
+:root[data-theme="light"] .right-sidebar a[aria-current="page"],
+[data-theme="light"] .right-sidebar a[aria-current="true"],
+[data-theme="light"] .right-sidebar a[aria-current="page"] {
+  color: var(--sl-color-accent) !important;
+}
+
+/* ==========================================
+   SCROLLBAR DE-CLUTTER
+   ========================================== */
+.sidebar-content, aside, [class*="sidebar"], .right-sidebar {
+  -ms-overflow-style: none !important;  /* IE and Edge */
+  scrollbar-width: none !important;  /* Firefox */
+}
+.sidebar-content::-webkit-scrollbar, aside::-webkit-scrollbar, [class*="sidebar"]::-webkit-scrollbar, .right-sidebar::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari and Opera */
+}
+
+/* ==========================================
+   LEGACY DESIGN TOKENS
+   ========================================== */
+:root[data-theme="dark"], [data-theme="dark"] {
+  color-scheme: dark !important;
+
+  --sl-color-black: #0C0E1C !important;      /* Deep black sidebar & header background */
+  --sl-color-bg: #12131F !important;         /* Premium slate content background, distinct from sidebar */
+  --sl-color-gray-6: #1C1F30 !important;     /* Card background (distinct from page background, high contrast) */
+  --sl-color-gray-5: #252840 !important;     /* Overlays, code blocks, and borders */
+  --sl-color-gray-4: #2B2F52 !important;
+  --sl-color-gray-3: rgba(245,240,232,0.14) !important;
+  --sl-color-gray-2: #E2DDD5 !important;     /* Warm silver-white text for superb baseline contrast */
+  --sl-color-gray-1: rgba(245,240,232,0.45) !important;
+  --sl-color-white: #FAF8F5 !important;      /* Pure brilliant white text */
+
+  --sl-color-accent: #C9A84C !important;     /* Theme Gold */
+  --sl-color-accent-low: rgba(201,168,76,0.13) !important;
+  --sl-color-accent-high: #E2C47A;
+  --sl-color-text-accent: #C9A84C !important;
+
+  --gold: #C9A84C;
+  --gold-light: #E2C47A;
+  --rose: #D4768A;
+  --rose-dark: #A85069;
+  --radius: 10px;
+  --transition: 0.22s ease;
+  --bg-dark: #12131F;
+  --bg-mid: #12131F;
+  --bg-card: #1C1F30;
+  --bg-card2: #252840;
+  --border-color: rgba(245,240,232,0.14);
+  --text-main: #FAF8F5;
+  --text-muted: #B6B0A6;
+  --accent-pink: #D4768A;
+
+  --badge-free: #6FB58A;
+  --badge-paid: var(--gold);
+  --badge-imslp: #8E86E0;
+  --badge-video: #D4768A;
+  --badge-theory: #B58AD4;
+  --badge-branch: var(--rose);
+}
+
+:root[data-theme="light"], [data-theme="light"] {
+  color-scheme: light !important;
+
+  --sl-color-black: #EDE8DF !important;      /* Soft warm gray sidebar & header */
+  --sl-color-bg: #F4EFE7 !important;         /* Warm cream page content backdrop */
+  --sl-color-gray-6: #E4DDD3 !important;     /* Card background (distinct from page background) */
+  --sl-color-gray-5: #EDE8DF !important;
+  --sl-color-gray-4: rgba(30,20,10,0.1) !important;
+  --sl-color-gray-3: rgba(30,20,10,0.2) !important;
+  --sl-color-gray-2: #2E2820 !important;     /* High contrast baseline body text */
+  --sl-color-gray-1: rgba(30,20,10,0.6) !important;
+  --sl-color-white: #1A1824 !important;      /* Active body text */
+
+  --sl-color-accent: #9a7420 !important;
+  --sl-color-accent-low: rgba(154,116,32,0.13) !important;
+  --sl-color-accent-high: #8a6820;
+  --sl-color-text-accent: #9a7420 !important;
+
+  --gold: #9a7420;
+  --gold-light: #8a6820;
+  --rose: #A85069;
+  --rose-dark: #A85069;
+  --radius: 10px;
+  --transition: 0.22s ease;
+  --bg-dark: #FAF7F2;
+  --bg-mid: #F4EFE7;
+  --bg-card: #EDE8DF;
+  --bg-card2: #E4DDD3;
+  --border-color: rgba(30,20,10,0.2);
+  --text-main: #1A1824;
+  --text-muted: #4B4339;
+  --accent-pink: #A85069;
+
+  --badge-free: #3E8A63;
+  --badge-paid: #9a7420;
+  --badge-imslp: #5b54b0;
+  --badge-video: #A85069;
+  --badge-theory: #7d4fb0;
+  --badge-branch: #A85069;
+}
