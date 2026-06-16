@@ -1,0 +1,378 @@
+---
+// src/components/InteractivePiano.astro
+---
+
+<div class="lab-block">
+  <div class="keyboard-wrap">
+    <div class="keyboard" id="keyboard">
+      <!-- White keys (Symmetrical 16-key layout) -->
+      <!-- Left Portion -->
+      <div class="key-white" data-note="F3"><span class="note-label">F</span></div>
+      <div class="key-white" data-note="G3"><span class="note-label">G</span></div>
+      <div class="key-white" data-note="A3"><span class="note-label">A</span></div>
+      <div class="key-white" data-note="B3"><span class="note-label">B</span></div>
+      
+      <!-- Centered Playable Portion -->
+      <div class="key-white" data-note="C4" data-key="a"><span class="note-label">C<span class="key-hint">A</span></span></div>
+      <div class="key-white" data-note="D4" data-key="s"><span class="note-label">D<span class="key-hint">S</span></span></div>
+      <div class="key-white" data-note="E4" data-key="d"><span class="note-label">E<span class="key-hint">D</span></span></div>
+      <div class="key-white" data-note="F4" data-key="f"><span class="note-label">F<span class="key-hint">F</span></span></div>
+      <div class="key-white" data-note="G4" data-key="g"><span class="note-label">G<span class="key-hint">G</span></span></div>
+      <div class="key-white" data-note="A4" data-key="h"><span class="note-label">A<span class="key-hint">H</span></span></div>
+      <div class="key-white" data-note="B4" data-key="j"><span class="note-label">B<span class="key-hint">J</span></span></div>
+      <div class="key-white" data-note="C5" data-key="k"><span class="note-label">C<span class="key-hint">K</span></span></div>
+      
+      <!-- Right Portion -->
+      <div class="key-white" data-note="D5"><span class="note-label">D</span></div>
+      <div class="key-white" data-note="E5"><span class="note-label">E</span></div>
+      <div class="key-white" data-note="F5"><span class="note-label">F</span></div>
+      <div class="key-white" data-note="G5"><span class="note-label">G</span></div>
+
+      <!-- Black keys (Symmetrical layout) -->
+      <!-- Left Portion -->
+      <div class="key-black" data-note="F#3" style="left: 37.5px;"></div>
+      <div class="key-black" data-note="G#3" style="left: 92.5px;"></div>
+      <div class="key-black" data-note="A#3" style="left: 147.5px;"></div>
+
+      <!-- Centered Playable Portion -->
+      <div class="key-black" data-note="C#4" style="left: 257.5px;"><span class="key-hint-black">W</span></div>
+      <div class="key-black" data-note="D#4" style="left: 312.5px;"><span class="key-hint-black">E</span></div>
+      <div class="key-black" data-note="F#4" style="left: 422.5px;"><span class="key-hint-black">T</span></div>
+      <div class="key-black" data-note="G#4" style="left: 477.5px;"><span class="key-hint-black">Y</span></div>
+      <div class="key-black" data-note="A#4" style="left: 532.5px;"><span class="key-hint-black">U</span></div>
+
+      <!-- Right Portion -->
+      <div class="key-black" data-note="C#5" style="left: 642.5px;"></div>
+      <div class="key-black" data-note="D#5" style="left: 697.5px;"></div>
+      <div class="key-black" data-note="F#5" style="left: 807.5px;"></div>
+    </div>
+  </div>
+  <p class="keyboard-hint">Tap a key, or play A S D F G H J K (White) or W E T Y U (Black).</p>
+</div>
+
+<div class="intro-chord-block" id="introChordBtn">
+  <div class="chord-play-btn">
+    <svg viewBox="0 0 24 24" fill="currentColor" class="chord-play-svg">
+      <polygon points="6 3 20 12 6 21 6 3" />
+    </svg>
+  </div>
+  <div class="chord-block-text">
+    <div class="chord-block-title">C major, your first chord</div>
+    <div class="chord-block-sub">C · E · G · pressed together</div>
+  </div>
+</div>
+
+<style>
+  .lab-block {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+  .keyboard-wrap {
+    position: relative !important;
+    overflow: hidden !important; /* Hide scrollbars completely */
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+  }
+  .keyboard {
+    position: relative !important;
+    height: 180px !important;
+    width: 877px !important; /* Symmetrical 16 white keys + gaps boundary */
+    margin: 0 auto !important;
+    font-size: 0 !important; /* Collapse HTML whitespace between inline-block child elements */
+    white-space: nowrap !important; /* Prevent keys from wrapping */
+  }
+  .key-white {
+    display: inline-block !important;
+    vertical-align: top !important; /* Guarantee pixel-perfect vertical alignment at the top */
+    width: 52px !important;
+    height: 180px !important;
+    background: var(--white-key, #F0EDE6) !important;
+    border-radius: 0 0 6px 6px !important;
+    cursor: pointer !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+    border-bottom: 3px solid #c8c0b0 !important;
+    transition: background 0.05s, transform 0.05s !important;
+    
+    /* Reset and override adjacent sibling margin leakage from Starlight */
+    margin: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    margin-right: 3px !important; 
+  }
+  .key-white:last-child {
+    margin-right: 0 !important;
+  }
+  .key-white.pressed {
+    background: var(--gold-light, #E2C47A) !important;
+    transform: scaleY(0.97) !important;
+    transform-origin: top !important;
+  }
+  .key-black {
+    width: 32px !important;
+    height: 110px !important;
+    background: var(--black-key, #181920) !important;
+    border-radius: 0 0 4px 4px !important;
+    cursor: pointer !important;
+    position: absolute !important;
+    top: 0 !important; /* Secure black keys to the absolute top of the frame */
+    z-index: 2 !important;
+    border-bottom: 3px solid #050508 !important;
+    box-shadow: 2px 4px 8px rgba(0,0,0,0.6) !important;
+    transition: background 0.05s, transform 0.05s !important;
+    
+    /* Reset and override adjacent sibling margin leakage from Starlight */
+    margin: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  .key-black.pressed {
+    background: var(--rose-dark, #A85069) !important;
+    transform: scaleY(0.97) !important;
+    transform-origin: top !important;
+  }
+  .note-label {
+    position: absolute !important;
+    bottom: 9px !important;
+    left: 0 !important;
+    right: 0 !important;
+    text-align: center !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 9px !important; /* Override parent font-size: 0 */
+    color: #666 !important;
+    pointer-events: none !important;
+    font-weight: 700 !important;
+  }
+  .key-hint {
+    font-size: 8px !important;
+    opacity: 0.65 !important;
+    display: block !important;
+    margin-top: 2px !important;
+    color: var(--rose) !important;
+  }
+  .key-hint-black {
+    position: absolute !important;
+    bottom: 8px !important;
+    left: 0 !important;
+    right: 0 !important;
+    text-align: center !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 8px !important;
+    color: var(--gold) !important;
+    opacity: 0.65 !important;
+    pointer-events: none !important;
+    font-weight: 700 !important;
+  }
+  .keyboard-hint {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.75rem !important;
+    color: var(--text-muted) !important;
+    margin-top: 1rem !important;
+    margin-bottom: 0 !important;
+    opacity: 0.75 !important;
+    text-align: center !important;
+  }
+
+  /* Intro Chord Block */
+  .intro-chord-block {
+    margin: 2rem 0;
+    padding: 1.5rem 1.8rem;
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius);
+    display: flex !important;
+    align-items: center !important; /* Vertical center alignment */
+    gap: 1.4rem !important;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .intro-chord-block:hover {
+    border-color: var(--gold);
+    transform: translateY(-1px);
+  }
+  .chord-play-btn {
+    width: 50px !important;
+    height: 50px !important;
+    background-color: var(--gold) !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    color: var(--sl-color-black);
+    transition: transform 0.15s;
+  }
+  .chord-play-svg {
+    width: 18px !important;
+    height: 18px !important;
+    display: block !important;
+  }
+  .intro-chord-block:hover .chord-play-btn {
+    transform: scale(1.08);
+  }
+  .chord-block-text {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    
+    /* Reset and override adjacent sibling margin leakage from Starlight */
+    margin: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding: 0 !important;
+  }
+  .chord-block-title {
+    font-family: 'Playfair Display', serif !important;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    color: var(--text-main) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.2 !important;
+  }
+  .chord-block-sub {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.68rem !important;
+    color: var(--text-muted) !important;
+    margin: 0.35rem 0 0 0 !important;
+    padding: 0 !important;
+    line-height: 1.2 !important;
+  }
+</style>
+
+<script>
+  function initPiano() {
+    const NOTE_FREQS: Record<string, number> = {
+      "F3": 174.61, "F#3": 185.00, "G3": 196.00, "G#3": 207.65, "A3": 220.00, "A#3": 233.08, "B3": 246.94,
+      "C4": 261.63, "C#4": 277.18, "D4": 293.66, "D#4": 311.13, "E4": 329.63, "F4": 349.23, "F#4": 369.99, "G4": 392.00, "G#4": 415.30, "A4": 440.00, "A#4": 466.16, "B4": 493.88,
+      "C5": 523.25, "C#5": 554.37, "D5": 587.33, "D#5": 622.25, "E5": 659.25, "F5": 698.46, "F#5": 739.99, "G5": 783.99
+    };
+
+    const KEY_MAP: Record<string, string> = {
+      "a": "C4", "s": "D4", "d": "E4", "f": "F4", "g": "G4", "h": "A4", "j": "B4", "k": "C5",
+      "w": "C#4", "e": "D#4", "t": "F#4", "y": "G#4", "u": "A#4"
+    };
+
+    let audioCtx: AudioContext | null = null;
+
+    function playNote(freq: number) {
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+
+        const now = audioCtx.currentTime;
+
+        const osc1 = audioCtx.createOscillator();
+        const gain1 = audioCtx.createGain();
+        osc1.type = 'triangle';
+        osc1.frequency.setValueAtTime(freq, now);
+
+        const osc2 = audioCtx.createOscillator();
+        const gain2 = audioCtx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(freq * 2, now);
+
+        const masterGain = audioCtx.createGain();
+
+        osc1.connect(gain1);
+        gain1.gain.setValueAtTime(0.5, now);
+        gain1.connect(masterGain);
+
+        osc2.connect(gain2);
+        gain2.gain.setValueAtTime(0.15, now);
+        gain2.connect(masterGain);
+
+        masterGain.connect(audioCtx.destination);
+
+        masterGain.gain.setValueAtTime(0, now);
+        masterGain.gain.linearRampToValueAtTime(0.6, now + 0.008);
+        masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
+
+        osc1.start(now);
+        osc2.start(now);
+
+        osc1.stop(now + 1.25);
+        osc2.stop(now + 1.25);
+      } catch (e) {
+        console.warn("AudioContext setup failed:", e);
+      }
+    }
+
+    const keys = document.querySelectorAll('.key-white, .key-black');
+
+    keys.forEach(key => {
+      const triggerPlay = () => {
+        const note = key.getAttribute('data-note');
+        if (note && NOTE_FREQS[note]) {
+          playNote(NOTE_FREQS[note]);
+          key.classList.add('pressed');
+          setTimeout(() => key.classList.remove('pressed'), 150);
+        }
+      };
+
+      key.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        triggerPlay();
+      });
+      key.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        triggerPlay();
+      });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.repeat) return;
+      const keyName = e.key.toLowerCase();
+      if (KEY_MAP[keyName]) {
+        const note = KEY_MAP[keyName];
+        const keyEl = document.querySelector(`[data-note="${note}"]`);
+        if (keyEl) {
+          playNote(NOTE_FREQS[note]);
+          keyEl.classList.add('pressed');
+        }
+      }
+    });
+
+    document.addEventListener('keyup', (e) => {
+      const keyName = e.key.toLowerCase();
+      if (KEY_MAP[keyName]) {
+        const note = KEY_MAP[keyName];
+        const keyEl = document.querySelector(`[data-note="${note}"]`);
+        if (keyEl) {
+          keyEl.classList.remove('pressed');
+        }
+      }
+    });
+
+    const introChordBtn = document.getElementById('introChordBtn');
+    if (introChordBtn) {
+      introChordBtn.addEventListener('click', () => {
+        playNote(NOTE_FREQS["C4"]);
+        playNote(NOTE_FREQS["E4"]);
+        playNote(NOTE_FREQS["G4"]);
+
+        const cEl = document.querySelector('[data-note="C4"]');
+        const eEl = document.querySelector('[data-note="E4"]');
+        const gEl = document.querySelector('[data-note="G4"]');
+
+        [cEl, eEl, gEl].forEach(el => {
+          if (el) {
+            el.classList.add('pressed');
+            setTimeout(() => el.classList.remove('pressed'), 250);
+          }
+        });
+      });
+    }
+  }
+
+  initPiano();
+  document.addEventListener('astro:page-load', initPiano);
+</script>
