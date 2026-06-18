@@ -1,0 +1,93 @@
+---
+// src/components/ProgressCard.astro
+
+/**
+ * ### ProgressCard Component
+ * 
+ * An individual card displaying completion progress for a single track.
+ * Features a high-contrast progress bar track dynamically updated by the state engine.
+ */
+export interface Props {
+  /** The parent progress track identifier this task contributes calculations to. */
+  trackId: string;
+  /** The descriptive title heading printed inside the progress card. */
+  title: string;
+}
+const { trackId, title } = Astro.props;
+---
+<div class="po-row" data-progress-row={trackId}>
+  <div class="po-top">
+    <span class="po-name">{title}</span>
+    <span class="po-pct" id={`${trackId}-pct`}>0%</span>
+  </div>
+  <div class="po-bar-bg">
+    <div class="po-bar-fg" id={`${trackId}-bar`}></div>
+  </div>
+</div>
+
+<style>
+  .po-row {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 8px !important;
+    padding: 0.85rem 1.1rem !important;
+    box-sizing: border-box !important;
+    transition: transform 0.15s ease, border-color 0.15s ease !important;
+    width: 100% !important;
+  }
+  .po-row:hover {
+    transform: translateY(-1px) !important;
+    border-color: var(--gold) !important;
+  }
+  :root[data-theme="light"] .po-row:hover {
+    border-color: var(--sl-color-accent) !important;
+  }
+
+  .po-top {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    font-size: 0.85rem !important;
+    margin-bottom: 0.5rem !important;
+    gap: 0.5rem !important;
+  }
+
+  .po-name {
+    color: var(--text-main) !important;
+    font-weight: 500 !important;
+    font-size: 0.86rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .po-pct {
+    font-family: 'JetBrains Mono', monospace !important;
+    color: var(--gold) !important;
+    font-weight: 700 !important;
+    font-size: 0.78rem !important;
+    flex-shrink: 0 !important;
+  }
+  :root[data-theme="light"] .po-pct {
+    color: var(--sl-color-accent) !important;
+  }
+
+  .po-bar-bg {
+    height: 5px !important;
+    background: rgba(128, 128, 128, 0.2) !important; /* Semi-transparent track, clearly visible in all light/dark themes */
+    border-radius: 3px !important;
+    overflow: hidden !important;
+    width: 100% !important;
+  }
+
+  .po-bar-fg {
+    height: 100% !important;
+    width: 0%;
+    background: var(--gold) !important;
+    border-radius: 3px !important;
+    transition: width 0.5s ease-out !important;
+  }
+  :root[data-theme="light"] .po-bar-fg {
+    background: var(--sl-color-accent) !important;
+  }
+</style>

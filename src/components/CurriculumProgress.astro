@@ -1,15 +1,6 @@
 ---
 // src/components/CurriculumProgress.astro
-
-/**
- * Astro props interface for the CurriculumProgress tracking grid dashboard.
- * Supports complete IDE documentation display.
- */
 export interface Props {
-  /** 
-   * Optional custom ID selector to target specific DOM calculations. 
-   * @default "curriculumOverview"
-   */
   id?: string;
 }
 
@@ -17,43 +8,12 @@ const { id = "curriculumOverview" } = Astro.props;
 ---
 
 <div id={id} class="progress-overview-container">
+  <!-- Main Overall Progress Header -->
   <div class="po-overall-header">
     <div class="po-big-pct" id="overall-pct">0%</div>
     <div class="po-cap-label">Overall Curriculum Progress</div>
     <div class="po-overall-bar-bg">
       <div class="po-overall-bar-fg" id="overall-bar"></div>
-    </div>
-  </div>
-  
-  <div class="po-grid-row">
-    <div class="po-row" data-progress-row="prestaff">
-      <div class="po-top">
-        <span class="po-name">Pre-Staff (Arm Weight &amp; Ear)</span>
-        <span class="po-pct" id="prestaff-pct">0%</span>
-      </div>
-      <div class="po-bar-bg">
-        <div class="po-bar-fg" id="prestaff-bar"></div>
-      </div>
-    </div>
-
-    <div class="po-row" data-progress-row="lvl0">
-      <div class="po-top">
-        <span class="po-name">Level 0 (Linear Reading)</span>
-        <span class="po-pct" id="lvl0-pct">0%</span>
-      </div>
-      <div class="po-bar-bg">
-        <div class="po-bar-fg" id="lvl0-bar"></div>
-      </div>
-    </div>
-
-    <div class="po-row" data-progress-row="leadsheets">
-      <div class="po-top">
-        <span class="po-name">Lead Sheets (Level 1 Harmony)</span>
-        <span class="po-pct" id="leadsheets-pct">0%</span>
-      </div>
-      <div class="po-bar-bg">
-        <div class="po-bar-fg" id="leadsheets-bar"></div>
-      </div>
     </div>
   </div>
 </div>
@@ -62,19 +22,21 @@ const { id = "curriculumOverview" } = Astro.props;
   .progress-overview-container {
     display: flex !important;
     flex-direction: column !important;
-    gap: 1rem !important;
+    gap: 1.25rem !important;
     margin: 1.5rem 0 2rem;
+    width: 100% !important;
   }
 
   .po-overall-header {
     background: var(--bg-card) !important;
     border: 1px solid var(--border-color) !important;
     border-left: 4px solid var(--gold) !important;
-    border-radius: var(--radius);
-    padding: 1.2rem 1.5rem !important;
+    border-radius: var(--radius) !important;
+    padding: 1.2rem 1.6rem !important;
     display: flex !important;
     flex-direction: column !important;
     gap: 0.5rem !important;
+    box-sizing: border-box !important;
   }
   :root[data-theme="light"] .po-overall-header {
     border-left-color: var(--sl-color-accent) !important;
@@ -101,7 +63,7 @@ const { id = "curriculumOverview" } = Astro.props;
 
   .po-overall-bar-bg {
     height: 8px !important;
-    background: var(--sl-color-gray-6) !important;
+    background: rgba(128, 128, 128, 0.2) !important; /* Semi-transparent track, clearly visible in all light/dark themes */
     border-radius: 4px !important;
     overflow: hidden !important;
     width: 100% !important;
@@ -115,61 +77,5 @@ const { id = "curriculumOverview" } = Astro.props;
   }
   :root[data-theme="light"] .po-overall-bar-fg {
     background: linear-gradient(90deg, var(--sl-color-accent), var(--rose)) !important;
-  }
-
-  .po-grid-row {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
-    gap: 1rem !important;
-  }
-
-  .po-row {
-    background: var(--bg-card) !important;
-    border: 1px solid var(--border-color) !important;
-    border-radius: 8px !important;
-    padding: 0.9rem 1.1rem !important;
-    box-sizing: border-box !important;
-  }
-
-  .po-top {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    font-size: 0.85rem !important;
-    margin-bottom: 0.55rem !important;
-  }
-
-  .po-name {
-    color: var(--text-main) !important;
-    font-weight: 600 !important;
-  }
-
-  .po-pct {
-    font-family: 'JetBrains Mono', monospace !important;
-    color: var(--gold) !important;
-    font-weight: 700 !important;
-    font-size: 0.78rem !important;
-  }
-  :root[data-theme="light"] .po-pct {
-    color: var(--sl-color-accent) !important;
-  }
-
-  .po-bar-bg {
-    height: 6px !important;
-    background: var(--sl-color-gray-6) !important;
-    border-radius: 3px !important;
-    overflow: hidden !important;
-    width: 100% !important;
-  }
-
-  .po-bar-fg {
-    height: 100% !important;
-    width: 0%;
-    background: var(--gold) !important;
-    border-radius: 3px !important;
-    transition: width 0.5s ease-out !important;
-  }
-  :root[data-theme="light"] .po-bar-fg {
-    background: var(--sl-color-accent) !important;
   }
 </style>

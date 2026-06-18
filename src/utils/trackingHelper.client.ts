@@ -10,6 +10,18 @@ interface TaskMap {
  * where only some of the checkboxes are currently rendered.
  */
 const GLOBAL_TASK_REGISTRY: TaskMap = {
+  tech1: [
+    'check-tech1-posture',
+    'check-tech1-drop',
+    'check-tech1-release',
+    'check-tech1-checkpoint'
+  ],
+  tech2: [
+    'check-tech2-dozen',
+    'check-tech2-scales',
+    'check-tech2-chords',
+    'check-tech2-checkpoint'
+  ],
   prestaff: [
     'check-prestaff-posture',
     'check-prestaff-ear',
@@ -23,10 +35,42 @@ const GLOBAL_TASK_REGISTRY: TaskMap = {
     'check-lvl0-chang',
     'check-lvl0-checkpoint'
   ],
-  leadsheets: [
-    'check-lead-level1',
-    'check-lead-triads',
-    'check-lead-drill'
+  lvl1: [
+    'check-lvl1-triads',
+    'check-lvl1-dyads',
+    'check-lvl1-leadsheet',
+    'check-lvl1-checkpoint'
+  ],
+  lvl2: [
+    'check-lvl2-scales',
+    'check-lvl2-keysig',
+    'check-lvl2-canons',
+    'check-lvl2-checkpoint'
+  ],
+  lvl3: [
+    'check-lvl3-leaps',
+    'check-lvl3-reading',
+    'check-lvl3-checkpoint'
+  ],
+  lvl4: [
+    'check-lvl4-inv',
+    'check-lvl4-expr',
+    'check-lvl4-checkpoint'
+  ],
+  lvl5: [
+    'check-lvl5-gradus',
+    'check-lvl5-anki',
+    'check-lvl5-checkpoint'
+  ],
+  lvl6: [
+    'check-lvl6-octaves',
+    'check-lvl6-phrasing',
+    'check-lvl6-checkpoint'
+  ],
+  lvl7: [
+    'check-lvl7-chorale',
+    'check-lvl7-loop',
+    'check-lvl7-checkpoint'
   ]
 };
 

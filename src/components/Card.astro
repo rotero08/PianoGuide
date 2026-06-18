@@ -45,6 +45,11 @@ export interface Props {
    * @default "none"
    */
   category?: 'acoustics' | 'pedagogy' | 'theory' | 'none'; 
+  /** 
+   * Renders the title as a giant stat number.
+   * @default false
+   */
+  isStat?: boolean;
 }
 
 const {
@@ -55,7 +60,8 @@ const {
   icon,
   link,
   buttonText = "Open ↗",
-  category
+  category,
+  isStat = false
 } = Astro.props;
 ---
 
@@ -68,7 +74,7 @@ const {
         <Icon name={icon} class="card-svg" />
       </span>
     )}
-    <h4 class="card-title">{title}</h4>
+    <h4 class:list={['card-title', { 'card-title-stat': isStat }]}>{title}</h4>
   </div>
 
   <div class="card-content">
@@ -160,6 +166,16 @@ const {
     margin: 0 !important;
     font-weight: 700 !important;
     line-height: 1.3 !important;
+  }
+
+  .card-title-stat {
+    font-size: 2.5rem !important;
+    color: var(--gold) !important;
+    line-height: 1 !important;
+    margin-bottom: 0.5rem !important;
+  }
+  :root[data-theme="light"] .card-title-stat {
+    color: var(--sl-color-accent) !important;
   }
 
   .card-content {

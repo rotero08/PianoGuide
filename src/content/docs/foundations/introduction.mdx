@@ -6,18 +6,33 @@ description: A self-taught, progressive piano path based on community wisdom.
 import Callout from '@components/Callout.astro';
 import Grid from '@components/Grid.astro';
 import Card from '@components/Card.astro';
+import TracksContainer from '@components/TracksContainer.astro';
+import TrackBlock from '@components/TrackBlock.astro';
 import CurriculumProgress from '@components/CurriculumProgress.astro';
+import ProgressCard from '@components/ProgressCard.astro';
 
-Much of the thinking behind this path is owed to **Mr. Scarlet OnTheMoon**, whose open-access curriculum work inspired this interactive version. The path itself is a **combination of relaxed technique and sight-reading**, resequenced so that technique comes first and reading joins once the hands are calm; the reading order draws mostly from that sight-reading curriculum, with the full reasoning detailed in [How This Method Works](/foundations/methodology/). 
+<Callout bordered={true} accentColor="rose" label="A few honest disclaimers before you start" icon="warning">
+  **I am not a pianist.** I am not even a beginner. I am a normal person with no prior piano experience who decided to read through the recommendations on **r/piano**, r/pianolearning, r/musictheory and the other places linked throughout this guide, and then build this website from what kept coming up. This is the path I am setting out to follow myself, written down so I can stick to it.
 
-It also leans heavily on community leaders widely cited in these discussions, including **u/Yeargdribble** for ideas on relative-pitch audiation, and **Mayron Cole** for progressive preparatory reading frameworks. A full directory of the authors, platforms, and public libraries this guide draws on is listed at the bottom of this interface.
+  **This is a curated shortlist, not a catalogue.** There are plenty of excellent resources out there, and this does not try to list all of them. It collects only what experienced players and teachers seem to rate most highly, and arranges it into something you can actually follow in order, with optional branches along the way.
+
+  **It is written for self-learners.** It aims to be an in-depth path for people teaching themselves, so it rarely talks about lessons. That said, the people this guide draws on are nearly unanimous on one point: a teacher, even an occasional one, is the most reliable way to catch problems with **posture and technique** before they harden into habits. If a teacher is not an option, the next best thing is a second pair of eyes from the community. From your very first week, film a short clip of your hands and posture and post it for feedback on [r/piano](https://www.reddit.com/r/piano/), [the Piano Street forums](https://www.pianostreet.com/smf/), or a Discord such as the r/piano server. Doing this early, rather than after months of solo practice, is what keeps small tension habits from becoming permanent ones.
+</Callout>
+
+<Card border="left" accentColor="gold" icon="star" title="Acknowledgments & Dedication">
+  Much of the thinking behind this path is owed to **Mr. Scarlet OnTheMoon**, whose open-access curriculum work inspired this interactive version. The path itself is a **combination of relaxed technique and sight-reading**, resequenced so that technique comes first and reading joins once the hands are calm; the reading order draws mostly from that sight-reading curriculum, with the full reasoning in [How This Method Works](/foundations/methodology/). It also leans heavily on community leaders widely cited in these discussions, including **u/Yeargdribble** for ideas on relative-pitch audiation, and **Mayron Cole** for progressive preparatory reading frameworks. A full directory of the authors, platforms, and public libraries this guide draws on is listed at the bottom of this interface.
+</Card>
+
+### Welcome, sit down and play
+
+## A self-taught path, built from advice that *keeps working for others*
 
 Press a key. That's the whole appeal of the piano: cause and effect, immediate and physical. This is your instrument for the year ahead. Find C, the white key just left of every group of two black keys, and hear what you're working toward.
 
 This guide gathers the advice that comes up most often across **r/piano**, r/pianolearning, r/musictheory, long-running community classics, and the public-domain pedagogy that working teachers tend to recommend, and arranges it into a single ordered path. A recurring observation in those communities is that self-taught players often stall not for lack of effort but because they collect scattered tips with no sequence. The idea here is the opposite: one path, Pre-Staff to Level 7, sequenced so that physical technique and reading fluency grow together rather than fight each other.
 
-<Callout bordered={true} accentColor="gold" label="The ultimate goal, what you will be able to do at the end">
-  The aim of a path like this is to leave you a genuinely literate, self-sufficient pianist by the time you work through Level 7. Concretely, the target is to be able to: **sit at a piano and sight-read** intermediate-to-advanced classical scores, with multiple voices, ledger lines, ornaments, and key changes, hands-together on a first pass; **play with relaxed, tension-free technique**, using hands-separate practice to clear fast runs, octaves, and polyrhythms without strain; **open a lead sheet or chord chart and accompany yourself** by ear, building patterns on the fly; **hear and audiate** music well enough to catch your own mistakes; and, most importantly, **teach yourself any new piece** using a repeatable deliberate-practice loop, so you can keep improving for life. Reading, technique, harmony, and ear are treated here not as four separate courses but as four strands of one skill, braided together level by level.
+<Callout bordered={true} accentColor="gold" label="The ultimate goal, what you will be able to do at the end" icon="target">
+  The aim of a path like this, according to the players and teachers it draws on, is to leave you a genuinely literate, self-sufficient pianist by the time you work through Level 7. Concretely, the target is to be able to: **sit at a piano and sight-read** intermediate-to-advanced classical scores, with multiple voices, ledger lines, ornaments, and key changes, hands-together on a first pass; **play with relaxed, tension-free technique**, using hands-separate practice to clear fast runs, octaves, and polyrhythms without strain; **open a lead sheet or chord chart and accompany yourself** by ear, building patterns on the fly; **hear and audiate** music well enough to catch your own mistakes; and, most importantly, **teach yourself any new piece** using a repeatable deliberate-practice loop, so you can keep improving for life. Reading, technique, harmony, and ear are treated here not as four separate courses but as four strands of one skill, braided together level by level.
 </Callout>
 
 Each of the levels opens with its own smaller goal, exactly what *that* level adds to the picture, so you always know what you're working toward and why.
@@ -25,6 +40,18 @@ Each of the levels opens with its own smaller goal, exactly what *that* level ad
 ## The rising tide of self-taught musicians
 
 The pandemic years turned a quiet hobby into a movement. Piano sales climbed, online platforms reported record sign-ups, and a generation discovered that you don't need an expensive weekly lesson to start making music. One online learning service reported its new-user base growing several times over from early 2020 onward. The same "teach yourself" ethos that reshaped coding and language learning arrived at the keyboard, but the piano is unusually complex, and self-direction without structure tends to stall. That is exactly the gap this method closes.
+
+<Grid cols={3}>
+  <Card title="8" subtitle="Levels" border="top" accentColor="gold" isStat={true}>
+    Pre-Staff → Level 7
+  </Card>
+  <Card title="20" subtitle="Minutes" border="top" accentColor="gold" isStat={true}>
+    Focused daily practice is enough to start
+  </Card>
+  <Card title="2–3" subtitle="Grade Gap" border="top" accentColor="gold" isStat={true}>
+    The calibration gap between playing and reading
+  </Card>
+</Grid>
 
 ## The myth of the "natural" musician
 
@@ -41,11 +68,11 @@ Master these and everything above them gets easier.
 
 ## Why technique comes first here
 
-This guide combines several sources, but it makes one deliberate choice about order: **technique before sight-reading.** Almost every self-taught stall traces back to tension that set in during the first weeks, so the curriculum opens with two short, reading-free levels — [Technique 1](/technique/technique-1/) and [Technique 2](/technique/technique-2/). You do no notation in them at all. You simply build a calm body and hands that obey, so that when reading begins, your physical setup is never the thing holding you back.
+This guide combines several sources, but it makes one deliberate choice about order: **technique before sight-reading.** Almost every self-taught stall traces back to tension that set in during the first weeks, so the curriculum opens with two short, reading-free levels — [Technique 1](/technique/technique-1/) and [Technique 2](/technique/technique-2/). You do no notation in them at all. You simply build a calm body and hands that obey, so that when reading begins, your physical setup is never the thing holding you back. Postural guidance is integrated directly into [Technique 1](/technique/technique-1/) so that your physical alignment can be referenced anytime.
 
-Only after those two foundations do you enter the **Sight-Reading Curriculum**, Pre-Staff through Level 7. That graded reading path — its levels, its resource lists, and its benchmark test pieces — is adapted from **Mr. Scarlet OnTheMoon's sight-reading chart**. Every reading resource and every benchmark you meet in those levels comes from that work, kept together in the sight-reading track and clearly separate from technique. Inside each sight-reading level, the left side is the reading material; the right side is only the small amount of supporting technique that level needs.
+Only after those two foundations do you enter the **Sight-Reading Curriculum**, Pre-Staff through Level 7. That graded reading path — its levels, its resource lists, and its benchmark test pieces — is adapted from **Mr. Scarlet OnTheMoon's sight-reading chart**. Every reading resource and every benchmark you meet in those levels comes from that work, kept together in the sight-reading track and clearly separate from technique. Inside each sight-reading level, the left side is the reading material (the Mr. Scarlet resources); the right side is only the small amount of supporting technique that level needs.
 
-<Callout bordered={true} accentColor="gold" label="The architectural insight">
+<Callout bordered={true} accentColor="gold" label="The architectural insight" icon="info">
   A point experienced self-learners tend to converge on is that the strongest piano education is rarely any single resource; it is a deliberate combination. The pattern they describe looks like this: build a structured foundation from a method book, use a small, trusted tool set (Functional Ear Trainer, Complete Rhythm Trainer, Sightread.dev, musictheory.net, Teoria.com, Anki) for feedback and theory, pull scores from public libraries like IMSLP, watch a classical channel such as Nahre Sol or Dr. Josh Wright (or Julian Bradley for jazz, Bill Hilton for chord-based playing) for off-keyboard demonstration, track progress against a graded syllabus, and practise with intention along the lines Ericsson describes. This guide simply tries to assemble that stack into one ordered path.
 </Callout>
 
@@ -55,27 +82,62 @@ With no examiner, a widely suggested workaround is to borrow an external ruler. 
 
 ## Your progress at a glance
 
-This dashboard tracks completion states globally. These metrics will scale up dynamically as you mark goals complete.
+Every level keeps its own checklist, and your daily / weekly / monthly practice plan lives inside each level too. Here's where you stand across the whole curriculum, and it updates live as you tick objectives off.
 
 <CurriculumProgress />
+
+<Grid cols={3}>
+  <ProgressCard trackId="tech1" title="Technique 1: Posture & Arm Weight" />
+  <ProgressCard trackId="tech2" title="Technique 2: Hand Shapes" />
+  <ProgressCard trackId="prestaff" title="Pre-Staff: Arm Weight & Ear" />
+  <ProgressCard trackId="lvl0" title="Level 0: Linear Reading" />
+  <ProgressCard trackId="lvl1" title="Level 1: Intervals & Chords" />
+  <ProgressCard trackId="lvl2" title="Level 2: Voices & Geometry" />
+  <ProgressCard trackId="lvl3" title="Level 3: Positional Shifting" />
+  <ProgressCard trackId="lvl4" title="Level 4: Inversions & Speed" />
+  <ProgressCard trackId="lvl5" title="Level 5: Early Polyphony" />
+  <ProgressCard trackId="lvl6" title="Level 6: Phrasing & Counterpoint" />
+  <ProgressCard trackId="lvl7" title="Level 7: Polytonal Independence" />
+</Grid>
 
 ## The mandatory spine, and the optional branches
 
 Not everything in this guide is meant to be done by everyone, in order, all at once. The people it draws on tend to describe one **required spine** that almost every self-learner is advised to follow, plus several **optional branches** you can pick up when you are ready, depending on the kind of player you want to become.
 
-* **Mandatory Spine (The reading & technique spine):** Technique 1 and 2 first, then Pre-Staff through Level 7. This is the one path nearly everyone in these communities is pointed toward: relaxed technique built first, then fluent sight-reading grown on top of it. Supporting tools like [How To Read Music](/skills/reading-music/), [Rhythm, Clefs & Decoding](/skills/rhythm-clefs/), [Keyboard Geometry](/skills/scales-chords/), and [Play By Ear](/skills/ear-training/) feed in exactly where each level instructs.
-* **Optional Branches (The harmony & keyboard branch):** If you also want to accompany singers, play pop and rock, or improvise rather than only read, this branch is for you:
-  * **Lead Sheets** — playing a melody from chord symbols (unlocks after Level 1).
-  * **Comping & Styles** — turning blocked chords into rhythmic accompaniment vamps (unlocks after Level 2).
-  * **Modern / Jazz Harmony** — extended chords, sevenths, ninths, and lead sheet alterations (unlocks after Level 4).
+<TracksContainer>
+  <TrackBlock title="The reading & technique spine" badge="MANDATORY" accentColor="gold">
+    Technique 1 and 2 first, then Pre-Staff through Level 7. This is the one path nearly everyone in these communities is pointed toward: relaxed technique built first, then fluent sight-reading grown on top of it. The supporting tools, [How To Read Music](/skills/reading-music/) (clefs, key signatures), [Rhythm, Clefs & Decoding](/skills/rhythm-clefs/), [Keyboard Geometry](/skills/scales-chords/), and [Play By Ear](/skills/ear-training/), are part of the spine too. They are not extra courses; they feed the early levels and are best used *alongside* Levels 0 to 2, exactly where each level tells you to.
+  </TrackBlock>
+
+  <TrackBlock title="The harmony & keyboard branch" badge="OPTIONAL" accentColor="rose">
+    If you also want to accompany singers, play pop and rock, or improvise rather than only read, this branch is for you. It is widely recommended but not required, and it is staged so it never overloads the spine:
+    
+    * **Lead Sheets** — playing a melody from chord symbols. Commonly suggested once you can read simple intervals, so it *unlocks after Level 1*.
+    * **Comping & Styles** — turning blocked chords into rhythmic accompaniment vamps. Most useful once chord shapes are reliable, so it *unlocks after Level 2*.
+    * **Modern / Jazz Harmony** — extended chords, sevenths and ninths, and reading jazz lead sheets. This sits on top of solid chord reading, so it *unlocks after Level 4*.
+
+    You can ignore this branch entirely and still complete the guide. Pick it up whenever a level tells you it has unlocked.
+  </TrackBlock>
+</TracksContainer>
 
 To help you navigate, each section features an explicit action layout card:
 
-<Grid>
-  <Card border="left" accentColor="gold" icon="map" title="Core Reading Levels" link="/curriculum/level-0/" buttonText="Start with Level 0">
+<Grid cols={2}>
+  <Card border="left" accentColor="gold" icon="map" title="Core Reading Levels" link="/curriculum/pre-staff/" buttonText="Start with Pre-Staff">
     Your central reading path, taking you from Pre-Staff (basic direction) up to Level 7 (advanced classical polyphony).
   </Card>
   <Card border="left" accentColor="rose" icon="target" title="Harmony &amp; Ear Track" link="/harmony/lead-sheets/" buttonText="Go to Harmony Track">
     Unlocks at Level 1. Learn to construct accompaniment patterns on the fly using chord charts, lead sheets, and simple vamps.
+  </Card>
+</Grid>
+
+## The Practice Loop Rules
+
+<Grid cols={2}>
+  <Card border="top" accentColor="gold" icon="repeat" title="The Three-Repeat Limit">
+    Play an exercise a maximum of three times in a single session. The first run is for raw translation, the second to steady the pulse, and the third to capture articulation details. A fourth run starts to build muscle memory, which most reading-focused teachers consider counter-productive for sight-reading [1](/reference/library/#ref-1).
+  </Card>
+  <Card border="top" accentColor="rose" icon="retreat" title="New Game Plus (Reset)">
+    If you hit a complete roadblock where the pieces at your current level feel overwhelming, do not keep grinding. Activate a **New Game +**: drop back to Level 0 and read different beginner pieces. This builds deep, automatic coordinate memory.
   </Card>
 </Grid>

@@ -1,0 +1,82 @@
+---
+// src/components/TracksContainer.astro
+
+/**
+ * ### TracksContainer Component
+ * 
+ * A structural container that groups track blocks. It manages margins, spacing,
+ * responsive columns, and prints the visual legend chips on the top layout rail.
+ * 
+ * @example
+ * <TracksContainer>
+ *   <TrackBlock title="The reading & technique spine" badge="MANDATORY" accentColor="gold">
+ *     Technique 1 and 2 first...
+ *   </TrackBlock>
+ * </TracksContainer>
+ */
+export type Props = Record<string, never>;
+---
+<div class="tracks-explainer-container">
+  <div class="legend-row">
+    <span class="legend-chip">
+      <span class="legend-dot mand"></span> Mandatory spine
+    </span>
+    <span class="legend-chip">
+      <span class="legend-dot opt"></span> Optional branch (unlocks as you progress)
+    </span>
+  </div>
+
+  <div class="explainer-grid">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .tracks-explainer-container {
+    margin: 2rem 0 !important;
+    width: 100% !important;
+  }
+
+  /* Legend Row styling */
+  .legend-row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.6rem 1.5rem !important;
+    margin-bottom: 1.2rem !important;
+    align-items: center !important;
+  }
+  .legend-chip {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    font-size: 0.82rem !important;
+    color: var(--text-muted) !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    letter-spacing: 0.02em !important;
+  }
+  .legend-dot {
+    width: 11px !important;
+    height: 11px !important;
+    border-radius: 50% !important;
+    flex-shrink: 0 !important;
+  }
+  .legend-dot.mand {
+    background: var(--gold) !important;
+  }
+  :root[data-theme="light"] .legend-dot.mand {
+    background: var(--sl-color-accent) !important;
+  }
+  .legend-dot.opt {
+    background: transparent !important;
+    border: 2px solid var(--rose) !important;
+  }
+
+  /* Explainer Grid */
+  .explainer-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+    gap: 1.5rem !important;
+    align-items: stretch !important;
+    width: 100% !important;
+  }
+</style>
