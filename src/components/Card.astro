@@ -3,44 +3,48 @@
 import Icon from './Icon.astro';
 
 /**
- * Props for the Card component.
+ * ### Card Component
+ * 
+ * A clean content tile featuring subtle shadow hover, transition parameters, and focus indicators.
  */
-interface Props {
-  /**
-   * The primary title heading text populated inside the card.
-   */
+export interface Props {
+  /** The primary title heading text populated inside the card. */
   title: string;
-  /**
-   * Optional decorative subtitle, displayed as monospaced uppercase metadata at the top of the card.
+  /** 
+   * Optional decorative subtitle displayed as monospaced uppercase metadata at the top of the card.
+   * @default undefined
    */
   subtitle?: string; 
-  /**
-   * Inserts a bold accent decorative border line.
-   * @default 'none'
+  /** 
+   * Inserts a bold accent decorative border line on the selected edge.
+   * @default "none"
    */
   border?: 'top' | 'left' | 'none'; 
-  /**
+  /** 
    * Theme styling preset applied to subtitles, decorative borders, and vector icons.
-   * @default 'gold'
+   * @default "gold"
    */
   accentColor?: 'gold' | 'rose' | 'none';
-  /**
-   * Optional identifier name of an icon (from the `Icon.astro` catalog) to display inside the card header.
+  /** 
+   * Optional identifier name of an icon to display inside the card header.
+   * @default "none"
    */
-  icon?: string; 
-  /**
-   * Destination URL or path. Setting this renders a styled external action anchor button link at the bottom of the card.
+  icon?: 'info' | 'target' | 'warning' | 'play-box' | 'link' | 'speed-wall' | 'app-trap' | 'acronym-trap' | 'repeat' | 'moon' | 'retreat' | 'chevron-down' | 'star' | 'map' | 'none'; 
+  /** 
+   * Destination URL or path. Setting this renders an action anchor button at the bottom.
+   * @default undefined
    */
   link?: string; 
-  /**
+  /** 
    * The button text displayed when a CTA link is configured.
    * @default "Open ↗"
    */
   buttonText?: string;
-  /**
-   * Custom tag classification string used to filter elements in dynamic, searchable `<Grid>` layouts.
+  /** 
+   * Custom tag classification string used to filter elements in dynamic grids.
+   * @default "none"
    */
-  category?: string; 
+  category?: 'acoustics' | 'pedagogy' | 'theory' | 'none'; 
 }
 
 const {
@@ -59,7 +63,7 @@ const {
   {subtitle && <div class="card-subtitle">{subtitle}</div>}
   
   <div class="card-header">
-    {icon && (
+    {icon && icon !== 'none' && (
       <span class="card-icon" aria-hidden="true">
         <Icon name={icon} class="card-svg" />
       </span>
@@ -115,7 +119,6 @@ const {
   :root[data-theme="light"] .gold.border-left { border-left-color: var(--sl-color-accent) !important; }
   .rose.border-left { border-left-color: var(--rose) !important; }
 
-  /* Subtitle */
   .card-subtitle {
     font-family: 'JetBrains Mono', monospace !important;
     font-size: 0.6rem !important;
@@ -137,7 +140,6 @@ const {
     padding: 0 !important;
   }
   
-  /* Icon inherits the accent color of the card! */
   .card-icon {
     display: block !important;
     flex-shrink: 0 !important;

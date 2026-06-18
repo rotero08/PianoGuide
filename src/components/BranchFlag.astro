@@ -1,6 +1,11 @@
 ---
 // src/components/BranchFlag.astro
-interface Props {
+
+/**
+ * Astro props interface for the BranchFlag component.
+ */
+export interface Props {
+  /** The localized descriptive metadata content string written on the flag label. */
   text: string;
 }
 const { text } = Astro.props;

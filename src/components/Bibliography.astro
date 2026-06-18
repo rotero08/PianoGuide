@@ -2,6 +2,18 @@
 // src/components/Bibliography.astro
 import { getCitationData } from '../utils/citationScanner';
 
+/**
+ * ### Bibliography Component
+ * 
+ * Renders the academic citation bibliography list, dynamically binding backlink metadata.
+ * 
+ * @example
+ * <Bibliography>
+ *   * #ref-1 **Rubin-Rabson, G. (1940).** *Studies in the psychology of memorizing piano music.*
+ * </Bibliography>
+ */
+export interface Props {}
+
 const { backlinks, numToSlug, slugToNumber } = await getCitationData();
 const bibliographyId = `bib-${Math.random().toString(36).substring(2, 11)}`;
 ---

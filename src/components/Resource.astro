@@ -9,43 +9,48 @@ interface Badge {
 }
 
 /**
- * Props for the Resource component.
+ * ### Resource Component
+ * 
+ * A structured card to reference books, videos, and PDFs, supporting stylized status badges.
  */
-interface Props {
-  /**
-   * The primary header title of the resource item.
-   */
+export interface Props {
+  /** The primary header title of the resource item. */
   title: string;
-  /**
-   * Destination URL link opened when the resource's action CTA button is clicked.
-   */
+  /** Destination URL link opened when the resource's action CTA button is clicked. */
   link: string;
-  /**
+  /** 
    * Custom text displayed inside the link anchor CTA button.
+   * @default "Open ↗"
    */
   buttonText?: string;
-  /**
+  /** 
    * If true, applies a 4px left decorative accent border line.
+   * @default false
    */
   borderLeft?: boolean;
-  /**
+  /** 
    * Accent border theme preset color applied when `borderLeft` is active.
+   * @default "rose"
    */
-  accentColor?: 'gold' | 'rose';
-  /**
+  accentColor?: 'gold' | 'rose' | 'none';
+  /** 
    * Optional icon lookup identifier name to display next to the title.
+   * @default "none"
    */
-  icon?: string;
-  /**
+  icon?: 'info' | 'target' | 'warning' | 'play-box' | 'link' | 'speed-wall' | 'app-trap' | 'acronym-trap' | 'repeat' | 'moon' | 'retreat' | 'chevron-down' | 'star' | 'map' | 'none';
+  /** 
    * Secondary subtitle stats string aligned to the top-right corner.
+   * @default undefined
    */
   subs?: string;
-  /**
+  /** 
    * Descriptive uppercase focus tag details line displayed above the body.
+   * @default undefined
    */
   focus?: string;
-  /**
-   * Space-separated metadata category lookup strings mapping to stylized status badges.
+  /** 
+   * Space-separated metadata category lookup strings mapping to status badges.
+   * @default ""
    */
   tags?: string;
 }
@@ -148,7 +153,7 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
 <div class:list={['resource-card', { 'has-border-left': borderLeft, [accentColor]: borderLeft }]} data-category={category}>
   <div class="resource-header">
     <div class="resource-header-left">
-      {icon && (
+      {icon && icon !== 'none' && (
         <span class="resource-icon" aria-hidden="true">
           <Icon name={icon} class="resource-svg" />
         </span>
@@ -181,7 +186,7 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
 
 <style>
   .resource-card {
-    background-color: var(--bg-card);
+    background-color: var(--sl-color-gray-6);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 1.5rem !important;
@@ -226,7 +231,7 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
     display: flex !important;
     align-items: center !important;
     color: var(--gold) !important;
-    transform: translateY(1.5px) !important; /* Visual optical alignment nudge */
+    transform: translateY(1.5px) !important;
   }
   :root[data-theme="light"] .resource-icon { color: var(--sl-color-accent) !important; }
   .resource-icon :global(.resource-svg) {
@@ -259,7 +264,7 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
   :root[data-theme="light"] .btn-link:hover { background-color: var(--sl-color-accent) !important; color: var(--sl-color-white) !important; border-color: var(--sl-color-accent) !important; }
 
   .badge { display: inline-block !important; padding: 0.15rem 0.45rem !important; border-radius: 4px !important; font-size: 0.65rem !important; font-weight: 700 !important; text-transform: uppercase !important; letter-spacing: 0.08em !important; white-space: nowrap !important; align-self: flex-start !important; width: max-content !important; font-family: 'JetBrains Mono', monospace !important; position: relative !important; cursor: help !important; }
-  .badge::after { content: attr(data-tip) !important; position: absolute !important; bottom: 130% !important; left: 50% !important; transform: translateX(-50%) !important; background-color: var(--sl-color-bg, #12131F) !important; color: var(--text-main, #FAF8F5) !important; border: 1px solid var(--border-color) !important; border-radius: 4px !important; padding: 0.45rem 0.65rem !important; font-size: 0.72rem !important; font-family: 'Space Grotesk', sans-serif !important; text-transform: none !important; letter-spacing: normal !important; font-weight: 400 !important; white-space: normal !important; width: 210px !important; text-align: center !important; opacity: 0 !important; pointer-events: none !important; transition: opacity 0.15s ease-out !important; z-index: 100 !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important; }
+  .badge::after { content: attr(data-tip) !important; position: absolute !important; bottom: 130% !important; left: 50% !important; transform: translateX(-50%) !important; background-color: var(--sl-color-bg, #12131F) !important; color: var(--text-main, #FAF8F5) !important; border: 1px solid var(--sl-color-gray-3) !important; border-radius: 4px !important; padding: 0.45rem 0.65rem !important; font-size: 0.72rem !important; font-family: 'Space Grotesk', sans-serif !important; text-transform: none !important; letter-spacing: normal !important; font-weight: 400 !important; white-space: normal !important; width: 210px !important; text-align: center !important; opacity: 0 !important; pointer-events: none !important; transition: opacity 0.15s ease-out !important; z-index: 100 !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important; }
   .badge:hover::after { opacity: 1 !important; }
   .badge.free, .badge.blueprint, .badge.success { background: rgba(111, 181, 138, 0.13) !important; color: var(--badge-free) !important; border: 1px solid rgba(111, 181, 138, 0.3) !important; }
   .badge.alternate { background: rgba(142, 134, 224, 0.13) !important; color: var(--badge-imslp) !important; border: 1px solid rgba(142, 134, 224, 0.3) !important; }

@@ -7,7 +7,7 @@ export default defineConfig({
 		starlight({
 			title: 'The Complete Pianist',
 			components: {
-				Head: './src/components/CitationLoader.astro',
+				Head: './src/components/GlobalLoader.astro',
 			},
 			customCss: [
 				'./src/styles/custom.css',

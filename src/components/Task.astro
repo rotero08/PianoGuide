@@ -1,0 +1,268 @@
+---
+// src/components/Task.astro
+
+/**
+ * ### Task Component
+ * 
+ * A single, interactive progress checklist row containing a custom circular checkbox.
+ */
+export interface Props {
+  /** 
+   * The unique storage identifier for this checklist item. 
+   * Must match an ID defined inside GLOBAL_TASK_REGISTRY in `trackingHelper.client.ts`. 
+   */
+  id: string;
+  /** 
+   * The parent progress track identifier this task contributes percentage calculations to.
+   */
+  trackId: 'prestaff' | 'lvl0' | 'leadsheets';
+  /** 
+   * Optional frequency or category tag metadata badge.
+   * @default "none"
+   */
+  tag?: 'daily' | 'weekly' | 'monthly' | 'check' | 'prereq' | 'none';
+  /** 
+   * Optional target path or external URL for instructional course materials.
+   * @default undefined
+   */
+  link?: string;
+  /** 
+   * Custom text populated inside the optional navigation button.
+   * @default "go →"
+   */
+  linkText?: string;
+}
+
+const { id, trackId, tag = "none", link, linkText = "go →" } = Astro.props;
+
+const tagStyles: Record<string, { label: string; class: string }> = {
+  daily: { label: 'Daily', class: 'tag-daily' },
+  weekly: { label: 'Weekly', class: 'tag-weekly' },
+  monthly: { label: 'Monthly', class: 'tag-monthly' },
+  check: { label: 'Check', class: 'tag-check' },
+  prereq: { label: 'Prereq', class: 'tag-prereq' }
+};
+
+const activeTag = tag !== 'none' ? tagStyles[tag] : null;
+---
+
+<div class="task-row-container" data-task-container={id}>
+  <div class="task-interactive-left">
+    <div class="task-checkbox-wrapper">
+      <input 
+        type="checkbox" 
+        id={id} 
+        data-track-id={trackId} 
+        class="task-checkbox-input" 
+      />
+      <label for={id} class="task-checkbox-label" aria-label="Mark task as complete">
+        <svg viewBox="0 0 24 24" fill="none" class="checkmark-svg">
+          <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
+        </svg>
+      </label>
+    </div>
+    
+    {activeTag && (
+      <span class:list={['task-tag-badge', activeTag.class]}>
+        {activeTag.label}
+      </span>
+    )}
+
+    <div class="task-body-content">
+      <slot />
+    </div>
+  </div>
+
+  {link && (
+    <a href={link} class="task-nav-btn">
+      {linkText}
+    </a>
+  )}
+</div>
+
+<style>
+  .task-row-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.85rem !important;
+    padding: 0.95rem 0 !important;
+    border-top: 1px solid var(--sl-color-gray-3) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .task-row-container:first-of-type {
+    border-top: none !important;
+  }
+
+  .task-interactive-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.85rem !important;
+    flex-grow: 1 !important;
+  }
+
+  .task-checkbox-wrapper {
+    position: relative !important;
+    width: 22px !important;
+    height: 22px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .task-checkbox-input {
+    opacity: 0 !important;
+    position: absolute !important;
+    inset: 0 !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+    z-index: 2 !important;
+  }
+
+  .task-checkbox-label {
+    position: absolute !important;
+    inset: 0 !important;
+    border: 2px solid var(--sl-color-gray-3) !important;
+    border-radius: 50% !important;
+    background-color: var(--sl-color-gray-6) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: background-color 0.15s, border-color 0.15s !important;
+    pointer-events: none !important;
+    z-index: 1 !important;
+  }
+
+  .task-checkbox-input:hover + .task-checkbox-label {
+    border-color: var(--gold) !important;
+  }
+  :root[data-theme="light"] .task-checkbox-input:hover + .task-checkbox-label {
+    border-color: var(--sl-color-accent) !important;
+  }
+
+  .task-checkbox-input:checked + .task-checkbox-label {
+    background-color: var(--gold) !important;
+    border-color: var(--gold) !important;
+  }
+  :root[data-theme="light"] .task-checkbox-input:checked + .task-checkbox-label {
+    background-color: var(--sl-color-accent) !important;
+    border-color: var(--sl-color-accent) !important;
+  }
+
+  .checkmark-svg {
+    width: 11px !important;
+    height: 11px !important;
+    color: var(--sl-color-black) !important;
+    opacity: 0 !important;
+    transform: scale(0.5) !important;
+    transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.15s !important;
+  }
+  :root[data-theme="light"] .checkmark-svg {
+    color: var(--sl-color-bg) !important;
+  }
+
+  .task-checkbox-input:checked + .task-checkbox-label .checkmark-svg {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+  }
+
+  .task-tag-badge {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.54rem !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    padding: 0.3rem 0.45rem !important;
+    border-radius: 5px !important;
+    flex-shrink: 0 !important;
+    font-weight: 700 !important;
+    width: 74px !important;
+    text-align: center !important;
+  }
+  .tag-daily {
+    background-color: rgba(201, 168, 76, 0.15) !important;
+    color: var(--gold) !important;
+  }
+  :root[data-theme="light"] .tag-daily {
+    background-color: rgba(154, 116, 32, 0.15) !important;
+    color: var(--sl-color-accent) !important;
+  }
+  .tag-weekly {
+    background-color: rgba(212, 118, 138, 0.15) !important;
+    color: var(--rose) !important;
+  }
+  .tag-monthly {
+    background-color: rgba(142, 134, 224, 0.15) !important;
+    color: var(--badge-imslp) !important;
+  }
+  .tag-check {
+    background-color: rgba(142, 134, 224, 0.15) !important;
+    color: var(--badge-imslp) !important;
+  }
+  .tag-prereq {
+    background-color: rgba(30, 41, 59, 0.4) !important;
+    color: var(--text-muted) !important;
+  }
+
+  .task-body-content {
+    font-size: 0.95rem !important;
+    line-height: 1.45 !important;
+    color: var(--text-main) !important;
+  }
+  .task-body-content :global(strong) {
+    color: var(--text-main) !important;
+  }
+  .task-body-content :global(p) {
+    color: var(--text-muted) !important;
+    font-size: 0.84rem !important;
+    line-height: 1.45 !important;
+    margin-top: 0.2rem !important;
+    margin-bottom: 0 !important;
+  }
+
+  .task-checkbox-input:checked ~ .task-body-content {
+    text-decoration: line-through !important;
+    text-decoration-color: var(--sl-color-gray-4) !important;
+    opacity: 0.55 !important;
+  }
+
+  .task-nav-btn {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.64rem !important;
+    color: var(--sl-color-accent) !important;
+    background: transparent !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 6px !important;
+    padding: 0.4rem 0.7rem !important;
+    flex-shrink: 0 !important;
+    cursor: pointer !important;
+    transition: all 0.15s !important;
+    align-self: center !important;
+  }
+  .task-nav-btn:hover {
+    border-color: var(--gold) !important;
+    color: var(--gold) !important;
+    text-decoration: none !important;
+  }
+  :root[data-theme="light"] .task-nav-btn:hover {
+    border-color: var(--sl-color-accent) !important;
+    color: var(--sl-color-accent) !important;
+  }
+
+  @media (max-width: 640px) {
+    .task-row-container {
+      flex-wrap: wrap !important;
+    }
+    .task-tag-badge {
+      order: 1 !important;
+    }
+    .task-interactive-left {
+      order: 3 !important;
+      flex-basis: 100% !important;
+    }
+    .task-nav-btn {
+      order: 2 !important;
+      margin-left: auto !important;
+    }
+  }
+</style>

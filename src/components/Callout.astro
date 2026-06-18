@@ -3,41 +3,47 @@
 import Icon from './Icon.astro';
 
 /**
- * Props for the Callout component.
+ * ### Callout Component
+ * 
+ * A styled highlight panel used to emphasize warnings, notes, or tips.
  */
-interface Props {
-  /**
-   * The main heading text displayed inside the callout block.
+export interface Props {
+  /** 
+   * The main header title displayed inside the callout block.
+   * @default undefined
+   * @example title="Important Note"
    */
   title?: string;
-  /**
+  /** 
    * An alternative heading or label for the callout. If both `title` and `label` are provided,
-   * the component merges their usage as the primary visual title.
+   * they will merge into the header display.
+   * @default undefined
+   * @example label="Why audiation comes first"
    */
   label?: string; 
-  /**
+  /** 
    * Optional name of an icon (from the `Icon.astro` lookup directory) to display beside the title.
+   * @default "none"
    */
-  icon?: string; 
-  /**
-   * If true, renders a styled left border using the `accentColor` theme, with subtle border boundaries.
+  icon?: 'info' | 'target' | 'warning' | 'play-box' | 'link' | 'speed-wall' | 'app-trap' | 'acronym-trap' | 'repeat' | 'moon' | 'retreat' | 'chevron-down' | 'star' | 'map' | 'none'; 
+  /** 
+   * If set to true, displays a styled left border using the current accent color.
    * @default false
    */
   bordered?: boolean; 
-  /**
-   * The background theme style of the callout container.
-   * Accepts predefined presets ('dark', 'tint', or 'transparent') or custom CSS color values.
-   * @default 'dark'
+  /** 
+   * The background theme style of the callout box.
+   * @default "dark"
    */
-  bgColor?: 'dark' | 'tint' | 'transparent' | string;
-  /**
+  bgColor?: 'dark' | 'tint' | 'transparent' | 'none';
+  /** 
    * The accent theme color used to style headers and bordered highlights.
-   * Predefined shortcuts are 'gold' and 'rose', but custom CSS color variables or hex codes are supported.
-   * @default 'gold'
+   * @default "gold"
    */
-  accentColor?: 'gold' | 'rose' | string;
-  /**
-   * Custom CSS color variable or hex string to style paragraph and typography elements inside the card.
+  accentColor?: 'gold' | 'rose' | 'none';
+  /** 
+   * Custom CSS color variable or hex string to style paragraph typography elements inside.
+   * @default undefined
    */
   textColor?: string;
 }
@@ -56,12 +62,14 @@ const displayTitle = title || label;
 
 const presetAccents: Record<string, string> = {
   gold: "var(--gold)",
-  rose: "var(--rose)"
+  rose: "var(--rose)",
+  none: "transparent"
 };
 const resolvedAccent = presetAccents[accentColor] || accentColor;
 
 const presetBackgrounds: Record<string, string> = {
   transparent: "transparent",
+  none: "transparent",
   tint: accentColor === 'rose' ? "rgba(212, 118, 138, 0.07)" : "rgba(201, 168, 76, 0.07)"
 };
 
@@ -93,14 +101,14 @@ const containerStyle = {
   })
 };
 
-const labelStyle = { color: resolvedAccent };
+const labelStyle = { color: resolvedAccent !== 'transparent' ? resolvedAccent : undefined };
 const contentStyle = { ...(textColor && { color: textColor }) };
 ---
 
 <div class:list={['callout-container', { bordered, tint: isTintBg }, accentColor]} style={containerStyle}>
   {displayTitle && (
     <span class="callout-label" style={labelStyle}>
-      {icon && <Icon name={icon} class="callout-svg" />}
+      {icon && icon !== 'none' && <Icon name={icon} class="callout-svg" />}
       {displayTitle}
     </span>
   )}

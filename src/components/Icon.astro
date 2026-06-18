@@ -2,22 +2,21 @@
 // src/components/Icon.astro
 
 /**
- * Props for the Icon component.
+ * Astro props interface for the Icon vector asset component.
+ * Integrates directly with VS Code autocomplete and hover systems.
  */
-interface Props {
-  /**
-   * The lookup name of the icon path to render from the static SVG vector catalog.
-   */
+export interface Props {
+  /** The specific directory identifier key of the SVG icon to fetch and render. */
   name: string;
-  /**
+  /** 
    * Optional space-separated SVG utility CSS classes used to override dimensions or color.
+   * @default ""
    */
   class?: string;
 }
 
 const { name, class: className = '' } = Astro.props;
 
-// Central dictionary of all legacy SVG paths
 const icons: Record<string, string> = {
   'info': '<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.6" fill="currentColor" stroke="none"/>',
   'target': '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/>',

@@ -1,7 +1,13 @@
 ---
-// src/components/CitationLoader.astro
+// src/components/GlobalLoader.astro
 import Default from '@astrojs/starlight/components/Head.astro';
 import { getCitationData } from '../utils/citationScanner';
+
+/**
+ * Astro props interface for the Global head override script injector.
+ * Maps Starlight configuration values seamlessly.
+ */
+export type Props = Record<string, unknown>;
 
 const { backlinks, numToSlug, slugToNumber } = await getCitationData();
 ---
@@ -21,4 +27,9 @@ const { backlinks, numToSlug, slugToNumber } = await getCitationData();
 <!-- Global client-side citation handler script -->
 <script>
   import '../utils/citationHelper.client.ts';
+</script>
+
+<!-- Global client-side progress tracking state engine -->
+<script>
+  import '../utils/trackingHelper.client.ts';
 </script>

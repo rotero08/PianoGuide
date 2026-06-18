@@ -2,50 +2,49 @@
 // src/components/Grid.astro
 
 /**
- * Defines an option inside the category selection dropdown list of interactive, searchable Grids.
+ * Interface representing a category filter option.
  */
-interface FilterOption {
-  /**
-   * The programmatic option identifier, matching card element classification attributes (e.g., `data-category`).
-   */
+export interface FilterOption {
+  /** The programmatic option value, matching resource tags. */
   value: string;
-  /**
-   * The user-facing label text populated inside the select dropdown item.
-   */
+  /** The human-readable label shown in the select dropdown list. */
   label: string;
 }
 
 /**
- * Props for the Grid component.
+ * ### Grid Component Props
+ * 
+ * Astro props interface for the responsive Grid layout container.
  */
-interface Props {
-  /**
-   * Force grid items into a strict column layout count (e.g., `cols={2}` for dual splits).
-   * Overrides automatic layout wrapping. Mobile viewports will dynamically fall back to a single column.
+export interface Props {
+  /** 
+   * Force the grid into a strict, fixed column layout.
+   * Overrides automated wrapping.
+   * @default undefined
    */
   cols?: number;
-  /**
-   * Minimum responsive item width before wrapping to another row. Ignored if `cols` is specified.
+  /** 
+   * Minimum responsive item width before wrapping to another row.
    * @default "320px"
    */
   minWidth?: string; 
-  /**
+  /** 
    * Grid layout gap spacing.
    * @default "1.5rem"
    */
   gap?: string;
-  /**
+  /** 
    * Activates interactive client-side query search bars and optional category filters.
    * @default false
    */
   searchable?: boolean;
-  /**
-   * Placeholder placeholder text populated inside search text input boxes.
+  /** 
+   * Placeholder text populated inside search text input boxes.
    * @default "Search..."
    */
   placeholder?: string;
-  /**
-   * List of filter metadata categories. Only used if `searchable` is true.
+  /** 
+   * List of filter metadata categories. Only used if searchable is true.
    * @default []
    */
   filterOptions?: FilterOption[];
@@ -169,7 +168,6 @@ const gridStyle = {
     align-items: stretch !important;
   }
 
-  /* Responsively override forced multi-column parameters on mobile */
   @media (max-width: 720px) {
     .cols-forced .grid-layout {
       grid-template-columns: 1fr !important;
