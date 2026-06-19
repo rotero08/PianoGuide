@@ -5,31 +5,22 @@
  * ### Task Component
  * 
  * A single, interactive progress checklist row containing a custom circular checkbox.
+ * 
+ * @example
+ * <Task id="check-prestaff-posture" trackId="prestaff">
+ *   **Posture drop:** Drop each hand...
+ * </Task>
  */
 export interface Props {
-  /** 
-   * The unique storage identifier for this checklist item. 
-   * Must match an ID defined inside GLOBAL_TASK_REGISTRY in `trackingHelper.client.ts`. 
-   */
+  /** The unique storage identifier for this checklist item. Must match an ID defined inside GLOBAL_TASK_REGISTRY in `trackingHelper.client.ts`. */
   id: string;
-  /** 
-   * The parent progress track identifier this task contributes percentage calculations to.
-   */
-  trackId: 'prestaff' | 'lvl0' | 'leadsheets';
-  /** 
-   * Optional frequency or category tag metadata badge.
-   * @default "none"
-   */
+  /** The parent progress track identifier this task contributes percentage calculations to. */
+  trackId: 'tech1' | 'tech2' | 'prestaff' | 'lvl0' | 'lvl1' | 'lvl2' | 'lvl3' | 'lvl4' | 'lvl5' | 'lvl6' | 'lvl7' | 'leadsheets';
+  /** Optional frequency or category tag metadata badge. */
   tag?: 'daily' | 'weekly' | 'monthly' | 'check' | 'prereq' | 'none';
-  /** 
-   * Optional target path or external URL for instructional course materials.
-   * @default undefined
-   */
+  /** Optional target path or external URL for instructional course materials. */
   link?: string;
-  /** 
-   * Custom text populated inside the optional navigation button.
-   * @default "go →"
-   */
+  /** Custom text populated inside the optional navigation button. */
   linkText?: string;
 }
 
@@ -48,6 +39,7 @@ const activeTag = tag !== 'none' ? tagStyles[tag] : null;
 
 <div class="task-row-container" data-task-container={id}>
   <div class="task-interactive-left">
+    <!-- Circle Checkbox on the Left -->
     <div class="task-checkbox-wrapper">
       <input 
         type="checkbox" 
@@ -86,13 +78,13 @@ const activeTag = tag !== 'none' ? tagStyles[tag] : null;
     align-items: center !important;
     justify-content: space-between !important;
     gap: 0.85rem !important;
-    padding: 0.95rem 0 !important;
-    border-top: 1px solid var(--sl-color-gray-3) !important;
+    padding: 0.8rem 0 !important;
+    border-bottom: 1px solid var(--border-color) !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
-  .task-row-container:first-of-type {
-    border-top: none !important;
+  .task-row-container:last-child {
+    border-bottom: none !important;
   }
 
   .task-interactive-left {
@@ -100,12 +92,13 @@ const activeTag = tag !== 'none' ? tagStyles[tag] : null;
     align-items: center !important;
     gap: 0.85rem !important;
     flex-grow: 1 !important;
+    min-width: 0 !important;
   }
 
   .task-checkbox-wrapper {
     position: relative !important;
-    width: 22px !important;
-    height: 22px !important;
+    width: 20px !important;
+    height: 20px !important;
     flex-shrink: 0 !important;
   }
 
@@ -121,9 +114,9 @@ const activeTag = tag !== 'none' ? tagStyles[tag] : null;
   .task-checkbox-label {
     position: absolute !important;
     inset: 0 !important;
-    border: 2px solid var(--sl-color-gray-3) !important;
+    border: 2px solid rgba(128, 128, 128, 0.2) !important;
     border-radius: 50% !important;
-    background-color: var(--sl-color-gray-6) !important;
+    background-color: transparent !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -203,66 +196,51 @@ const activeTag = tag !== 'none' ? tagStyles[tag] : null;
   }
 
   .task-body-content {
-    font-size: 0.95rem !important;
+    font-size: 0.92rem !important;
     line-height: 1.45 !important;
-    color: var(--text-main) !important;
+    color: var(--text-muted) !important;
+    min-width: 0 !important;
+    flex-grow: 1 !important;
   }
   .task-body-content :global(strong) {
     color: var(--text-main) !important;
-  }
-  .task-body-content :global(p) {
-    color: var(--text-muted) !important;
-    font-size: 0.84rem !important;
-    line-height: 1.45 !important;
-    margin-top: 0.2rem !important;
-    margin-bottom: 0 !important;
+    font-weight: 700 !important;
   }
 
   .task-checkbox-input:checked ~ .task-body-content {
     text-decoration: line-through !important;
-    text-decoration-color: var(--sl-color-gray-4) !important;
+    text-decoration-color: var(--text-faint) !important;
     opacity: 0.55 !important;
   }
 
   .task-nav-btn {
     font-family: 'JetBrains Mono', monospace !important;
-    font-size: 0.64rem !important;
-    color: var(--sl-color-accent) !important;
-    background: transparent !important;
+    font-size: 0.72rem !important;
+    color: var(--gold) !important;
+    background: var(--bg-card2) !important;
     text-decoration: none !important;
     white-space: nowrap !important;
     border: 1px solid var(--border-color) !important;
     border-radius: 6px !important;
-    padding: 0.4rem 0.7rem !important;
+    padding: 0.35rem 0.7rem !important;
     flex-shrink: 0 !important;
     cursor: pointer !important;
     transition: all 0.15s !important;
     align-self: center !important;
+    font-weight: 600 !important;
+  }
+  :root[data-theme="light"] .task-nav-btn {
+    color: var(--sl-color-accent) !important;
   }
   .task-nav-btn:hover {
+    background-color: var(--gold) !important;
     border-color: var(--gold) !important;
-    color: var(--gold) !important;
+    color: var(--sl-color-black) !important;
     text-decoration: none !important;
   }
   :root[data-theme="light"] .task-nav-btn:hover {
     border-color: var(--sl-color-accent) !important;
-    color: var(--sl-color-accent) !important;
-  }
-
-  @media (max-width: 640px) {
-    .task-row-container {
-      flex-wrap: wrap !important;
-    }
-    .task-tag-badge {
-      order: 1 !important;
-    }
-    .task-interactive-left {
-      order: 3 !important;
-      flex-basis: 100% !important;
-    }
-    .task-nav-btn {
-      order: 2 !important;
-      margin-left: auto !important;
-    }
+    background-color: var(--sl-color-accent) !important;
+    color: var(--sl-color-white) !important;
   }
 </style>

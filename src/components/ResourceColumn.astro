@@ -1,0 +1,318 @@
+---
+// src/components/ResourceColumn.astro
+
+/**
+ * ### ResourceColumn Component
+ * 
+ * A vertical layout column representing a core curriculum track (e.g. Technique & Ear).
+ * Manages parent header themes, icons, and dynamically aggregates completion rates of child resources.
+ * 
+ * @example
+ * <ResourceColumn id="technique" title="Technique & Ear" subtitle="..." accentColor="gold">
+ *   ... items ...
+ * </ResourceColumn>
+ */
+export interface Props {
+  /** The target column ID ('technique' or 'reading') to match pinning targets. */
+  id: 'technique' | 'reading';
+  /** The heading title for the column. */
+  title: string;
+  /** Optional metadata tagline or subtitle below the header. */
+  subtitle?: string;
+  /** Theme styling preset applied to accent headers. */
+  accentColor?: 'gold' | 'rose';
+}
+
+const { id, title, subtitle, accentColor = 'gold' } = Astro.props;
+---
+
+<div class:list={['res-column-wrapper', id, accentColor]} id={id}>
+  <div class="res-column-header">
+    <div class="res-title-box">
+      <!-- Raised Hand outline SVG -->
+      {id === 'technique' ? (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="col-header-svg">
+          <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v5M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8M10 10.5V5.5a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v9M6 13V9a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v6a10 10 0 0 0 10 10h1a10 10 0 0 0 10-10v-4" />
+        </svg>
+      ) : (
+        /* Eye outline SVG */
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="col-header-svg">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+      )}
+      <h3>{title}</h3>
+      {id === 'reading' && <span class="res-reading-tag-meta">THE EYES · HANDS-TOGETHER</span>}
+    </div>
+    
+    {subtitle && <p class="res-column-subtitle" set:html={subtitle}></p>}
+
+    <!-- Column Tracker Progress bar under subtitle -->
+    <div class="column-track-progress">
+      <div class="ct-progress-bar-bg">
+        <div class="ct-progress-bar-fg" id={`col-bar-${id}`}></div>
+      </div>
+      <span class="ct-progress-text" id={`col-pct-${id}`}>0/0 done</span>
+    </div>
+  </div>
+
+  <div class="res-list-container">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .res-column-wrapper {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius) !important;
+    padding: 1.6rem !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+  }
+  .res-column-wrapper.gold {
+    border-top: 3px solid var(--gold) !important;
+  }
+  :root[data-theme="light"] .res-column-wrapper.gold {
+    border-top-color: var(--sl-color-accent) !important;
+  }
+  .res-column-wrapper.rose {
+    border-top: 3px solid var(--rose) !important;
+  }
+
+  .res-column-header {
+    margin-bottom: 0.3rem !important; /* Reduced margin-bottom completely removes the empty gap below tracking bar */
+  }
+
+  .res-title-box {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.55rem !important;
+    margin-bottom: 0.45rem !important;
+    flex-wrap: wrap !important;
+  }
+  .res-title-box h3 {
+    margin: 0 !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-size: 1.15rem !important;
+    color: var(--text-main) !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+  }
+
+  .col-header-svg {
+    width: 18px !important;
+    height: 18px !important;
+    flex-shrink: 0 !important;
+  }
+  .gold .col-header-svg { color: var(--gold) !important; }
+  :root[data-theme="light"] .gold .col-header-svg { color: var(--sl-color-accent) !important; }
+  .rose .col-header-svg { color: var(--rose) !important; }
+
+  .res-reading-tag-meta {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.58rem !important;
+    color: var(--rose) !important;
+    letter-spacing: 0.08em !important;
+    margin-left: 0.35rem !important;
+  }
+
+  .res-column-subtitle {
+    font-size: 0.88rem !important;
+    line-height: 1.55 !important;
+    color: var(--text-muted) !important;
+    margin: 0 0 1rem 0 !important;
+  }
+  .res-column-subtitle :global(a) {
+    color: var(--gold) !important;
+    text-decoration: underline !important;
+  }
+  :root[data-theme="light"] .res-column-subtitle :global(a) {
+    color: var(--sl-color-accent) !important;
+  }
+
+  /* Column Progress Tracker */
+  .column-track-progress {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    margin-top: 0.85rem !important;
+  }
+  .ct-progress-bar-bg {
+    width: 60px !important;
+    height: 5px !important;
+    background-color: rgba(128, 128, 128, 0.2) !important;
+    border-radius: 3px !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+  }
+  .ct-progress-bar-fg {
+    height: 100% !important;
+    width: 0%;
+    border-radius: 3px !important;
+    transition: width 0.3s ease-out !important;
+  }
+  .gold .ct-progress-bar-fg {
+    background-color: var(--gold) !important;
+  }
+  :root[data-theme="light"] .gold .ct-progress-bar-fg {
+    background-color: var(--sl-color-accent) !important;
+  }
+  .rose .ct-progress-bar-fg {
+    background-color: var(--rose) !important;
+  }
+
+  .ct-progress-text {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.68rem !important;
+    color: var(--text-muted) !important;
+    white-space: nowrap !important;
+    font-weight: 700 !important;
+  }
+
+  .res-list-container {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+</style>
+
+<script is:inline define:vars={{ id }}>
+  (function() {
+    function updateColumnPercentages() {
+      const column = document.getElementById(id);
+      if (!column) return;
+
+      const listContainer = column.querySelector('.res-list-container');
+      if (!listContainer) return;
+
+      // Select unique original resources (ignoring clones)
+      const rows = listContainer.querySelectorAll('.resource-row-container:not(.cloned-res-item)');
+      const total = rows.length;
+
+      let completed = 0;
+      const checkedStates = JSON.parse(localStorage.getItem('cp-checked-resources') || '{}');
+
+      rows.forEach(row => {
+        const resId = row.getAttribute('data-res-id');
+        if (checkedStates[resId]) {
+          completed++;
+        }
+      });
+
+      const bar = document.getElementById(`col-bar-${id}`);
+      const label = document.getElementById(`col-pct-${id}`);
+
+      if (label) {
+        label.textContent = `${completed}/${total} done`;
+      }
+      if (bar) {
+        const pct = total > 0 ? (completed / total) * 100 : 0;
+        bar.style.width = `${pct}%`;
+      }
+    }
+
+    function syncAlternatives() {
+      const column = document.getElementById(id);
+      if (!column) return;
+
+      const listContainer = column.querySelector('.res-list-container');
+      if (!listContainer) return;
+
+      const altBox = column.querySelector('.alternatives-wrapper');
+
+      // Wipe previously cloned nodes to avoid duplicate issues
+      listContainer.querySelectorAll('.cloned-res-item').forEach(el => el.remove());
+
+      const pinnedStates = JSON.parse(localStorage.getItem('cp-pinned-resources') || '{}');
+
+      // SCOPED QUERY: Strictly scan original alternatives inside the Alternatives Box to prevent collisions
+      const alternatives = altBox ? altBox.querySelectorAll('.resource-row-container:not(.cloned-res-item)') : [];
+
+      let pinnedCount = 0;
+      const totalAlts = alternatives.length;
+
+      alternatives.forEach(alt => {
+        const resId = alt.getAttribute('data-res-id');
+        if (pinnedStates[resId] === true || pinnedStates[resId] === 'true') {
+          pinnedCount++;
+          const clone = alt.cloneNode(true);
+          clone.classList.add('cloned-res-item');
+          clone.removeAttribute('data-is-alternative');
+          clone.removeAttribute('data-pin-to');
+          clone.style.removeProperty('display'); // Erases display:none cloned from hidden original
+
+          // Strip the listener-bound attributes from clones so we can rebind them
+          clone.removeAttribute('data-listener-bound');
+          clone.querySelectorAll('[data-listener-bound]').forEach(el => {
+            el.removeAttribute('data-listener-bound');
+          });
+
+          // Pinned alternative clones insert perfectly above the alternatives accordion block
+          if (altBox) {
+            listContainer.insertBefore(clone, altBox);
+          } else {
+            listContainer.appendChild(clone);
+          }
+
+          // HIDE the original alternative in the alternatives box
+          alt.style.setProperty('display', 'none', 'important');
+        } else {
+          // SHOW the original alternative if it is not pinned
+          alt.style.removeProperty('display');
+        }
+      });
+
+      // HIDE the entire Alternatives Box if all its resources are currently pinned
+      let isAltBoxHidden = false;
+      if (altBox) {
+        if (pinnedCount === totalAlts && totalAlts > 0) {
+          altBox.style.setProperty('display', 'none', 'important');
+          isAltBoxHidden = true;
+        } else {
+          altBox.style.removeProperty('display');
+        }
+      }
+
+      // DYNAMIC VISIBLE BOTTOM BORDER RESET: Clears bottom lines of the last visible child
+      const allRows = listContainer.querySelectorAll('.resource-row-container');
+      allRows.forEach(row => row.classList.remove('last-visible'));
+
+      if (altBox && !isAltBoxHidden) {
+        // Query visible items inside Alternatives Box using robust JSON states
+        const visibleAlts = Array.from(alternatives).filter(alt => {
+          const resId = alt.getAttribute('data-res-id');
+          return !(pinnedStates[resId] === true || pinnedStates[resId] === 'true');
+        });
+        if (visibleAlts.length > 0) {
+          visibleAlts[visibleAlts.length - 1].classList.add('last-visible');
+        }
+      } else {
+        const visibleMainRows = Array.from(allRows).filter(row => {
+          if (row.closest('.alternatives-wrapper')) return false; // Filter out hidden nested items
+          return row.style.display !== 'none';
+        });
+        if (visibleMainRows.length > 0) {
+          visibleMainRows[visibleMainRows.length - 1].classList.add('last-visible');
+        }
+      }
+
+      window.dispatchEvent(new CustomEvent('cp-rebind-listeners'));
+      updateColumnPercentages();
+    }
+
+    window.addEventListener('cp-resource-state-changed', updateColumnPercentages);
+    window.addEventListener('cp-resource-pin-changed', syncAlternatives);
+
+    setTimeout(() => {
+      syncAlternatives();
+      updateColumnPercentages();
+    }, 50);
+
+    document.addEventListener('astro:page-load', () => {
+      syncAlternatives();
+      updateColumnPercentages();
+    });
+  })();
+</script>

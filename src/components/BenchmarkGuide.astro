@@ -1,0 +1,103 @@
+---
+// src/components/BenchmarkGuide.astro
+
+/**
+ * ### BenchmarkGuide Component
+ * 
+ * Renders a collapsible dashed gold border callout for level benchmark instructions.
+ * 
+ * @example
+ * <BenchmarkGuide title="How to use these benchmarks">
+ *   The free Mayron Cole Audition Book page...
+ * </BenchmarkGuide>
+ */
+export interface Props {
+  /** The title displayed inside the benchmark callout block. */
+  title: string;
+}
+const { title } = Astro.props;
+---
+<details class="benchmark-dashed-callout" open>
+  <summary class="benchmark-guide-header">
+    <!-- Chevron arrow on the left exactly matching Screenshot 3 -->
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="benchmark-chev">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+    <h4>{title}</h4>
+  </summary>
+  <div class="benchmark-guide-content">
+    <slot />
+  </div>
+</details>
+
+<style>
+  .benchmark-dashed-callout {
+    background: linear-gradient(135deg, rgba(201, 168, 76, 0.03) 0%, rgba(19, 27, 46, 0.2) 100%) !important;
+    border: 1px dashed rgba(201, 168, 76, 0.4) !important;
+    border-radius: var(--radius) !important;
+    padding: 1.25rem 1.5rem !important;
+    margin-bottom: 2rem !important;
+    box-sizing: border-box !important;
+    display: block !important;
+  }
+  :root[data-theme="light"] .benchmark-dashed-callout {
+    background: linear-gradient(135deg, rgba(154, 116, 32, 0.02) 0%, rgba(244, 239, 231, 0.2) 100%) !important;
+    border-color: rgba(154, 116, 32, 0.4) !important;
+  }
+
+  .benchmark-guide-header {
+    display: flex !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    gap: 0.5rem !important; /* Visual closeness on the left */
+    cursor: pointer !important;
+    user-select: none !important;
+    list-style: none !important;
+    width: fit-content !important;
+  }
+  .benchmark-guide-header::-webkit-details-marker,
+  .benchmark-guide-header::marker {
+    display: none !important;
+    content: "" !important;
+  }
+
+  .benchmark-dashed-callout h4 {
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    color: var(--gold) !important;
+    margin: 0 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+  }
+  :root[data-theme="light"] .benchmark-dashed-callout h4 {
+    color: var(--sl-color-accent) !important;
+  }
+
+  .benchmark-chev {
+    width: 12px !important;
+    height: 12px !important;
+    color: var(--gold) !important;
+    transition: transform 0.2s ease, color 0.15s ease !important;
+    flex-shrink: 0 !important;
+  }
+  :root[data-theme="light"] .benchmark-chev {
+    color: var(--sl-color-accent) !important;
+  }
+  .benchmark-dashed-callout[open] .benchmark-chev {
+    transform: rotate(90deg) !important; /* Rotates down when expanded */
+  }
+
+  .benchmark-guide-content {
+    font-size: 0.9rem !important;
+    line-height: 1.6 !important;
+    color: var(--text-muted) !important;
+    margin-top: 0.85rem !important;
+  }
+  .benchmark-guide-content :global(p) {
+    margin: 0 !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+    color: inherit !important;
+  }
+</style>

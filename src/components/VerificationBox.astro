@@ -1,0 +1,161 @@
+---
+// src/components/VerificationBox.astro
+
+/**
+ * ### VerificationBox Component
+ * 
+ * Outer container for a level's checklist and benchmarks.
+ * Displays a gold left accent border and header with progress metrics on the right.
+ * 
+ * @example
+ * <VerificationBox trackId="prestaff" title="Pre-Staff" levelInfo="≈ Preparatory">
+ *   ... content ...
+ * </VerificationBox>
+ */
+export interface Props {
+  /** Unique parent progress track identifier (e.g. 'prestaff' or 'lvl0'). */
+  trackId: string;
+  /** Heading title displayed in the verification box header. */
+  title: string;
+  /** Optional metadata subtitle or description text below the heading. */
+  subtitle?: string;
+  /** Associated grade level string (e.g. '≈ ABRSM/RCM Preparatory'). */
+  levelInfo?: string;
+}
+
+const { trackId, title, subtitle, levelInfo } = Astro.props;
+---
+<div class="verification-outer-container">
+  <div class="verification-header-box">
+    <div class="vh-left-content">
+      <h2 class="vh-title-text">{title}</h2>
+      {subtitle && <p class="vh-subtitle-text">{subtitle}</p>}
+    </div>
+    <div class="vh-right-content">
+      {levelInfo && <span class="vh-level-badge">{levelInfo}</span>}
+      <div class="vh-progress-bar-wrapper">
+        <div class="vh-bar-bg">
+          <div class="vh-bar-fg" id={`${trackId}-bar`}></div>
+        </div>
+        <span class="vh-pct-label" id={`${trackId}-pct`}>0%</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="verification-body-content">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .verification-outer-container {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-left: 4px solid var(--gold) !important;
+    border-radius: var(--radius) !important;
+    padding: 1.8rem !important;
+    margin: 2.5rem 0 !important;
+    box-sizing: border-box !important;
+  }
+  :root[data-theme="light"] .verification-outer-container {
+    border-left-color: var(--sl-color-accent) !important;
+  }
+
+  .verification-header-box {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    padding-bottom: 1rem !important;
+    margin-bottom: 1.5rem !important;
+    flex-wrap: wrap !important;
+    gap: 1rem !important;
+  }
+
+  .vh-left-content {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.25rem !important;
+  }
+  .vh-title-text {
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+    color: var(--text-main) !important;
+    margin: 0 !important;
+  }
+  .vh-subtitle-text {
+    font-size: 0.88rem !important;
+    color: var(--text-muted) !important;
+    margin: 0 !important;
+  }
+
+  .vh-right-content {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    flex-wrap: wrap !important;
+  }
+  .vh-level-badge {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.8rem !important;
+    color: var(--text-main) !important;
+    font-weight: 600 !important;
+  }
+  .vh-progress-bar-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.6rem !important;
+    min-width: 140px !important;
+  }
+  .vh-bar-bg {
+    flex-grow: 1 !important;
+    height: 6px !important;
+    background-color: rgba(128, 128, 128, 0.2) !important;
+    border-radius: 3px !important;
+    overflow: hidden !important;
+  }
+  .vh-bar-fg {
+    height: 100% !important;
+    width: 0%;
+    background-color: var(--gold) !important;
+    border-radius: 3px !important;
+    transition: width 0.5s ease-out !important;
+  }
+  :root[data-theme="light"] .vh-bar-fg {
+    background-color: var(--sl-color-accent) !important;
+  }
+  .vh-pct-label {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.8rem !important;
+    color: var(--gold) !important;
+    font-weight: 700 !important;
+    min-width: 32px !important;
+    text-align: right !important;
+  }
+  :root[data-theme="light"] .vh-pct-label {
+    color: var(--sl-color-accent) !important;
+  }
+
+  /* Target nested H3 tags styled identically to Screenshot 2 */
+  .verification-body-content :global(h3) {
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    margin-top: 0 !important;
+    margin-bottom: 0.85rem !important;
+  }
+
+  /* Gold style for column 1 head, pink style for column 2 head */
+  .verification-body-content :global(div:first-child h3) {
+    color: var(--gold) !important;
+  }
+  :root[data-theme="light"] .verification-body-content :global(div:first-child h3) {
+    color: var(--sl-color-accent) !important;
+  }
+  .verification-body-content :global(div:last-child h3) {
+    color: var(--rose) !important;
+  }
+</style>

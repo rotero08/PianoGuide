@@ -1,0 +1,209 @@
+---
+// src/components/AlternativesBox.astro
+
+/**
+ * ### AlternativesBox Component
+ * 
+ * A collapsible drawer aggregating secondary alternative study tracks.
+ * Features an internal progress indicator matching standard column layouts.
+ * 
+ * @example
+ * <AlternativesBox>
+ *   ... items ...
+ * </AlternativesBox>
+ */
+export interface Props {
+  /** The heading title of the collapsible alternatives container. */
+  title?: string;
+}
+
+const { title = "Alternative Method Books & Resources" } = Astro.props;
+---
+
+<div class="alternatives-wrapper">
+  <details class="alternatives-drawer" open>
+    <summary class="alternatives-header">
+      <!-- Chevron arrow on the left side, matching all your other collapsible elements -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="alternatives-chev">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+      <h3>{title}</h3>
+    </summary>
+    
+    <div class="alternatives-content-body">
+      <!-- Accordion Progress Track -->
+      <div class="alt-progress-wrapper">
+        <div class="alt-progress-bar-bg">
+          <div class="alt-progress-bar-fill-bar" id="alt-progress-bar-fill"></div>
+        </div>
+        <span class="alt-progress-text" id="alt-progress-text-label">0/0 done</span>
+      </div>
+
+      <div class="alternatives-list-container">
+        <slot />
+      </div>
+    </div>
+  </details>
+</div>
+
+<style>
+  .alternatives-wrapper {
+    margin-top: 1.5rem !important;
+    width: 100% !important;
+  }
+
+  /* Fully restored "roundy" corners and borders */
+  .alternatives-drawer {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius) !important;
+    overflow: hidden !important;
+    padding: 0 !important; /* Strips Starlight default details padding! */
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+
+  summary.alternatives-header {
+    background-color: rgba(201, 168, 76, 0.04) !important;
+    padding: 0.9rem 1.6rem !important; /* Spans 100% width edge-to-edge flush with outer borders */
+    cursor: pointer !important;
+    user-select: none !important;
+    display: flex !important;
+    justify-content: flex-start !important; /* Flex-start keeps Chevron close to header text on the left */
+    align-items: center !important;
+    gap: 0.55rem !important; /* Visual closeness matching the other lists */
+    list-style: none !important;
+    width: 100% !important;
+    max-width: 100% !important; /* Forces summary tag to stretch completely to the right */
+    box-sizing: border-box !important;
+    border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0 !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+  }
+  summary.alternatives-header::-webkit-details-marker,
+  summary.alternatives-header::marker {
+    display: none !important;
+    content: "" !important;
+  }
+
+  :root[data-theme="light"] summary.alternatives-header {
+    background-color: rgba(154, 116, 32, 0.04) !important;
+  }
+
+  summary.alternatives-header h3 {
+    margin: 0 !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 0.95rem !important;
+    color: var(--gold) !important;
+  }
+  :root[data-theme="light"] summary.alternatives-header h3 {
+    color: var(--sl-color-accent) !important;
+  }
+
+  .alternatives-chev {
+    width: 12px !important;
+    height: 12px !important;
+    color: var(--gold) !important;
+    transition: transform 0.2s ease, color 0.15s ease !important;
+    flex-shrink: 0 !important;
+  }
+  :root[data-theme="light"] .alternatives-chev {
+    color: var(--sl-color-accent) !important;
+  }
+  .alternatives-drawer[open] .alternatives-chev {
+    transform: rotate(90deg) !important; /* Rotates cleanly to point down when open, identical to the others */
+  }
+
+  .alternatives-content-body {
+    border-top: 1px solid var(--border-color) !important; /* Underline stretching the full width of the drawer container */
+    padding: 0 !important; /* Completely cleared internal padding as requested, making alternative lists stretch 100% full-width */
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+
+  .alt-progress-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    margin-top: 1rem !important; /* Increased top-margin above progress tracking bar to account for the reduced body padding */
+    margin-bottom: 0.8rem !important; /* Visual spacing below progress bar before the first item starts */
+    padding: 0 1rem !important; /* Align progress metrics cleanly with items */
+  }
+  .alt-progress-bar-bg {
+    width: 60px !important;
+    height: 5px !important;
+    background-color: rgba(128, 128, 128, 0.2) !important;
+    border-radius: 3px !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+  }
+  .alt-progress-bar-fill-bar {
+    height: 100% !important;
+    width: 0%;
+    background-color: var(--gold) !important;
+    border-radius: 3px !important;
+    transition: width 0.3s ease-out !important;
+  }
+  :root[data-theme="light"] .alt-progress-bar-fill-bar {
+    background-color: var(--sl-color-accent) !important;
+  }
+
+  .alt-progress-text {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.68rem !important;
+    color: var(--text-muted) !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+  }
+
+  .alternatives-list-container {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+</style>
+
+<script is:inline>
+  (function() {
+    function updateAltProgress() {
+      const container = document.querySelector('.alternatives-list-container');
+      if (!container) return;
+
+      // Filter and count only visible (non-pinned) alternative resources
+      const rows = Array.from(container.querySelectorAll('.resource-row-container')).filter(row => {
+        return row.style.display !== 'none';
+      });
+      const total = rows.length;
+
+      let completed = 0;
+      const checkedStates = JSON.parse(localStorage.getItem('cp-checked-resources') || '{}');
+
+      rows.forEach(row => {
+        const resId = row.getAttribute('data-res-id');
+        if (checkedStates[resId]) {
+          completed++;
+        }
+      });
+
+      const bar = document.getElementById('alt-progress-bar-fill');
+      const text = document.getElementById('alt-progress-text-label');
+
+      if (text) {
+        text.textContent = `${completed}/${total} done`;
+      }
+      if (bar) {
+        const pct = total > 0 ? (completed / total) * 100 : 0;
+        bar.style.width = `${pct}%`;
+      }
+    }
+
+    window.addEventListener('cp-resource-state-changed', updateAltProgress);
+    window.addEventListener('cp-resource-pin-changed', updateAltProgress);
+    
+    setTimeout(updateAltProgress, 50);
+    document.addEventListener('astro:page-load', updateAltProgress);
+  })();
+</script>

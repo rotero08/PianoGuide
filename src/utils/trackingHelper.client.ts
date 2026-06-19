@@ -154,15 +154,15 @@ function calculateAndRenderProgress(savedStates: Record<string, boolean>): void 
  * Helper to update individual progression bars and text labels.
  */
 function updateProgressElementPair(trackId: string, percentage: number): void {
-  const textLabel = document.getElementById(`${trackId}-pct`);
-  const barFill = document.getElementById(`${trackId}-bar`);
+  const textLabels = document.querySelectorAll(`[id="${trackId}-pct"]`);
+  const barFills = document.querySelectorAll(`[id="${trackId}-bar"]`);
 
-  if (textLabel) {
-    textLabel.textContent = `${percentage}%`;
-  }
-  if (barFill) {
-    barFill.style.width = `${percentage}%`;
-  }
+  textLabels.forEach((el) => {
+    el.textContent = `${percentage}%`;
+  });
+  barFills.forEach((el) => {
+    (el as HTMLElement).style.width = `${percentage}%`;
+  });
 }
 
 /**

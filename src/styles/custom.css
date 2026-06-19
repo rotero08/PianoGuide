@@ -79,7 +79,6 @@ starlight-menu-button button {
   background-color: var(--bg-card) !important; 
   color: var(--gold) !important;               
   border: 1px solid var(--border-color) !important;
-  /* Specific transitions only (eliminates visibility transitions entirely) */
   transition: background-color 0.12s ease-in-out, color 0.12s ease-in-out, border-color 0.12s ease-in-out !important; 
 }
 
@@ -96,7 +95,6 @@ starlight-menu-button button[aria-expanded="true"] {
    ========================================== */
 .sidebar-content a {
   border-left: 3px solid transparent !important;
-  /* Specific transitions only (eliminates visibility transitions entirely) */
   transition: border-color 0.16s ease, color 0.16s ease, background-color 0.16s ease !important;
   padding-left: 1.5rem !important;
   background: none !important;
@@ -302,12 +300,10 @@ starlight-menu-button button[aria-expanded="true"] {
   --badge-branch: #A85069;
 }
 
-/* ==========================================
+/* ==========================================================================
    SOLID COVER BACKGROUND FOR MOBILE SIDEBAR
-   (Prevents background text overlap flickering)
-   ========================================== */
+   ========================================================================== */
 @media (max-width: 50em) {
-  /* Disable slide, fade, and transform transitions to make menu toggles instantaneous */
   nav.sidebar,
   .sidebar-pane,
   .sidebar-content,
@@ -316,15 +312,13 @@ starlight-menu-button button[aria-expanded="true"] {
     animation: none !important;
   }
 
-  /* Force solid backgrounds and prevent lower-layer page content from bleeding through */
   .sidebar-pane,
   #starlight__sidebar {
     background-color: var(--sl-color-bg) !important;
-    z-index: 1000 !important; /* Positions above page content and card layouts */
+    z-index: 1000 !important; 
     box-shadow: 0 0 24px rgba(0, 0, 0, 0.4) !important;
   }
 
-  /* Raise the z-index of the parent sidebar on mobile to prevent stacking context clipping */
   body[data-mobile-menu-expanded] nav.sidebar,
   body[data-mobile-menu-expanded] .sidebar-pane,
   body[data-mobile-menu-expanded] #starlight__sidebar {
@@ -333,7 +327,6 @@ starlight-menu-button button[aria-expanded="true"] {
   }
 }
 
-/* Light Theme overrides specifically scoped to the mobile viewport */
 @media (max-width: 50em) {
   :root[data-theme="light"] .sidebar-pane,
   :root[data-theme="light"] #starlight__sidebar,
@@ -342,4 +335,61 @@ starlight-menu-button button[aria-expanded="true"] {
     background-color: var(--sl-color-bg) !important;
     box-shadow: 0 0 24px rgba(30, 20, 10, 0.15) !important;
   }
+}
+
+/* ==========================================================================
+   CUSTOM DETAILS & SUMMARY CARET RESET (PREVENTS REPEATED ARROWS & BORDERS)
+   ========================================================================= */
+
+/* Completely hide standard disclosure markers across all custom collapsible summary elements */
+.res-item-summary::-webkit-details-marker,
+.res-item-summary::marker,
+.benchmark-guide-header::-webkit-details-marker,
+.benchmark-guide-header::marker,
+.alternatives-header::-webkit-details-marker,
+.alternatives-header::marker {
+  display: none !important;
+  content: "" !important;
+}
+
+/* Ensure list-style-type is cleared across all browsers */
+.res-item-summary,
+.benchmark-guide-header,
+.alternatives-header {
+  list-style: none !important;
+  list-style-type: none !important;
+}
+
+/* Neutralize any pseudo-element carets injected by Starlight or browser engines */
+.res-item-summary::before,
+.res-item-summary::after,
+.benchmark-guide-header::before,
+.benchmark-guide-header::after,
+.alternatives-header::before,
+.alternatives-header::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Strip Starlight's default details left-border and vertical line in list grids */
+.sl-markdown-content details.resource-row-container,
+.sl-markdown-content details.res-item-drawer {
+  border: none !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  border-inline-start: none !important;
+  border-left: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Force strip Starlight's default details padding inside alternatives drawer so it can touch edges */
+.sl-markdown-content details.alternatives-drawer {
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.sl-markdown-content details.resource-row-container:last-of-type,
+.sl-markdown-content details.res-item-drawer:last-of-type {
+  border-bottom: none !important;
 }

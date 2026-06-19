@@ -1,0 +1,143 @@
+---
+// src/components/AuditionCard.astro
+
+/**
+ * ### AuditionCard Component
+ * 
+ * A card specifically designed to highlight benchmark audition levels.
+ * Features customizable category badges and clean CTA buttons.
+ * 
+ * @example
+ * <AuditionCard title="Cole Audition Book" link="..." tags="free">
+ *   Sight-read this page cleanly...
+ * </AuditionCard>
+ */
+export interface Props {
+  /** The title displayed inside the audition card. */
+  title: string;
+  /** Associated composer name. */
+  composer?: string;
+  /** Destination link for the main CTA button action. */
+  link: string;
+  /** Custom text for the main CTA button action. */
+  buttonText?: string;
+  /** Space-separated categories/tags (e.g. 'free'). */
+  tags?: string;
+}
+
+const { title, composer, link, buttonText = "Get Audition Book ↗", tags = "" } = Astro.props;
+const tagList = tags ? tags.trim().split(/\s+/).filter(Boolean) : [];
+---
+<div class="audition-gate-card">
+  <div class="audition-top-badges">
+    <span class="audition-badge-method">METHOD AUDITION</span>
+    {tagList.includes('free') && <span class="audition-badge-free">FREE</span>}
+  </div>
+  
+  <h4 class="audition-title">{title}</h4>
+  {composer && <p class="audition-composer">{composer}</p>}
+  
+  <div class="audition-desc-content">
+    <slot />
+  </div>
+
+  <a href={link} target="_blank" rel="noopener" class="audition-cta-btn">{buttonText}</a>
+</div>
+
+<style>
+  .audition-gate-card {
+    background: var(--bg-card2) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 8px !important;
+    padding: 1.25rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+  }
+
+  .audition-top-badges {
+    display: flex !important;
+    gap: 0.5rem !important;
+    margin-bottom: 0.6rem !important;
+    align-items: center !important;
+  }
+  .audition-badge-method {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.54rem !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    color: var(--rose) !important;
+    font-weight: 700 !important;
+  }
+  .audition-badge-free {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.54rem !important;
+    letter-spacing: 0.08em !important;
+    background-color: rgba(111, 181, 138, 0.15) !important;
+    color: var(--badge-free) !important;
+    border: 1px solid rgba(111, 181, 138, 0.3) !important;
+    padding: 0.15rem 0.35rem !important;
+    border-radius: 4px !important;
+    font-weight: 700 !important;
+  }
+
+  .audition-title {
+    font-family: 'Playfair Display', serif !important;
+    font-size: 1.15rem !important;
+    color: var(--text-main) !important;
+    margin: 0 0 0.15rem 0 !important;
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+  }
+  .audition-composer {
+    font-size: 0.78rem !important;
+    color: var(--text-muted) !important;
+    margin: 0 0 0.8rem 0 !important;
+  }
+
+  .audition-desc-content {
+    font-size: 0.88rem !important;
+    line-height: 1.55 !important;
+    color: var(--text-muted) !important;
+    margin: 0 0 1.25rem 0 !important;
+  }
+  .audition-desc-content :global(p) {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+    color: inherit !important;
+  }
+
+  .audition-cta-btn {
+    display: inline-block !important;
+    text-align: center !important;
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--gold) !important;
+    padding: 0.55rem 1rem !important;
+    border-radius: 6px !important;
+    font-size: 0.85rem !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+    transition: all 0.2s !important;
+    cursor: pointer !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    font-family: 'JetBrains Mono', monospace !important;
+  }
+  :root[data-theme="light"] .audition-cta-btn {
+    color: var(--sl-color-accent) !important;
+  }
+  .audition-cta-btn:hover {
+    background-color: var(--gold) !important;
+    color: var(--sl-color-black) !important;
+    border-color: var(--gold) !important;
+    text-decoration: none !important;
+  }
+  :root[data-theme="light"] .audition-cta-btn:hover {
+    background-color: var(--sl-color-accent) !important;
+    color: var(--sl-color-white) !important;
+    border-color: var(--sl-color-accent) !important;
+  }
+</style>
