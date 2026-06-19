@@ -27,9 +27,13 @@ export interface Props {
   isAlternative?: boolean;
   /** The target column ID to clone this item into when pinned (e.g. 'reading' or 'technique'). */
   pinTo?: 'reading' | 'technique';
+  /** Optional task-management practice plan details. */
+  practicePlan?: string;
+  /** Optional completion benchmark specifications. */
+  doneWhen?: string;
 }
 
-const { id, title, tagline, link, tags = '', isAlternative = false, pinTo } = Astro.props;
+const { id, title, tagline, link, tags = '', isAlternative = false, pinTo, practicePlan, doneWhen } = Astro.props;
 
 const tagList = tags ? tags.trim().split(/\s+/).filter(Boolean) : [];
 
@@ -62,7 +66,7 @@ const tagStyles: Record<string, { label: string; class: string }> = {
     </div>
 
     <div class="res-controls-right">
-      <!-- Pinning thumbtack button (Reverted to use correct structural conditional wrapping) -->
+      <!-- Pinning thumbtack button -->
       {isAlternative && (
         <button class="res-pin-toggle-btn" aria-label="Pin resource to main list" data-pin-btn-id={id}>
           <!-- Pin on icon -->
@@ -96,6 +100,28 @@ const tagStyles: Record<string, { label: string; class: string }> = {
   <div class="res-item-expanded-content">
     <div class="res-more-inner">
       <slot />
+
+      { (practicePlan || doneWhen) && (
+        <div class="res-meta-grid">
+          {practicePlan && (
+            <div class="res-cell">
+              <span class="rc-label">Practice Plan</span>
+              <span class="rc-text">{practicePlan}</span>
+            </div>
+          )}
+          {doneWhen && (
+            <div class="res-cell">
+              <span class="rc-label">Done When</span>
+              <span class="rc-text">{doneWhen}</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div class="res-foot">
+        <a class="res-open" href={link} target="_blank" rel="noopener">Open resource ↗</a>
+        <button class="res-mark-btn" data-res-id={id}>Mark as done</button>
+      </div>
     </div>
   </div>
 </details>
@@ -352,21 +378,139 @@ const tagStyles: Record<string, { label: string; class: string }> = {
     transform: scale(1) !important;
   }
 
-  /* Expanded container styles */
+  /* Expanded container styles (underline restricted from extending onto buttons) */
   .res-item-expanded-content {
-    padding-left: 1.35rem !important;
+    padding-left: 2rem !important;
     padding-top: 0.55rem !important;
     padding-bottom: 0.25rem !important;
     font-size: 0.86rem !important;
     color: var(--text-muted) !important;
     line-height: 1.55 !important;
+    box-sizing: border-box !important;
   }
-  .res-item-expanded-content :global(a:not(.btn-link)) {
+  .res-item-expanded-content :global(a:not(.btn-link):not(.res-open)) {
     color: var(--gold) !important;
     text-decoration: underline !important;
   }
-  :root[data-theme="light"] .res-item-expanded-content :global(a:not(.btn-link)) {
+  :root[data-theme="light"] .res-item-expanded-content :global(a:not(.btn-link):not(.res-open)) {
     color: var(--sl-color-accent) !important;
+  }
+
+  /* Interactive Meta Grid details layout matching legacy specification [5] */
+  .res-meta-grid {
+    display: grid !important;
+    gap: 0.5rem !important;
+    margin-top: 1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  @media(min-width: 620px) {
+    .res-meta-grid {
+      grid-template-columns: 1fr 1fr !important;
+    }
+  }
+  .res-cell {
+    background: rgba(201, 168, 76, 0.05) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 8px !important;
+    padding: 0.5rem 0.65rem !important;
+  }
+  :root[data-theme="light"] .res-cell {
+    background: rgba(154, 116, 32, 0.05) !important;
+  }
+  .res-cell .rc-label {
+    display: block !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.58rem !important;
+    letter-spacing: 0.09em !important;
+    text-transform: uppercase !important;
+    color: var(--gold) !important;
+    margin-bottom: 0.25rem !important;
+    font-weight: 700 !important;
+  }
+  :root[data-theme="light"] .res-cell .rc-label {
+    color: var(--sl-color-accent) !important;
+  }
+  .res-cell .rc-text {
+    font-size: 0.85rem !important;
+    line-height: 1.45 !important;
+    color: var(--text-main) !important;
+  }
+
+  /* Footer action buttons styled precisely like your upload [5] */
+  .res-foot {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.7rem !important;
+    flex-wrap: wrap !important;
+    margin-top: 1rem !important;
+  }
+
+  .res-open {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.68rem !important;
+    letter-spacing: 0.04em !important;
+    font-weight: 500 !important;
+    color: var(--gold-light) !important;
+    background: rgba(201, 168, 76, 0.06) !important;
+    text-decoration: none !important;
+    border: 1px solid rgba(201, 168, 76, 0.35) !important;
+    border-radius: 999px !important;
+    padding: 0.5rem 1rem !important;
+    transition: all 0.18s !important;
+    cursor: pointer !important;
+  }
+  .res-open:hover {
+    border-color: var(--gold) !important;
+    color: var(--gold) !important;
+    background: rgba(201, 168, 76, 0.13) !important;
+    text-decoration: none !important; /* Ensures the underline remains completely removed */
+  }
+  :root[data-theme="light"] .res-open {
+    color: var(--sl-color-accent) !important;
+    background: rgba(154, 116, 32, 0.06) !important;
+    border-color: rgba(154, 116, 32, 0.35) !important;
+  }
+  :root[data-theme="light"] .res-open:hover {
+    border-color: var(--sl-color-accent) !important;
+    color: var(--sl-color-accent) !important;
+    background: rgba(154, 116, 32, 0.13) !important;
+  }
+
+  .res-mark-btn {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.64rem !important;
+    letter-spacing: 0.03em !important;
+    color: var(--text-muted) !important;
+    background: transparent !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 999px !important;
+    padding: 0.5rem 1rem !important;
+    cursor: pointer !important;
+    transition: all 0.15s !important;
+    font-weight: 500 !important;
+  }
+  .res-mark-btn:hover {
+    border-color: var(--gold) !important;
+    color: var(--gold) !important;
+    background: rgba(201, 168, 76, 0.06) !important;
+  }
+  :root[data-theme="light"] .res-mark-btn:hover {
+    border-color: var(--sl-color-accent) !important;
+    color: var(--sl-color-accent) !important;
+    background: rgba(154, 116, 32, 0.06) !important;
+  }
+  .res-mark-btn.completed {
+    color: var(--gold) !important;
+    border-color: var(--gold) !important;
+    background: rgba(201, 168, 76, 0.06) !important;
+  }
+  :root[data-theme="light"] .res-mark-btn.completed {
+    color: var(--sl-color-accent) !important;
+    border-color: var(--sl-color-accent) !important;
+    background: rgba(154, 116, 32, 0.06) !important;
   }
 </style>
 
@@ -379,21 +523,36 @@ const tagStyles: Record<string, { label: string; class: string }> = {
       const rows = document.querySelectorAll('.resource-row-container');
 
       rows.forEach(row => {
-        const id = row.getAttribute('data-res-id');
-        if (!id) return;
+        const resId = row.getAttribute('data-res-id');
+        if (resId === null) return;
+        const resourceId: string = resId; // Explicit const to prevent any Type 'null' inside nested event listener closures
 
         const checkbox = row.querySelector('.res-done-checkbox');
         const pinBtn = row.querySelector('.res-pin-toggle-btn');
+        const markBtn = row.querySelector('.res-mark-btn');
 
-        if (checkedStates[id]) {
-          row.classList.add('done');
-          if (checkbox) checkbox.classList.add('checked');
-        } else {
-          row.classList.remove('done');
-          if (checkbox) checkbox.classList.remove('checked');
+        function updateCompletedState(isCompleted: boolean) {
+          if (isCompleted) {
+            row.classList.add('done');
+            if (checkbox) checkbox.classList.add('checked');
+            if (markBtn) {
+              markBtn.classList.add('completed');
+              markBtn.textContent = 'Done ✓';
+            }
+          } else {
+            row.classList.remove('done');
+            if (checkbox) checkbox.classList.remove('checked');
+            if (markBtn) {
+              markBtn.classList.remove('completed');
+              markBtn.textContent = 'Mark as done';
+            }
+          }
         }
 
-        if (pinnedStates[id] === true || pinnedStates[id] === 'true') {
+        // Initialize state safely using narrowed local index key
+        updateCompletedState(!!checkedStates[resourceId]);
+
+        if (pinnedStates[resourceId] === true || pinnedStates[resourceId] === 'true') {
           row.classList.add('pinned');
           if (pinBtn) pinBtn.classList.add('active');
         } else {
@@ -401,44 +560,65 @@ const tagStyles: Record<string, { label: string; class: string }> = {
           if (pinBtn) pinBtn.classList.remove('active');
         }
 
+        function toggleDone() {
+          const currentChecked = JSON.parse(localStorage.getItem('cp-checked-resources') || '{}');
+          const targetState = !currentChecked[resourceId];
+          currentChecked[resourceId] = targetState;
+          localStorage.setItem('cp-checked-resources', JSON.stringify(currentChecked));
+
+          document.querySelectorAll(`[data-res-id="${resourceId}"]`).forEach(el => {
+            const cb = el.querySelector('.res-done-checkbox');
+            const mb = el.querySelector('.res-mark-btn');
+            if (targetState) {
+              el.classList.add('done');
+              if (cb) cb.classList.add('checked');
+              if (mb) {
+                mb.classList.add('completed');
+                mb.textContent = 'Done ✓';
+              }
+            } else {
+              el.classList.remove('done');
+              if (cb) cb.classList.remove('checked');
+              if (mb) {
+                mb.classList.remove('completed');
+                mb.textContent = 'Mark as done';
+              }
+            }
+          });
+
+          window.dispatchEvent(new CustomEvent('cp-resource-state-changed', { detail: { id: resourceId, checked: targetState } }));
+        }
+
         if (checkbox && !checkbox.hasAttribute('data-listener-bound')) {
           checkbox.setAttribute('data-listener-bound', 'true');
           checkbox.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevents details drawer from toggling
+            e.stopPropagation(); 
             e.preventDefault();
-            
-            const currentChecked = JSON.parse(localStorage.getItem('cp-checked-resources') || '{}');
-            const targetState = !currentChecked[id];
-            currentChecked[id] = targetState;
-            localStorage.setItem('cp-checked-resources', JSON.stringify(currentChecked));
+            toggleDone();
+          });
+        }
 
-            document.querySelectorAll(`[data-res-id="${id}"]`).forEach(el => {
-              const cb = el.querySelector('.res-done-checkbox');
-              if (targetState) {
-                el.classList.add('done');
-                if (cb) cb.classList.add('checked');
-              } else {
-                el.classList.remove('done');
-                if (cb) cb.classList.remove('checked');
-              }
-            });
-
-            window.dispatchEvent(new CustomEvent('cp-resource-state-changed', { detail: { id, checked: targetState } }));
+        if (markBtn && !markBtn.hasAttribute('data-listener-bound')) {
+          markBtn.setAttribute('data-listener-bound', 'true');
+          markBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            e.preventDefault();
+            toggleDone();
           });
         }
 
         if (pinBtn && !pinBtn.hasAttribute('data-listener-bound')) {
           pinBtn.setAttribute('data-listener-bound', 'true');
           pinBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevents details drawer from toggling
+            e.stopPropagation(); 
             e.preventDefault();
 
             const currentPins = JSON.parse(localStorage.getItem('cp-pinned-resources') || '{}');
-            const targetPin = !currentPins[id];
-            currentPins[id] = targetPin;
+            const targetPin = !currentPins[resourceId];
+            currentPins[resourceId] = targetPin;
             localStorage.setItem('cp-pinned-resources', JSON.stringify(currentPins));
 
-            document.querySelectorAll(`[data-res-id="${id}"]`).forEach(el => {
+            document.querySelectorAll(`[data-res-id="${resourceId}"]`).forEach(el => {
               const pb = el.querySelector('.res-pin-toggle-btn');
               if (pb) {
                 if (targetPin) {
@@ -451,7 +631,7 @@ const tagStyles: Record<string, { label: string; class: string }> = {
               }
             });
 
-            window.dispatchEvent(new CustomEvent('cp-resource-pin-changed', { detail: { id, pinned: targetPin } }));
+            window.dispatchEvent(new CustomEvent('cp-resource-pin-changed', { detail: { id: resourceId, pinned: targetPin } }));
           });
         }
       });
