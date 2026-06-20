@@ -1,53 +1,20 @@
 ---
 // src/components/Grid.astro
 
-/**
- * Interface representing a category filter option.
- */
 export interface FilterOption {
-  /** The programmatic option value, matching resource tags. */
   value: string;
-  /** The human-readable label shown in the select dropdown list. */
   label: string;
 }
 
-/**
- * ### Grid Component Props
- * 
- * Astro props interface for the responsive Grid layout container.
- */
 export interface Props {
-  /** 
-   * Force the grid into a strict, fixed column layout.
-   * Overrides automated wrapping.
-   * @default undefined
-   */
   cols?: number;
-  /** 
-   * Minimum responsive item width before wrapping to another row.
-   * @default "320px"
-   */
   minWidth?: string; 
-  /** 
-   * Grid layout gap spacing.
-   * @default "1.5rem"
-   */
   gap?: string;
-  /** 
-   * Activates interactive client-side query search bars and optional category filters.
-   * @default false
-   */
   searchable?: boolean;
-  /** 
-   * Placeholder text populated inside search text input boxes.
-   * @default "Search..."
-   */
   placeholder?: string;
-  /** 
-   * List of filter metadata categories. Only used if searchable is true.
-   * @default []
-   */
   filterOptions?: FilterOption[];
+  legend?: boolean;
+  slot?: string;
 }
 
 const {
@@ -56,12 +23,12 @@ const {
   gap = "1.5rem",
   searchable = false,
   placeholder = "Search...",
-  filterOptions = []
+  filterOptions = [],
+  legend = false
 } = Astro.props;
 
 const gridId = `grid-${Math.random().toString(36).substring(2, 11)}`;
 
-// Compute CSS variables for clean integration with styles
 const gridStyle = {
   gap,
   gridTemplateColumns: cols 
@@ -71,6 +38,17 @@ const gridStyle = {
 ---
 
 <div id={gridId} class:list={['grid-container', { 'cols-forced': !!cols }]} data-searchable={searchable ? "true" : "false"}>
+  {legend && (
+    <div class="legend-row">
+      <span class="legend-chip">
+        <span class="legend-dot mand"></span> Mandatory spine
+      </span>
+      <span class="legend-chip">
+        <span class="legend-dot opt"></span> Optional branch (unlocks as you progress)
+      </span>
+    </div>
+  )}
+
   {searchable && (
     <div class="filter-group">
       <input 
@@ -97,6 +75,39 @@ const gridStyle = {
   .grid-container {
     width: 100%;
     margin: 1.5rem 0 2.5rem;
+  }
+  .legend-row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.6rem 1.5rem !important;
+    margin-bottom: 1.2rem !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+  .legend-chip {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    font-size: 0.82rem !important;
+    color: var(--text-muted) !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    letter-spacing: 0.02em !important;
+  }
+  .legend-dot {
+    width: 11px !important;
+    height: 11px !important;
+    border-radius: 50% !important;
+    flex-shrink: 0 !important;
+  }
+  .legend-dot.mand {
+    background: var(--gold) !important;
+  }
+  :root[data-theme="light"] .legend-dot.mand {
+    background: var(--sl-color-accent) !important;
+  }
+  .legend-dot.opt {
+    background: transparent !important;
+    border: 2px solid var(--rose) !important;
   }
   .filter-group {
     display: flex;
@@ -144,36 +155,29 @@ const gridStyle = {
     background-position: right 0.8rem center;
     background-size: 1.1rem;
   }
-  
   :root[data-theme="light"] .select-filter {
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239a7420' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
   }
-  
   .select-filter:focus, .select-filter:hover {
     border-color: var(--gold);
   }
-  
   :root[data-theme="light"] .select-filter:focus, 
   :root[data-theme="light"] .select-filter:hover {
     border-color: var(--sl-color-accent);
   }
-
   .select-filter option {
     background-color: var(--bg-dark) !important;
     color: var(--text-main) !important;
   }
-
   .grid-layout {
     display: grid !important;
     align-items: stretch !important;
   }
-
   @media (max-width: 720px) {
     .cols-forced .grid-layout {
       grid-template-columns: 1fr !important;
     }
   }
-
   .grid-layout :global(*) {
     margin-top: 0 !important;
     margin-bottom: 0 !important;

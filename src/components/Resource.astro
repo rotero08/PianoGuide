@@ -8,54 +8,28 @@ interface Badge {
   tip: string;
 }
 
-/**
- * ### Resource Component
- * 
- * A structured card to reference books, videos, and PDFs, supporting stylized status badges.
- */
 export interface Props {
-  /** The primary header title of the resource item. */
+  id?: string;
   title: string;
-  /** Destination URL link opened when the resource's action CTA button is clicked. */
   link: string;
-  /** 
-   * Custom text displayed inside the link anchor CTA button.
-   * @default "Open ↗"
-   */
   buttonText?: string;
-  /** 
-   * If true, applies a 4px left decorative accent border line.
-   * @default false
-   */
   borderLeft?: boolean;
-  /** 
-   * Accent border theme preset color applied when `borderLeft` is active.
-   * @default "rose"
-   */
   accentColor?: 'gold' | 'rose' | 'none';
-  /** 
-   * Optional icon lookup identifier name to display next to the title.
-   * @default "none"
-   */
   icon?: 'info' | 'target' | 'warning' | 'play-box' | 'link' | 'speed-wall' | 'app-trap' | 'acronym-trap' | 'repeat' | 'moon' | 'retreat' | 'chevron-down' | 'star' | 'map' | 'none';
-  /** 
-   * Secondary subtitle stats string aligned to the top-right corner.
-   * @default undefined
-   */
   subs?: string;
-  /** 
-   * Descriptive uppercase focus tag details line displayed above the body.
-   * @default undefined
-   */
   focus?: string;
-  /** 
-   * Space-separated metadata category lookup strings mapping to status badges.
-   * @default ""
-   */
   tags?: string;
+  variant?: 'card' | 'drawer';
+  tagline?: string;
+  isAlternative?: boolean;
+  pinTo?: 'reading' | 'technique';
+  practicePlan?: string;
+  doneWhen?: string;
+  slot?: string;
 }
 
 const {
+  id,
   title,
   link,
   buttonText = "Open ↗",
@@ -64,8 +38,16 @@ const {
   icon,
   subs,
   focus,
-  tags = ""
+  tags = "",
+  variant = "card",
+  tagline,
+  isAlternative = false,
+  pinTo,
+  practicePlan,
+  doneWhen
 } = Astro.props;
+
+const tagList = tags ? tags.trim().split(/\s+/).filter(Boolean) : [];
 
 const TAG_DICTIONARY: Record<string, { text: string; type: string; tip: string }> = {
   acoustics: { 
@@ -86,103 +68,215 @@ const TAG_DICTIONARY: Record<string, { text: string; type: string; tip: string }
   free: { 
     text: "Free", 
     type: "success", 
-    tip: "Completely free public domain scores or web tools." 
+    tip: "Completely free domain material." 
   },
   paid: { 
     text: "Paid", 
     type: "paid", 
-    tip: "A physical book or structured paid material. Requires purchase." 
+    tip: "A physical book or structured paid material." 
   },
   freevideo: { 
     text: "Free Video", 
     type: "video", 
-    tip: "High-quality, free instructional video lesson or analysis." 
+    tip: "High-quality, free video lesson." 
   },
   imslp: { 
     text: "IMSLP", 
     type: "alternate", 
-    tip: "International Music Score Library Project (IMSLP). Free public domain sheet music." 
+    tip: "IMSLP public domain score database." 
   },
   blueprint: { 
     text: "Blueprint", 
     type: "blueprint", 
-    tip: "Comprehensive community guides and structured roadmaps." 
+    tip: "Structured roadmap." 
   },
   alternate: { 
     text: "Alternate", 
     type: "alternate", 
-    tip: "Alternative non-classical routes and curriculum options." 
+    tip: "Alternative roadmap options." 
   },
   video: { 
     text: "Video", 
     type: "video", 
-    tip: "High-quality free instructional video." 
+    tip: "High-quality video lesson." 
   },
   branch: { 
     text: "Branch", 
     type: "branch", 
-    tip: "A specialized branching path focused on chording, style, and active improvisation." 
-  },
-  community: { 
-    text: "Community Classic", 
-    type: "free", 
-    tip: "Outstanding community guide or roadmap." 
+    tip: "An optional branching track." 
   }
 };
 
-const tagList = tags ? tags.trim().split(/\s+/).filter(Boolean) : [];
+const resolvedBadges: Badge[] = tagList
+  .filter(tag => {
+    if (tag === 'audition') return false;
+    if (tag === 'free' && tagList.includes('audition')) return false;
+    return true;
+  })
+  .map(tag => {
+    const match = TAG_DICTIONARY[tag];
+    if (match) return match;
+    const formattedText = tag
+      .replace(/-/g, ' ')
+      .replace(/\b\w/g, c => c.toUpperCase());
+    return {
+      text: formattedText,
+      type: 'accent',
+      tip: `Tag: ${formattedText}`
+    };
+  });
 
-const resolvedBadges: Badge[] = tagList.map(tag => {
-  const match = TAG_DICTIONARY[tag];
-  if (match) {
-    return match;
-  }
-  const formattedText = tag
-    .replace(/-/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
-  return {
-    text: formattedText,
-    type: 'accent',
-    tip: `Tag: ${formattedText}`
-  };
-});
+const tagStyles: Record<string, { label: string; class: string }> = {
+  free: { label: 'FREE', class: 'free' },
+  recommended: { label: '★ RECOMMENDED', class: 'recommended' },
+  paid: { label: 'PAID', class: 'paid' },
+  'paid-book': { label: 'PAID BOOK', class: 'paid' }
+};
 
 const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(t)) || '';
 ---
 
-<div class:list={['resource-card', { 'has-border-left': borderLeft, [accentColor]: borderLeft }]} data-category={category}>
-  <div class="resource-header">
-    <div class="resource-header-left">
-      {icon && icon !== 'none' && (
-        <span class="resource-icon" aria-hidden="true">
-          <Icon name={icon} class="resource-svg" />
-        </span>
-      )}
-      <span class="resource-title">{title}</span>
+{variant === 'card' ? (
+  <div class:list={['resource-card', { 'has-border-left': borderLeft, [accentColor]: borderLeft }]} data-category={category}>
+    <div class="resource-header">
+      <div class="resource-header-left">
+        {tagList.includes('audition') && (
+          <div class="audition-top-badges">
+            <span class="audition-badge-method">METHOD AUDITION</span>
+            {tagList.includes('free') && <span class="audition-badge-free">FREE</span>}
+          </div>
+        )}
+        {icon && icon !== 'none' && (
+          <span class="resource-icon" aria-hidden="true">
+            <Icon name={icon} class="resource-svg" />
+          </span>
+        )}
+        <span class="resource-title">{title}</span>
+      </div>
+      {subs && <span class="resource-subs">{subs}</span>}
     </div>
-    {subs && <span class="resource-subs">{subs}</span>}
-  </div>
-  
-  {resolvedBadges.length > 0 && (
-    <div class="resource-badges">
-      {resolvedBadges.map(badge => (
-        <span class:list={['badge', badge.type]} data-tip={badge.tip}>
-          {badge.text}
-        </span>
-      ))}
+    
+    {resolvedBadges.length > 0 && (
+      <div class="resource-badges">
+        {resolvedBadges.map(badge => (
+          <span class:list={['badge', badge.type]} data-tip={badge.tip}>
+            {badge.text}
+          </span>
+        ))}
+      </div>
+    )}
+
+    {focus && (
+      tagList.includes('audition') ? (
+        <p class="audition-composer">{focus}</p>
+      ) : (
+        <span class="focus-tag">{focus}</span>
+      )
+    )}
+
+    <div class="resource-desc">
+      <slot />
     </div>
-  )}
 
-  {focus && <span class="focus-tag">{focus}</span>}
-
-  <div class="resource-desc">
-    <slot />
+    <a href={link} target="_blank" rel="noopener" class="btn-link">
+      {buttonText}
+    </a>
   </div>
+) : (
+  <details 
+    class="res-item-drawer resource-row-container" 
+    data-res-id={id} 
+    data-is-alternative={isAlternative ? "true" : "false"} 
+    data-pin-to={pinTo}
+    data-is-recommended={tagList.includes('recommended') ? "true" : "false"}
+  >
+    <summary class="res-item-summary">
+      <div class="res-summary-left">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="res-item-chev">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+        
+        <div class="res-summary-text-box">
+          <div class="res-title-badge-row">
+            <span class="res-title-label">{title}</span>
+            {tagList.map(tag => {
+              const style = tagStyles[tag] || { label: tag.toUpperCase(), class: 'paid' };
+              const match = TAG_DICTIONARY[tag] || { tip: `Tag: ${tag}` };
+              const isRecommended = tag === 'recommended';
+              return (
+                <span 
+                  class:list={[
+                    'res-tag-badge', 
+                    !isRecommended && 'badge', /* Suppress JSDoc tooltip bindings on recommended badges */
+                    style.class
+                  ]} 
+                  data-tip={!isRecommended ? match.tip : undefined}
+                >
+                  {style.label}
+                </span>
+              );
+            })}
+          </div>
+          <p class="res-tagline-para">{tagline}</p>
+        </div>
+      </div>
 
-  <a href={link} target="_blank" rel="noopener" class="btn-link">
-    {buttonText}
-  </a>
-</div>
+      <div class="res-controls-right">
+        {isAlternative && (
+          <button class="res-pin-toggle-btn" aria-label="Pin resource to main list" data-pin-btn-id={id}>
+            <span class="pin-icon-on">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pin-svg">
+                <line x1="12" y1="17" x2="12" y2="22"></line>
+                <path d="M5 17h14v-1.76a2 2 0 0 0-.44-1.24l-2.12-2.65A1 1 0 0 1 16 10.76V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v5.76a1 1 0 0 1-.44.59l-2.12 2.65a2 2 0 0 0-.44 1.24Z"></path>
+              </svg>
+            </span>
+            <span class="pin-icon-off">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pin-svg">
+                <line x1="12" y1="17" x2="12" y2="22"></line>
+                <path d="M5 17h14v-1.76a2 2 0 0 0-.44-1.24l-2.12-2.65A1 1 0 0 1 16 10.76V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v5.76a1 1 0 0 1-.44.59l-2.12 2.65a2 2 0 0 0-.44 1.24Z"></path>
+                <line x1="2" y1="2" x2="22" y2="22" stroke="currentColor" stroke-width="2.5"></line>
+              </svg>
+            </span>
+          </button>
+        )}
+        
+        <button class="res-done-checkbox" aria-label="Mark resource as completed" data-checkbox-id={id}>
+          <svg viewBox="0 0 24 24" fill="none" class="res-checkmark-svg">
+            <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
+          </svg>
+        </button>
+      </div>
+    </summary>
+
+    <div class="res-item-expanded-content">
+      <div class="res-more-inner">
+        <slot />
+
+        { (practicePlan || doneWhen) && (
+          <div class="res-meta-grid">
+            {practicePlan && (
+              <div class="res-cell">
+                <span class="rc-label">Practice Plan</span>
+                <span class="rc-text">{practicePlan}</span>
+              </div>
+            )}
+            {doneWhen && (
+              <div class="res-cell">
+                <span class="rc-label">Done When</span>
+                <span class="rc-text">{doneWhen}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div class="res-foot">
+          <a class="res-open" href={link} target="_blank" rel="noopener">Open resource ↗</a>
+          <button class="res-mark-btn" data-res-id={id}>Mark as done</button>
+        </div>
+      </div>
+    </div>
+  </details>
+)}
 
 <style>
   .resource-card {
@@ -205,10 +299,9 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
     box-shadow: 0 4px 20px -2px rgba(201, 168, 76, 0.05);
   }
   :root[data-theme="light"] .resource-card:hover {
-    border-color: var(--sl-color-accent);
+    border-color: var(--sl-color-accent) !important;
     box-shadow: 0 4px 20px -2px rgba(154, 116, 32, 0.05);
   }
-  
   .resource-card.has-border-left { border-left-width: 4px !important; }
   .resource-card.has-border-left.rose { border-left-color: var(--rose) !important; }
   .resource-card.has-border-left.gold { border-left-color: var(--gold) !important; }
@@ -226,6 +319,7 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
     display: flex !important;
     align-items: center !important;
     gap: 0.5rem !important;
+    flex-wrap: wrap;
   }
   .resource-icon {
     display: flex !important;
@@ -238,7 +332,6 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
     width: 20px !important;
     height: 20px !important;
   }
-
   .resource-title {
     font-size: 1.1rem !important;
     font-weight: 700 !important;
@@ -246,6 +339,7 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
     line-height: 1.4 !important;
     margin: 0 !important;
     font-family: 'Playfair Display', serif !important;
+    width: 100%;
   }
   .resource-subs {
     font-family: 'JetBrains Mono', monospace !important;
@@ -254,6 +348,39 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
     white-space: nowrap !important;
   }
   :root[data-theme="light"] .resource-subs { color: var(--sl-color-accent) !important; }
+
+  .audition-top-badges {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    width: 100%;
+    margin-bottom: 0.2rem;
+  }
+  .audition-badge-method {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.54rem !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    color: var(--rose) !important;
+    font-weight: 700;
+  }
+  .audition-badge-free {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.54rem !important;
+    letter-spacing: 0.08em !important;
+    background-color: rgba(111, 181, 138, 0.15) !important;
+    color: var(--badge-free) !important;
+    border: 1px solid rgba(111, 181, 138, 0.3) !important;
+    padding: 0.15rem 0.35rem !important;
+    border-radius: 4px !important;
+    font-weight: 700;
+  }
+  .audition-composer {
+    font-size: 0.78rem !important;
+    color: var(--text-muted) !important;
+    margin: 0 0 0.8rem 0 !important;
+    font-family: var(--sl-font) !important;
+  }
 
   .resource-badges { display: flex !important; flex-wrap: wrap !important; gap: 0.4rem !important; margin-bottom: 0.2rem !important; }
   .focus-tag { font-family: 'JetBrains Mono', monospace !important; font-size: 0.56rem !important; letter-spacing: 0.1em !important; text-transform: uppercase !important; color: var(--rose) !important; display: block !important; margin-bottom: 0.2rem !important; }
@@ -276,4 +403,481 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
   .badge.branch { background: rgba(212, 118, 138, 0.13) !important; color: var(--badge-branch) !important; border: 1px solid rgba(212, 118, 138, 0.3) !important; }
   .badge.accent { background-color: rgba(201, 168, 76, 0.13); color: var(--gold); border: 1px solid rgba(201, 168, 76, 0.3); }
   :root[data-theme="light"] .badge.accent { background-color: rgba(154, 116, 32, 0.13); color: var(--sl-color-accent); border-color: rgba(154, 116, 32, 0.3); }
+
+  .resource-row-container {
+    display: block !important;
+    border: none !important; 
+    border-bottom: 1px solid var(--border-color) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 0.85rem 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  .resource-row-container:last-child {
+    border-bottom: none !important;
+  }
+  .resource-row-container.last-visible {
+    border-bottom: none !important;
+  }
+
+  .res-item-summary {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    cursor: pointer !important;
+    user-select: none !important;
+    list-style: none !important;
+    width: 100% !important;
+    gap: 0.5rem !important;
+    box-sizing: border-box !important;
+    padding: 0.4rem 1rem !important; 
+  }
+  .res-item-summary::-webkit-details-marker,
+  .res-item-summary::marker {
+    display: none !important;
+    content: "" !important;
+  }
+  .res-summary-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.55rem !important;
+    flex-grow: 1 !important;
+    min-width: 0 !important;
+  }
+  .res-item-chev {
+    width: 12px !important;
+    height: 12px !important;
+    color: var(--text-faint) !important;
+    flex-shrink: 0 !important;
+    transition: transform 0.2s ease, color 0.15s ease !important;
+  }
+  .resource-row-container:hover .res-item-chev {
+    color: var(--gold) !important;
+  }
+  :root[data-theme="light"] .resource-row-container:hover .res-item-chev {
+    color: var(--sl-color-accent) !important;
+  }
+  .res-item-drawer[open] .res-item-chev {
+    transform: rotate(90deg) !important;
+    color: var(--gold) !important;
+  }
+  :root[data-theme="light"] .res-item-drawer[open] .res-item-chev {
+    color: var(--sl-color-accent) !important;
+  }
+  .res-summary-text-box {
+    flex-grow: 1 !important;
+    min-width: 0 !important;
+  }
+  .res-title-badge-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    flex-wrap: wrap !important;
+    margin-bottom: 0.15rem !important;
+  }
+  .res-title-label {
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    color: var(--text-main) !important;
+    line-height: 1.35 !important;
+  }
+  .res-item-summary:hover .res-title-label {
+    color: var(--gold) !important;
+  }
+  :root[data-theme="light"] .res-item-summary:hover .res-title-label {
+    color: var(--sl-color-accent) !important;
+  }
+  .resource-row-container.done .res-title-label {
+    text-decoration: line-through !important;
+    text-decoration-color: var(--text-faint) !important;
+    opacity: 0.55 !important;
+  }
+  .resource-row-container.done .res-tagline-para {
+    opacity: 0.45 !important;
+  }
+  .res-tag-badge {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.65rem !important; /* Unified 0.65rem scale for drawer badges */
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    padding: 0.15rem 0.45rem !important; /* Unified padding for drawer badges */
+    border-radius: 4px !important;
+    font-weight: 700 !important;
+  }
+  .tag-free {
+    background-color: rgba(111, 181, 138, 0.12) !important;
+    color: var(--badge-free) !important;
+    border: 1px solid rgba(111, 181, 138, 0.3) !important;
+  }
+  .tag-recommended {
+    background-color: rgba(20, 20, 20, 0.9) !important;
+    color: var(--gold) !important;
+    border: 1px solid rgba(201, 168, 76, 0.3) !important;
+  }
+  :root[data-theme="light"] .tag-recommended {
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    color: var(--sl-color-accent) !important;
+    border-color: rgba(154, 116, 32, 0.3) !important;
+  }
+  .tag-paid {
+    background-color: rgba(201, 168, 76, 0.12) !important;
+    color: var(--gold) !important;
+    border: 1px solid rgba(201, 168, 76, 0.3) !important;
+  }
+  :root[data-theme="light"] .tag-paid {
+    color: var(--sl-color-accent) !important;
+    border-color: rgba(154, 116, 32, 0.3) !important;
+    background-color: rgba(154, 116, 32, 0.12) !important;
+  }
+  .res-tagline-para {
+    font-size: 0.86rem !important;
+    line-height: 1.45 !important;
+    color: var(--text-muted) !important;
+    margin: 0 !important;
+    transition: opacity 0.15s !important;
+  }
+  .res-controls-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.6rem !important;
+    flex-shrink: 0 !important;
+    margin-top: 0.1rem !important;
+  }
+  .res-pin-toggle-btn {
+    background: none !important;
+    border: none !important;
+    color: var(--text-faint) !important;
+    cursor: pointer !important;
+    padding: 5px !important;
+    border-radius: 4px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: color 0.15s, background-color 0.15s !important;
+    flex-shrink: 0 !important;
+  }
+  .res-pin-toggle-btn:hover {
+    color: var(--gold) !important;
+    background-color: rgba(201, 168, 76, 0.08) !important;
+  }
+  :root[data-theme="light"] .res-pin-toggle-btn:hover {
+    color: var(--sl-color-accent) !important;
+    background-color: rgba(154, 116, 32, 0.08) !important;
+  }
+  .res-pin-toggle-btn.active {
+    color: var(--gold) !important;
+  }
+  :root[data-theme="light"] .res-pin-toggle-btn.active {
+    color: var(--sl-color-accent) !important;
+  }
+  .pin-svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+  .res-pin-toggle-btn .pin-icon-off { display: none !important; }
+  .res-pin-toggle-btn.active:hover .pin-icon-on { display: none !important; }
+  .res-pin-toggle-btn.active:hover .pin-icon-off { display: block !important; }
+
+  .res-done-checkbox {
+    width: 20px !important;
+    height: 20px !important;
+    border: 2px solid rgba(128, 128, 128, 0.25) !important;
+    border-radius: 50% !important;
+    background: transparent !important;
+    flex-shrink: 0 !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: background-color 0.15s, border-color 0.15s !important;
+    padding: 0 !important;
+  }
+  .res-done-checkbox:hover { border-color: var(--gold) !important; }
+  :root[data-theme="light"] .res-done-checkbox:hover { border-color: var(--sl-color-accent) !important; }
+  
+  .resource-row-container .res-done-checkbox.checked {
+    background-color: var(--gold) !important;
+    border-color: var(--gold) !important;
+  }
+  :root[data-theme="light"] .resource-row-container .res-done-checkbox.checked {
+    background-color: var(--sl-color-accent) !important;
+    border-color: var(--sl-color-accent) !important;
+  }
+  .resource-row-container .res-checkmark-svg {
+    width: 11px !important;
+    height: 11px !important;
+    color: var(--sl-color-black) !important;
+    opacity: 0 !important;
+    transform: scale(0.5) !important;
+    transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.15s !important;
+  }
+  :root[data-theme="light"] .resource-row-container .res-checkmark-svg {
+    color: var(--sl-color-bg) !important;
+  }
+  .res-done-checkbox.checked .res-checkmark-svg {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+  }
+
+  .res-item-expanded-content {
+    padding-left: 1.8rem !important; /* Perfect visual left padding alignment */
+    padding-right: 1.4rem !important; /* Perfect visual right padding alignment */
+    padding-top: 0.55rem !important;
+    padding-bottom: 0.25rem !important;
+    font-size: 0.86rem !important;
+    color: var(--text-muted) !important;
+    line-height: 1.55 !important;
+    box-sizing: border-box !important;
+  }
+  .res-item-expanded-content :global(a:not(.btn-link):not(.res-open)) {
+    color: var(--gold) !important;
+    text-decoration: underline !important;
+  }
+  :root[data-theme="light"] .res-item-expanded-content :global(a:not(.btn-link):not(.res-open)) {
+    color: var(--sl-color-accent) !important;
+  }
+  .res-meta-grid {
+    display: grid !important;
+    gap: 0.5rem !important;
+    margin-top: 1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  @media(min-width: 620px) {
+    .res-meta-grid { grid-template-columns: 1fr 1fr !important; }
+  }
+  .res-cell {
+    background: rgba(201, 168, 76, 0.05) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 8px !important;
+    padding: 0.5rem 0.65rem !important;
+  }
+  :root[data-theme="light"] .res-cell { background: rgba(154, 116, 32, 0.05) !important; }
+  .res-cell .rc-label {
+    display: block !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.58rem !important;
+    letter-spacing: 0.09em !important;
+    text-transform: uppercase !important;
+    color: var(--gold) !important;
+    margin-bottom: 0.25rem !important;
+    font-weight: 700 !important;
+  }
+  :root[data-theme="light"] .res-cell .rc-label { color: var(--sl-color-accent) !important; }
+  .res-cell .rc-text { font-size: 0.85rem !important; line-height: 1.45 !important; color: var(--text-main) !important; }
+
+  .res-foot {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.7rem !important;
+    flex-wrap: wrap !important;
+    margin-top: 1rem !important;
+  }
+  .res-open {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.68rem !important;
+    letter-spacing: 0.04em !important;
+    font-weight: 500 !important;
+    color: var(--gold-light) !important;
+    background: rgba(201, 168, 76, 0.06) !important;
+    text-decoration: none !important;
+    border: 1px solid rgba(201, 168, 76, 0.35) !important;
+    border-radius: 999px !important;
+    padding: 0.5rem 1rem !important;
+    transition: all 0.18s !important;
+    cursor: pointer !important;
+  }
+  .res-open:hover {
+    border-color: var(--gold) !important;
+    color: var(--gold) !important;
+    background: rgba(201, 168, 76, 0.13) !important;
+    text-decoration: none !important;
+  }
+  :root[data-theme="light"] .res-open {
+    color: var(--sl-color-accent) !important;
+    background: rgba(154, 116, 32, 0.06) !important;
+    border-color: rgba(154, 116, 32, 0.35) !important;
+  }
+  :root[data-theme="light"] .res-open:hover {
+    border-color: var(--sl-color-accent) !important;
+    color: var(--sl-color-accent) !important;
+    background: rgba(154, 116, 32, 0.13) !important;
+  }
+  .res-mark-btn {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.64rem !important;
+    letter-spacing: 0.03em !important;
+    color: var(--text-muted) !important;
+    background: transparent !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 999px !important;
+    padding: 0.5rem 1rem !important;
+    cursor: pointer !important;
+    transition: all 0.15s !important;
+    font-weight: 500 !important;
+  }
+  .res-mark-btn:hover {
+    border-color: var(--gold) !important;
+    color: var(--gold) !important;
+    background: rgba(201, 168, 76, 0.06) !important;
+  }
+  :root[data-theme="light"] .res-mark-btn:hover {
+    border-color: var(--sl-color-accent) !important;
+    color: var(--sl-color-accent) !important;
+    background: rgba(154, 116, 32, 0.06) !important;
+  }
+  .res-mark-btn.completed {
+    color: var(--gold) !important;
+    border-color: var(--gold) !important;
+    background: rgba(201, 168, 76, 0.06) !important;
+  }
+  :root[data-theme="light"] .res-mark-btn.completed {
+    color: var(--sl-color-accent) !important;
+    border-color: var(--sl-color-accent) !important;
+    background: rgba(154, 116, 32, 0.06) !important;
+  }
+
+  /* Align drawer tooltips to the left edge of the badge to prevent left-side viewport clipping */
+  .res-tag-badge.badge::after {
+    left: 0 !important;
+    transform: none !important;
+    bottom: 135% !important;
+  }
 </style>
+
+<script>
+  function initResourceControls() {
+    const checkedStates = JSON.parse(localStorage.getItem('cp-checked-resources') || '{}');
+    const pinnedStates = JSON.parse(localStorage.getItem('cp-pinned-resources') || '{}');
+    const rows = document.querySelectorAll('.resource-row-container');
+
+    rows.forEach(row => {
+      const resId = row.getAttribute('data-res-id');
+      if (resId === null) return;
+      const resourceId = resId;
+
+      const checkbox = row.querySelector('.res-done-checkbox');
+      const pinBtn = row.querySelector('.res-pin-toggle-btn');
+      const markBtn = row.querySelector('.res-mark-btn');
+
+      // Default visual configuration lookup matching default pin rules
+      const initialParent = row.getAttribute('data-initial-parent') || 
+        (row.closest('.alternatives-list-container') ? 'alt' : 'main');
+
+      const hasUserSetting = pinnedStates.hasOwnProperty(resourceId);
+      const isPinned = hasUserSetting 
+        ? (pinnedStates[resourceId] === true || pinnedStates[resourceId] === 'true')
+        : (initialParent === 'main');
+
+      if (isPinned) {
+        row.classList.add('pinned');
+        if (pinBtn) pinBtn.classList.add('active');
+      } else {
+        row.classList.remove('pinned');
+        if (pinBtn) pinBtn.classList.remove('active');
+      }
+
+      function updateCompletedState(isCompleted: boolean) {
+        if (isCompleted) {
+          row.classList.add('done');
+          if (checkbox) checkbox.classList.add('checked');
+          if (markBtn) {
+            markBtn.classList.add('completed');
+            markBtn.textContent = 'Done ✓';
+          }
+        } else {
+          row.classList.remove('done');
+          if (checkbox) checkbox.classList.remove('checked');
+          if (markBtn) {
+            markBtn.classList.remove('completed');
+            markBtn.textContent = 'Mark as done';
+          }
+        }
+      }
+
+      updateCompletedState(!!checkedStates[resourceId]);
+
+      function toggleDone() {
+        const currentChecked = JSON.parse(localStorage.getItem('cp-checked-resources') || '{}');
+        const targetState = !currentChecked[resourceId];
+        currentChecked[resourceId] = targetState;
+        localStorage.setItem('cp-checked-resources', JSON.stringify(currentChecked));
+
+        document.querySelectorAll(`[data-res-id="${resourceId}"]`).forEach(el => {
+          const cb = el.querySelector('.res-done-checkbox');
+          const mb = el.querySelector('.res-mark-btn');
+          if (targetState) {
+            el.classList.add('done');
+            if (cb) cb.classList.add('checked');
+            if (mb) {
+              mb.classList.add('completed');
+              mb.textContent = 'Done ✓';
+            }
+          } else {
+            el.classList.remove('done');
+            if (cb) cb.classList.remove('checked');
+            if (mb) {
+              mb.classList.remove('completed');
+              mb.textContent = 'Mark as done';
+            }
+          }
+        });
+
+        window.dispatchEvent(new CustomEvent('cp-resource-state-changed', { detail: { id: resourceId, checked: targetState } }));
+      }
+
+      if (checkbox && !checkbox.hasAttribute('data-listener-bound')) {
+        checkbox.setAttribute('data-listener-bound', 'true');
+        checkbox.addEventListener('click', (e) => {
+          e.stopPropagation(); 
+          e.preventDefault();
+          toggleDone();
+        });
+      }
+
+      if (markBtn && !markBtn.hasAttribute('data-listener-bound')) {
+        markBtn.setAttribute('data-listener-bound', 'true');
+        markBtn.addEventListener('click', (e) => {
+          e.stopPropagation(); 
+          e.preventDefault();
+          toggleDone();
+        });
+      }
+
+      if (pinBtn && !pinBtn.hasAttribute('data-listener-bound')) {
+        pinBtn.setAttribute('data-listener-bound', 'true');
+        pinBtn.addEventListener('click', (e) => {
+          e.stopPropagation(); 
+          e.preventDefault();
+
+          const currentPins = JSON.parse(localStorage.getItem('cp-pinned-resources') || '{}');
+          const targetPin = !currentPins[resourceId];
+          currentPins[resourceId] = targetPin;
+          localStorage.setItem('cp-pinned-resources', JSON.stringify(currentPins));
+
+          document.querySelectorAll(`[data-res-id="${resourceId}"]`).forEach(el => {
+            const pb = el.querySelector('.res-pin-toggle-btn');
+            if (pb) {
+              if (targetPin) {
+                el.classList.add('pinned');
+                pb.classList.add('active');
+              } else {
+                el.classList.remove('pinned');
+                pb.classList.remove('active');
+              }
+            }
+          });
+
+          window.dispatchEvent(new CustomEvent('cp-resource-pin-changed', { detail: { id: resourceId, pinned: targetPin } }));
+        });
+      }
+    });
+  }
+
+  initResourceControls();
+  window.addEventListener('cp-rebind-listeners', initResourceControls);
+  document.addEventListener('astro:page-load', initResourceControls);
+</script>

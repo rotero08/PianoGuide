@@ -2,54 +2,76 @@
 // src/components/Card.astro
 import Icon from './Icon.astro';
 
-/**
- * ### Card Component
- * 
- * A clean content tile featuring subtle shadow hover, transition parameters, and focus indicators.
- */
 export interface Props {
-  /** The primary title heading text populated inside the card. */
-  title: string;
+  /** 
+   * The primary title heading text populated inside the card. Not rendered in `variant="flat"`.
+   * @default undefined
+   * @example title="Requirements & Checklist"
+   */
+  title?: string;
   /** 
    * Optional decorative subtitle displayed as monospaced uppercase metadata at the top of the card.
    * @default undefined
+   * @example subtitle="Preparatory Level"
    */
   subtitle?: string; 
   /** 
    * Inserts a bold accent decorative border line on the selected edge.
    * @default "none"
+   * @example border="left"
    */
   border?: 'top' | 'left' | 'none'; 
   /** 
    * Theme styling preset applied to subtitles, decorative borders, and vector icons.
    * @default "gold"
+   * @example accentColor="rose"
    */
   accentColor?: 'gold' | 'rose' | 'none';
   /** 
-   * Optional identifier name of an icon to display inside the card header.
+   * Optional identifier name of an icon (from the `Icon.astro` catalog) to display inside the card header.
    * @default "none"
+   * @example icon="repeat"
    */
   icon?: 'info' | 'target' | 'warning' | 'play-box' | 'link' | 'speed-wall' | 'app-trap' | 'acronym-trap' | 'repeat' | 'moon' | 'retreat' | 'chevron-down' | 'star' | 'map' | 'none'; 
   /** 
    * Destination URL or path. Setting this renders an action anchor button at the bottom.
    * @default undefined
+   * @example link="/curriculum/pre-staff/"
    */
   link?: string; 
   /** 
    * The button text displayed when a CTA link is configured.
    * @default "Open ↗"
+   * @example buttonText="Start Training"
    */
   buttonText?: string;
   /** 
-   * Custom tag classification string used to filter elements in dynamic grids.
+   * Custom tag classification string used to filter elements inside searchable grids.
    * @default "none"
+   * @example category="theory"
    */
   category?: 'acoustics' | 'pedagogy' | 'theory' | 'none'; 
   /** 
    * Renders the title as a giant stat number.
    * @default false
+   * @example isStat={true}
    */
   isStat?: boolean;
+  /** 
+   * Text rendered inside an optional monospaced uppercase badge.
+   * @default undefined
+   * @example badge="MANDATORY"
+   */
+  badge?: string;
+  /** 
+   * The layout rendering style:
+   * - `card` (standard boxed card layout)
+   * - `flat` (borderless column grouping container, useful for verification layout columns)
+   * @default "card"
+   */
+  variant?: 'card' | 'flat';
+  /** Standard slot parameter reserved for MDX compilation. */
+  slot?: string;
 }
 
 const {
@@ -61,32 +83,45 @@ const {
   link,
   buttonText = "Open ↗",
   category,
-  isStat = false
+  isStat = false,
+  badge,
+  variant = 'card'
 } = Astro.props;
 ---
 
-<div class:list={['unified-card', border !== 'none' ? `border-${border}` : '', accentColor]} data-category={category}>
-  {subtitle && <div class="card-subtitle">{subtitle}</div>}
-  
-  <div class="card-header">
-    {icon && icon !== 'none' && (
-      <span class="card-icon" aria-hidden="true">
-        <Icon name={icon} class="card-svg" />
-      </span>
+{variant === 'card' ? (
+  <div class:list={['unified-card', border !== 'none' ? `border-${border}` : '', accentColor]} data-category={category}>
+    <div class="card-meta-row">
+      {subtitle && <div class="card-subtitle">{subtitle}</div>}
+      {badge && <span class:list={['card-badge', accentColor]}>{badge}</span>}
+    </div>
+    
+    {title && (
+      <div class="card-header">
+        {icon && icon !== 'none' && (
+          <span class="card-icon" aria-hidden="true">
+            <Icon name={icon} class="card-svg" />
+          </span>
+        )}
+        <h4 class:list={['card-title', { 'card-title-stat': isStat }]}>{title}</h4>
+      </div>
     )}
-    <h4 class:list={['card-title', { 'card-title-stat': isStat }]}>{title}</h4>
-  </div>
 
-  <div class="card-content">
+    <div class="card-content">
+      <slot />
+    </div>
+
+    {link && (
+      <a href={link} target="_blank" rel="noopener" class="btn-link">
+        {buttonText}
+      </a>
+    )}
+  </div>
+) : (
+  <div class="flat-column">
     <slot />
   </div>
-
-  {link && (
-    <a href={link} target="_blank" rel="noopener" class="btn-link">
-      {buttonText}
-    </a>
-  )}
-</div>
+)}
 
 <style>
   .unified-card {
@@ -125,17 +160,49 @@ const {
   :root[data-theme="light"] .gold.border-left { border-left-color: var(--sl-color-accent) !important; }
   .rose.border-left { border-left-color: var(--rose) !important; }
 
+  .card-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 0.1rem;
+  }
   .card-subtitle {
     font-family: 'JetBrains Mono', monospace !important;
     font-size: 0.6rem !important;
     letter-spacing: 0.12em !important;
     text-transform: uppercase !important;
     font-weight: 700 !important;
-    margin-bottom: 0.1rem !important;
   }
   .gold .card-subtitle { color: var(--gold) !important; }
   :root[data-theme="light"] .gold .card-subtitle { color: var(--sl-color-accent) !important; }
   .rose .card-subtitle { color: var(--rose) !important; }
+
+  .card-badge {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.58rem !important;
+    letter-spacing: 0.09em !important;
+    text-transform: uppercase !important;
+    font-weight: 700 !important;
+    padding: 0.28rem 0.55rem !important;
+    border-radius: 5px !important;
+    display: inline-block !important;
+  }
+  .card-badge.gold {
+    background: rgba(201, 168, 76, 0.15) !important;
+    color: var(--gold) !important;
+    border: 1px solid rgba(201, 168, 76, 0.3) !important;
+  }
+  :root[data-theme="light"] .card-badge.gold {
+    background: rgba(154, 116, 32, 0.15) !important;
+    color: var(--sl-color-accent) !important;
+    border-color: rgba(154, 116, 32, 0.3) !important;
+  }
+  .card-badge.rose {
+    background: rgba(212, 118, 138, 0.15) !important;
+    color: var(--rose) !important;
+    border: 1px solid rgba(212, 118, 138, 0.3) !important;
+  }
 
   .card-header {
     display: flex !important;
@@ -145,7 +212,6 @@ const {
     margin: 0 !important;
     padding: 0 !important;
   }
-  
   .card-icon {
     display: block !important;
     flex-shrink: 0 !important;
@@ -153,12 +219,10 @@ const {
   .gold .card-icon { color: var(--gold) !important; }
   :root[data-theme="light"] .gold .card-icon { color: var(--sl-color-accent) !important; }
   .rose .card-icon { color: var(--rose) !important; }
-  
   .card-icon :global(.card-svg) {
     width: 26px !important;
     height: 26px !important;
   }
-
   .card-title {
     font-family: 'Playfair Display', serif !important;
     font-size: 1.1rem !important;
@@ -167,7 +231,6 @@ const {
     font-weight: 700 !important;
     line-height: 1.3 !important;
   }
-
   .card-title-stat {
     font-size: 2.5rem !important;
     color: var(--gold) !important;
@@ -177,12 +240,12 @@ const {
   :root[data-theme="light"] .card-title-stat {
     color: var(--sl-color-accent) !important;
   }
-
   .card-content {
     font-size: 0.88rem !important;
     line-height: 1.55 !important;
     color: var(--text-muted) !important;
     flex-grow: 1 !important;
+    width: 100%;
   }
   .card-content :global(p) {
     margin: 0 !important;
@@ -191,7 +254,20 @@ const {
     line-height: inherit !important;
     color: inherit !important;
   }
-
+  .card-content :global(ul) {
+    margin: 0.5rem 0 0.5rem 1.2rem !important;
+    padding: 0 !important;
+    list-style-type: disc !important;
+  }
+  .card-content :global(li) {
+    font-size: 0.88rem !important;
+    line-height: 1.55 !important;
+    color: var(--text-muted) !important;
+    margin-bottom: 0.4rem !important;
+  }
+  .card-content :global(li strong) {
+    color: var(--text-main) !important;
+  }
   .btn-link {
     display: inline-block !important;
     text-align: center !important;
@@ -219,5 +295,13 @@ const {
     background-color: var(--sl-color-accent) !important;
     color: var(--sl-color-white) !important;
     border-color: var(--sl-color-accent) !important;
+  }
+
+  .flat-column {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
   }
 </style>

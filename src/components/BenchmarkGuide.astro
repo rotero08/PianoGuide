@@ -1,25 +1,15 @@
 ---
 // src/components/BenchmarkGuide.astro
 
-/**
- * ### BenchmarkGuide Component
- * 
- * Renders a collapsible dashed gold border callout for level benchmark instructions.
- * 
- * @example
- * <BenchmarkGuide title="How to use these benchmarks">
- *   The free Mayron Cole Audition Book page...
- * </BenchmarkGuide>
- */
 export interface Props {
-  /** The title displayed inside the benchmark callout block. */
   title: string;
+  slot?: string;
 }
+
 const { title } = Astro.props;
 ---
 <details class="benchmark-dashed-callout" open>
   <summary class="benchmark-guide-header">
-    <!-- Chevron arrow on the left exactly matching Screenshot 3 -->
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="benchmark-chev">
       <polyline points="9 18 15 12 9 6"></polyline>
     </svg>
@@ -49,7 +39,7 @@ const { title } = Astro.props;
     display: flex !important;
     justify-content: flex-start !important;
     align-items: center !important;
-    gap: 0.5rem !important; /* Visual closeness on the left */
+    gap: 0.5rem !important;
     cursor: pointer !important;
     user-select: none !important;
     list-style: none !important;
@@ -85,7 +75,7 @@ const { title } = Astro.props;
     color: var(--sl-color-accent) !important;
   }
   .benchmark-dashed-callout[open] .benchmark-chev {
-    transform: rotate(90deg) !important; /* Rotates down when expanded */
+    transform: rotate(90deg) !important;
   }
 
   .benchmark-guide-content {

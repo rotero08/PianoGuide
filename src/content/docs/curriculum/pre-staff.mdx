@@ -6,13 +6,12 @@ description: Before the staff appears - arm-drop geometry and pitch matching.
 import Callout from '@components/Callout.astro';
 import Grid from '@components/Grid.astro';
 import ResourceColumn from '@components/ResourceColumn.astro';
-import ResourceItem from '@components/ResourceItem.astro';
+import Resource from '@components/Resource.astro';
 import AlternativesBox from '@components/AlternativesBox.astro';
 import VerificationBox from '@components/VerificationBox.astro';
 import BenchmarkGuide from '@components/BenchmarkGuide.astro';
 import Task from '@components/Task.astro';
-import AuditionCard from '@components/AuditionCard.astro';
-import GridCol from '@components/GridCol.astro';
+import Card from '@components/Card.astro';
 
 *Level Pre-Staff · the absolute start*
 
@@ -23,11 +22,12 @@ import GridCol from '@components/GridCol.astro';
 Before the staff appears, you build the two things everything else rests on: a relaxed body and a working ear. Reading at this stage is purely directional, just arrows showing up or down, so all of your attention can go to relaxation and keyboard geometry.
 
 <Grid cols={2}>
-  <ResourceColumn id="technique" title="Technique & Ear" subtitle="Build basic arm drop and aural tracking. Posture details reside inside [Technique 1](/technique/technique-1/)." accentColor="gold">
-    <ResourceItem id="prestaff-fet" title="Functional Ear Trainer" tagline="Highly regarded relative pitch tracker to lock tonal center." link="/skills/ear-training/" tags="free">
+  <ResourceColumn id="technique" title="Technique & Ear" subtitle="Build basic arm drop and aural tracking. Posture details reside inside [Technique 1](/technique/technique-1/).">
+    <Resource variant="drawer" id="prestaff-fet" title="Functional Ear Trainer" tagline="Highly regarded relative pitch tracker to lock tonal center." link="/skills/ear-training/" tags="free">
       Drills relative pitch by identifying scale degrees relative to the home key. Direct links are inside the [Play By Ear & Audiation](/skills/ear-training/) tab.
-    </ResourceItem>
-    <ResourceItem 
+    </Resource>
+    <Resource 
+      variant="drawer"
       id="prestaff-curtis" 
       title="William Curtis: First Steps to Ear Training" 
       tagline="Vocal pitch-matching exercises to build cognitive audiation." 
@@ -37,11 +37,12 @@ Before the staff appears, you build the two things everything else rests on: a r
       doneWhen="Your pitch matching holds steadily."
     >
       Sing back the exact pitch a key plays to verify that your brain can hold and predict pitch accurately.
-    </ResourceItem>
+    </Resource>
   </ResourceColumn>
 
-  <ResourceColumn id="reading" title="Sight-Reading" subtitle="Graphic and arrow notation only. The eyes simply learn that higher means move right and lower means move left." accentColor="rose">
-    <ResourceItem 
+  <ResourceColumn id="reading" title="Sight-Reading" subtitle="Graphic and arrow notation only. The eyes simply learn that higher means move right and lower means move left.">
+    <Resource 
+      variant="drawer"
       id="prestaff-cole" 
       title="Mayron Cole: Pre-Level 1" 
       tagline="Arrow-and-finger-number method to build coordination before the staff." 
@@ -53,18 +54,18 @@ Before the staff appears, you build the two things everything else rests on: a r
       doneWhen="You play five arrow patterns without looking down."
     >
       Uses directional arrows and simple finger indexes instead of a staff. This removes decoding friction, focusing attention entirely on developing hand alignment and visual spacing.
-    </ResourceItem>
+    </Resource>
 
     <AlternativesBox>
-      <ResourceItem id="prestaff-junior" title="Mayron Cole: Blast Off Junior" tagline="A rapid 5-lesson introduction to rhythm and key geography." link="http://www.freepianomethod.com/blast-off---blast-off-junior.html" tags="free" isAlternative={true} pinTo="reading">
+      <Resource variant="drawer" id="prestaff-junior" title="Mayron Cole: Blast Off Junior" tagline="A rapid 5-lesson introduction to rhythm and key geography." link="http://www.freepianomethod.com/blast-off---blast-off-junior.html" tags="free" isAlternative={true} pinTo="reading">
         Five-lesson introduction to rhythm and key geography, designed to be finished in about a week.
-      </ResourceItem>
-      <ResourceItem id="prestaff-adult" title="Mayron Cole: Blast Off with Piano" tagline="The standard adult-paced version of the Blast Off on-ramp." link="https://www.freepianomethod.com/blast-off.html" tags="free" isAlternative={true} pinTo="reading">
+      </Resource>
+      <Resource variant="drawer" id="prestaff-adult" title="Mayron Cole: Blast Off with Piano" tagline="The standard adult-paced version of the Blast Off on-ramp." link="https://www.freepianomethod.com/blast-off.html" tags="free" isAlternative={true} pinTo="reading">
         The standard adult-paced version of the Blast Off on-ramp course.
-      </ResourceItem>
-      <ResourceItem id="prestaff-julie" title="Julie Lind: Pre-Staff Sheet Music" tagline="Extra simple, directional pieces to read for multi-source variety." link="https://www.pianosongdownload.com/prestaffmusic.html" tags="free" isAlternative={true} pinTo="reading">
+      </Resource>
+      <Resource variant="drawer" id="prestaff-julie" title="Julie Lind: Pre-Staff Sheet Music" tagline="Extra simple, directional pieces to read for multi-source variety." link="https://www.pianosongdownload.com/prestaffmusic.html" tags="free" isAlternative={true} pinTo="reading">
         Extra simple, directional pieces to read so you are not relying on a single source.
-      </ResourceItem>
+      </Resource>
     </AlternativesBox>
   </ResourceColumn>
 </Grid>
@@ -75,7 +76,7 @@ Before the staff appears, you build the two things everything else rests on: a r
   </BenchmarkGuide>
 
   <Grid cols={2}>
-    <GridCol>
+    <Card variant="flat">
       ### REQUIREMENTS & CHECKLIST
 
       <Task id="check-prestaff-posture" trackId="prestaff" tag="none" link="/technique/technique-1/" linkText="go →">
@@ -93,14 +94,21 @@ Before the staff appears, you build the two things everything else rests on: a r
       <Task id="check-prestaff-checkpoint" trackId="prestaff" tag="none">
         **Keyboard coordinates:** Map any natural key by touch with closed eyes, clearing the gate piece.
       </Task>
-    </GridCol>
+    </Card>
 
-    <GridCol>
+    <Card variant="flat">
       ### PRIMARY AUDITION GATE
 
-      <AuditionCard title="Cole Audition Book — Page 4" composer="Mayron Cole" link="https://www.freepianomethod.com/supplemental-items-for-teachers.html" buttonText="Get Audition Book ↗" tags="free">
+      <Resource 
+        variant="card"
+        title="Cole Audition Book — Page 4" 
+        focus="Mayron Cole" 
+        link="https://www.freepianomethod.com/supplemental-items-for-teachers.html" 
+        buttonText="Get Audition Book ↗" 
+        tags="free audition"
+      >
         Sight-read this page cleanly to verify that your visual and physical co-ordination is ready for staff notation.
-      </AuditionCard>
-    </GridCol>
+      </Resource>
+    </Card>
   </Grid>
 </VerificationBox>

@@ -6,8 +6,6 @@ description: A self-taught, progressive piano path based on community wisdom.
 import Callout from '@components/Callout.astro';
 import Grid from '@components/Grid.astro';
 import Card from '@components/Card.astro';
-import TracksContainer from '@components/TracksContainer.astro';
-import TrackBlock from '@components/TrackBlock.astro';
 import CurriculumProgress from '@components/CurriculumProgress.astro';
 import ProgressCard from '@components/ProgressCard.astro';
 
@@ -104,12 +102,12 @@ Every level keeps its own checklist, and your daily / weekly / monthly practice 
 
 Not everything in this guide is meant to be done by everyone, in order, all at once. The people it draws on tend to describe one **required spine** that almost every self-learner is advised to follow, plus several **optional branches** you can pick up when you are ready, depending on the kind of player you want to become.
 
-<TracksContainer>
-  <TrackBlock title="The reading & technique spine" badge="MANDATORY" accentColor="gold">
+<Grid cols={2} legend={true}>
+  <Card title="The reading & technique spine" badge="MANDATORY" border="left" accentColor="gold">
     Technique 1 and 2 first, then Pre-Staff through Level 7. This is the one path nearly everyone in these communities is pointed toward: relaxed technique built first, then fluent sight-reading grown on top of it. The supporting tools, [How To Read Music](/skills/reading-music/) (clefs, key signatures), [Rhythm, Clefs & Decoding](/skills/rhythm-clefs/), [Keyboard Geometry](/skills/scales-chords/), and [Play By Ear](/skills/ear-training/), are part of the spine too. They are not extra courses; they feed the early levels and are best used *alongside* Levels 0 to 2, exactly where each level tells you to.
-  </TrackBlock>
+  </Card>
 
-  <TrackBlock title="The harmony & keyboard branch" badge="OPTIONAL" accentColor="rose">
+  <Card title="The harmony & keyboard branch" badge="OPTIONAL" border="left" accentColor="rose">
     If you also want to accompany singers, play pop and rock, or improvise rather than only read, this branch is for you. It is widely recommended but not required, and it is staged so it never overloads the spine:
     
     * **Lead Sheets** — playing a melody from chord symbols. Commonly suggested once you can read simple intervals, so it *unlocks after Level 1*.
@@ -117,8 +115,8 @@ Not everything in this guide is meant to be done by everyone, in order, all at o
     * **Modern / Jazz Harmony** — extended chords, sevenths and ninths, and reading jazz lead sheets. This sits on top of solid chord reading, so it *unlocks after Level 4*.
 
     You can ignore this branch entirely and still complete the guide. Pick it up whenever a level tells you it has unlocked.
-  </TrackBlock>
-</TracksContainer>
+  </Card>
+</Grid>
 
 To help you navigate, each section features an explicit action layout card:
 
