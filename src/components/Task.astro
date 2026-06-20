@@ -47,7 +47,8 @@ const activeTag = tag !== 'none' ? tagStyles[tag] : null;
         data-track-id={trackId} 
         class="task-checkbox-input" 
       />
-      <label for={id} class="task-checkbox-label" aria-label="Mark task as complete">
+      <label for={id} class="task-checkbox-label">
+        <span class="sr-only">Mark task as complete</span>
         <svg viewBox="0 0 24 24" fill="none" class="checkmark-svg">
           <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
         </svg>
@@ -73,6 +74,18 @@ const activeTag = tag !== 'none' ? tagStyles[tag] : null;
 </div>
 
 <style>
+  .sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border-width: 0 !important;
+  }
+
   .task-row-container {
     display: flex !important;
     align-items: center !important;

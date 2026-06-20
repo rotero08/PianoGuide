@@ -10,6 +10,11 @@ export interface Props {
 }
 
 const { id, title, subtitle, accentColor = 'gold' } = Astro.props;
+
+// Convert simple markdown links [text](url) to HTML anchors dynamically on the server
+const processedSubtitle = subtitle
+  ? subtitle.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+  : '';
 ---
 
 <div class:list={['res-column-wrapper', id, accentColor]} id={id}>
@@ -29,7 +34,7 @@ const { id, title, subtitle, accentColor = 'gold' } = Astro.props;
       {id === 'reading' && <span class="res-reading-tag-meta">THE EYES · HANDS-TOGETHER</span>}
     </div>
     
-    {subtitle && <p class="res-column-subtitle" set:html={subtitle}></p>}
+    {processedSubtitle && <p class="res-column-subtitle" set:html={processedSubtitle}></p>}
 
     <div class="column-track-progress">
       <div class="ct-progress-bar-bg">
@@ -87,9 +92,12 @@ const { id, title, subtitle, accentColor = 'gold' } = Astro.props;
     height: 18px !important;
     flex-shrink: 0 !important;
   }
+  
+  /* Fixed color mapping typo */
   .gold .col-header-svg { color: var(--gold) !important; }
-  :root[data-theme="light"] .gold .col-header-svg { background-color: var(--sl-color-accent) !important; }
-  .rose .col-header-svg { background-color: var(--rose) !important; }
+  :root[data-theme="light"] .gold .col-header-svg { color: var(--sl-color-accent) !important; }
+  .rose .col-header-svg { color: var(--rose) !important; }
+
   .res-reading-tag-meta {
     font-family: 'JetBrains Mono', monospace !important;
     font-size: 0.58rem !important;
@@ -155,7 +163,6 @@ const { id, title, subtitle, accentColor = 'gold' } = Astro.props;
       const listContainer = column.querySelector('.res-list-container');
       if (!listContainer) return;
 
-      // Select resources that are actively in the main list (excluding alternatives inside the accordion)
       const rows = Array.from(listContainer.querySelectorAll('.resource-row-container')).filter(row => {
         return !row.closest('.alternatives-list-container');
       });
@@ -197,7 +204,6 @@ const { id, title, subtitle, accentColor = 'gold' } = Astro.props;
       const pinnedStates = JSON.parse(localStorage.getItem('cp-pinned-resources') || '{}');
       const alternatives = column.querySelectorAll('.resource-row-container[data-is-alternative="true"]');
 
-      // Tag each element with its initial location on the very first execution pass
       alternatives.forEach(alt => {
         if (!alt.hasAttribute('data-initial-parent')) {
           const startedInAlt = alt.closest('.alternatives-list-container') !== null;
@@ -215,7 +221,7 @@ const { id, title, subtitle, accentColor = 'gold' } = Astro.props;
         const hasUserSetting = pinnedStates.hasOwnProperty(resId);
         const isPinned = hasUserSetting 
           ? (pinnedStates[resId] === true || pinnedStates[resId] === 'true')
-          : (initialParent === 'main'); // Default main items are pinned on load, alternatives are not
+          : (initialParent === 'main');
 
         if (isPinned) {
           if (initialParent === 'alt') {
@@ -234,7 +240,6 @@ const { id, title, subtitle, accentColor = 'gold' } = Astro.props;
         }
       });
 
-      // SORT ALTERNATIVES CONTAINER: Bubble recommended items (data-is-recommended="true") directly to the top of the unpinned list
       const altChildren = Array.from(altContainer.querySelectorAll('.resource-row-container'));
       altChildren.sort((a, b) => {
         const aRec = a.getAttribute('data-is-recommended') === 'true';
@@ -242,12 +247,10 @@ const { id, title, subtitle, accentColor = 'gold' } = Astro.props;
         if (aRec && !bRec) return -1;
         if (!aRec && bRec) return 1;
         
-        // Secondary stable sort sorting alphabetically by id
         const aId = a.getAttribute('data-res-id') || '';
         const bId = b.getAttribute('data-res-id') || '';
         return aId.localeCompare(bId);
       });
-      // Re-append sorted children back into altContainer to update actual physical DOM ordering
       altChildren.forEach(child => altContainer.appendChild(child));
 
       if (altBox) {
@@ -271,8 +274,6 @@ const { id, title, subtitle, accentColor = 'gold' } = Astro.props;
       }
 
       updateColumnPercentages();
-      
-      // Notify the Alternatives box to sync its own progress bars
       window.dispatchEvent(new CustomEvent('cp-alternatives-synced'));
     }
 

@@ -207,7 +207,7 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
                 <span 
                   class:list={[
                     'res-tag-badge', 
-                    !isRecommended && 'badge', /* Suppress JSDoc tooltip bindings on recommended badges */
+                    !isRecommended && 'badge', 
                     style.class
                   ]} 
                   data-tip={!isRecommended ? match.tip : undefined}
@@ -283,11 +283,11 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
     background-color: var(--sl-color-gray-6);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 1.5rem !important;
+    padding: 1.2rem !important; /* Spacing gap reduction */
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-start !important;
-    gap: 0.6rem !important;
+    gap: 0.45rem !important; /* Spacing gap reduction */
     transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     box-sizing: border-box !important;
     height: 100% !important;
@@ -311,14 +311,14 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
-    gap: 0.5rem !important;
+    gap: 0.4rem !important;
     margin: 0 !important;
     padding: 0 !important;
   }
   .resource-header-left {
     display: flex !important;
     align-items: center !important;
-    gap: 0.5rem !important;
+    gap: 0.4rem !important;
     flex-wrap: wrap;
   }
   .resource-icon {
@@ -352,13 +352,13 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
   .audition-top-badges {
     display: flex !important;
     align-items: center !important;
-    gap: 0.5rem !important;
+    gap: 0.4rem !important;
     width: 100%;
-    margin-bottom: 0.2rem;
+    margin-bottom: 0.15rem;
   }
   .audition-badge-method {
     font-family: 'JetBrains Mono', monospace !important;
-    font-size: 0.54rem !important;
+    font-size: 0.7rem !important;
     letter-spacing: 0.08em !important;
     text-transform: uppercase !important;
     color: var(--rose) !important;
@@ -378,13 +378,28 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
   .audition-composer {
     font-size: 0.78rem !important;
     color: var(--text-muted) !important;
-    margin: 0 0 0.8rem 0 !important;
+    margin: 0 0 0.6rem 0 !important;
     font-family: var(--sl-font) !important;
   }
 
-  .resource-badges { display: flex !important; flex-wrap: wrap !important; gap: 0.4rem !important; margin-bottom: 0.2rem !important; }
-  .focus-tag { font-family: 'JetBrains Mono', monospace !important; font-size: 0.56rem !important; letter-spacing: 0.1em !important; text-transform: uppercase !important; color: var(--rose) !important; display: block !important; margin-bottom: 0.2rem !important; }
-  .resource-desc { font-size: 0.95rem !important; color: var(--text-muted) !important; margin: 0 0 1rem 0 !important; line-height: 1.6 !important; flex-grow: 1 !important; }
+  .resource-badges { 
+    display: flex !important; 
+    flex-wrap: wrap !important; 
+    gap: 0.35rem !important; 
+    margin-top: 0.1rem !important;
+    margin-bottom: 0.1rem !important; 
+  }
+  .focus-tag { 
+    font-family: 'JetBrains Mono', monospace !important; 
+    font-size: 0.71rem !important; /* Accessible enlarged typography */
+    letter-spacing: 0.08em !important; 
+    text-transform: uppercase !important; 
+    color: var(--rose) !important; 
+    display: block !important; 
+    margin-top: 0.15rem !important;
+    margin-bottom: 0.15rem !important; 
+  }
+  .resource-desc { font-size: 0.95rem !important; color: var(--text-muted) !important; margin: 0 0 0.8rem 0 !important; line-height: 1.6 !important; flex-grow: 1 !important; }
   .resource-desc :global(p) { margin: 0 !important; padding: 0 !important; font-size: inherit !important; line-height: inherit !important; color: inherit !important; }
   .btn-link { display: inline-block !important; text-align: center !important; background-color: var(--bg-card2) !important; border: 1px solid var(--border-color) !important; color: var(--text-main) !important; padding: 0.6rem 1rem !important; border-radius: 6px !important; font-size: 0.85rem !important; text-decoration: none !important; font-weight: 600 !important; transition: all 0.2s !important; cursor: pointer !important; width: 100% !important; box-sizing: border-box !important; margin-top: auto !important; }
   .btn-link:hover { background-color: var(--gold) !important; color: var(--sl-color-black) !important; border-color: var(--gold) !important; text-decoration: none !important; }
@@ -498,10 +513,10 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
   }
   .res-tag-badge {
     font-family: 'JetBrains Mono', monospace !important;
-    font-size: 0.65rem !important; /* Unified 0.65rem scale for drawer badges */
+    font-size: 0.65rem !important; 
     letter-spacing: 0.08em !important;
     text-transform: uppercase !important;
-    padding: 0.15rem 0.45rem !important; /* Unified padding for drawer badges */
+    padding: 0.15rem 0.45rem !important; 
     border-radius: 4px !important;
     font-weight: 700 !important;
   }
@@ -621,8 +636,8 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
   }
 
   .res-item-expanded-content {
-    padding-left: 1.8rem !important; /* Perfect visual left padding alignment */
-    padding-right: 1.4rem !important; /* Perfect visual right padding alignment */
+    padding-left: 1.8rem !important; 
+    padding-right: 1.4rem !important; 
     padding-top: 0.55rem !important;
     padding-bottom: 0.25rem !important;
     font-size: 0.86rem !important;
@@ -740,7 +755,6 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
     background: rgba(154, 116, 32, 0.06) !important;
   }
 
-  /* Align drawer tooltips to the left edge of the badge to prevent left-side viewport clipping */
   .res-tag-badge.badge::after {
     left: 0 !important;
     transform: none !important;
@@ -763,7 +777,6 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
       const pinBtn = row.querySelector('.res-pin-toggle-btn');
       const markBtn = row.querySelector('.res-mark-btn');
 
-      // Default visual configuration lookup matching default pin rules
       const initialParent = row.getAttribute('data-initial-parent') || 
         (row.closest('.alternatives-list-container') ? 'alt' : 'main');
 

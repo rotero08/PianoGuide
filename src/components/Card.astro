@@ -304,4 +304,13 @@ const {
     box-sizing: border-box !important;
     width: 100% !important;
   }
+
+  /* 
+    Benchmark height fix: prevents boxed cards from stretching to the full height 
+    of the verification checklist.
+  */
+  .flat-column :global(.resource-card),
+  .flat-column :global(.unified-card) {
+    height: auto !important;
+  }
 </style>

@@ -22,6 +22,34 @@ import Card from '@components/Card.astro';
 The five-line staff arrives. To keep the mental load low, your hands stay locked in one position, so almost all of your attention can go to the new job of tracking two staves at once.
 
 <Grid cols={2}>
+  <ResourceColumn id="technique" title="Technique Support" subtitle="Develop key decoding away from the bench to prevent working memory overload.">
+    <Resource
+      variant="drawer"
+      id="lvl0-dandelot"
+      title="Georges Dandelot: Manuel Pratique"
+      tagline="Speak note names aloud away from the keys to isolate visual decoding."
+      link="/skills/rhythm-clefs/"
+      tags="paid"
+      practicePlan="Five minutes daily at 60 BPM."
+      doneWhen="You read a full grand-staff line with no hesitation."
+    >
+      A classic note-naming drill book. The method is to speak note names aloud with a metronome at a slow tempo, away from the piano, which separates pure visual decoding from the job of moving your hands and stops your working memory from overloading.
+    </Resource>
+    
+    <Resource
+      variant="drawer"
+      id="lvl0-westenra"
+      title="Westenra: Read Music FAST (Part 1)"
+      tagline="Landmark and interval reading maps up to a fifth."
+      link="/skills/reading-music/"
+      tags="paid"
+      practicePlan="Ten minutes daily; Part 1 only for now."
+      doneWhen="You name any interval up to a fifth instantly."
+    >
+      A focused course built around landmark reading. Instead of the slow routine of recalling a mnemonic and counting lines, it anchors your eyes on reference notes such as Bass C, Middle C, and Treble C, then teaches you to read the distance from them straight into a finger span.
+    </Resource>
+  </ResourceColumn>
+
   <ResourceColumn id="reading" title="Sight-Reading" subtitle="Stationary five-finger reading with no shifts and no leaps, just two clefs moving together." accentColor="rose">
     <Resource
       variant="drawer"
@@ -56,34 +84,6 @@ The five-line staff arrives. To keep the mental load low, your hands stay locked
         A free twelve-volume progressive set; Volume 1 starts here and its end pieces preview the next level.
       </Resource>
     </AlternativesBox>
-  </ResourceColumn>
-
-  <ResourceColumn id="technique" title="Technique Support" subtitle="Develop key decoding away from the bench to prevent working memory overload.">
-    <Resource
-      variant="drawer"
-      id="lvl0-dandelot"
-      title="Georges Dandelot: Manuel Pratique"
-      tagline="Speak note names aloud away from the keys to isolate visual decoding."
-      link="/skills/rhythm-clefs/"
-      tags="paid"
-      practicePlan="Five minutes daily at 60 BPM."
-      doneWhen="You read a full grand-staff line with no hesitation."
-    >
-      A classic note-naming drill book. The method is to speak note names aloud with a metronome at a slow tempo, away from the piano, which separates pure visual decoding from the job of moving your hands and stops your working memory from overloading.
-    </Resource>
-    
-    <Resource
-      variant="drawer"
-      id="lvl0-westenra"
-      title="Westenra: Read Music FAST (Part 1)"
-      tagline="Landmark and interval reading maps up to a fifth."
-      link="/skills/reading-music/"
-      tags="paid"
-      practicePlan="Ten minutes daily; Part 1 only for now."
-      doneWhen="You name any interval up to a fifth instantly."
-    >
-      A focused course built around landmark reading. Instead of the slow routine of recalling a mnemonic and counting lines, it anchors your eyes on reference notes such as Bass C, Middle C, and Treble C, then teaches you to read the distance from them straight into a finger span.
-    </Resource>
   </ResourceColumn>
 </Grid>
 

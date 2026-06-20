@@ -39,29 +39,37 @@ const { trackId, title, subtitle, levelInfo } = Astro.props;
     border: 1px solid var(--border-color) !important;
     border-left: 4px solid var(--gold) !important;
     border-radius: var(--radius) !important;
-    padding: 1.8rem !important;
-    margin: 2.5rem 0 !important;
+    padding: 1.5rem !important; /* Slightly tighter overall container padding */
+    margin: 2rem 0 !important;
     box-sizing: border-box !important;
   }
   :root[data-theme="light"] .verification-outer-container {
     border-left-color: var(--sl-color-accent) !important;
   }
 
+  /* 
+    Localized overrides strictly for nested Grid elements. 
+    This eliminates default margin compounding to produce clean, tight gaps.
+  */
+  .verification-outer-container :global(.grid-container) {
+    margin-top: 0.1rem !important;
+    margin-bottom: 0.1rem !important;
+  }
+
   .verification-header-box {
     display: flex !important;
     flex-direction: column !important;
     border-bottom: 1px solid var(--border-color) !important;
-    padding-bottom: 1.2rem !important;
-    margin-bottom: 1.5rem !important;
-    gap: 0.35rem !important; /* Clean space between top row and subtitle */
+    padding-bottom: 0.85rem !important; /* Clean, tighter padding below the line */
+    margin-bottom: 0.85rem !important; /* Reduced margin below the line to tighten the upper gap */
+    gap: 0.35rem !important; 
     width: 100% !important;
   }
 
-  /* Flex row aligning the title and right-hand tracking metrics on the exact same plane */
   .vh-header-top-row {
     display: flex !important;
     justify-content: space-between !important;
-    align-items: center !important; /* Perfect vertical alignment */
+    align-items: center !important; 
     width: 100% !important;
     flex-wrap: wrap !important;
     gap: 1.5rem !important;
@@ -85,13 +93,13 @@ const { trackId, title, subtitle, levelInfo } = Astro.props;
 
   .vh-right-content {
     display: flex !important;
-    align-items: center !important; /* Centered internally on the right metrics line */
+    align-items: center !important; 
     gap: 1.25rem !important;
   }
 
   .vh-level-badge {
     font-family: 'Space Grotesk', var(--sl-font), sans-serif !important;
-    font-size: 1rem !important; /* Custom 1rem scale */
+    font-size: 1rem !important; 
     color: var(--text-main) !important;
     font-weight: 500 !important;
     letter-spacing: -0.01em !important;
@@ -107,7 +115,7 @@ const { trackId, title, subtitle, levelInfo } = Astro.props;
 
   .vh-bar-bg {
     flex-grow: 1 !important;
-    height: 6px !important; /* Sleek, thin progress track */
+    height: 6px !important; 
     background-color: rgba(255, 255, 255, 0.1) !important;
     border-radius: 999px !important;
     overflow: hidden !important;
@@ -129,7 +137,7 @@ const { trackId, title, subtitle, levelInfo } = Astro.props;
 
   .vh-pct-label {
     font-family: 'Space Grotesk', var(--sl-font), sans-serif !important;
-    font-size: 1rem !important; /* Custom 1rem scale */
+    font-size: 1rem !important; 
     color: var(--gold) !important;
     font-weight: 600 !important;
     min-width: 32px !important;
@@ -142,12 +150,18 @@ const { trackId, title, subtitle, levelInfo } = Astro.props;
 
   .verification-body-content :global(h3) {
     font-family: 'Space Grotesk', sans-serif !important;
-    font-size: 0.72rem !important;
+    font-size: 0.92rem !important; 
     font-weight: 700 !important;
     letter-spacing: 0.08em !important;
     text-transform: uppercase !important;
     margin-top: 0 !important;
     margin-bottom: 0.85rem !important;
     color: var(--rose) !important;
+  }
+
+  /* Completely hide anchor link icons for all headers inside the verification container */
+  .verification-outer-container :is(h1, h2, h3, h4, h5, h6) :global(.anchor-link),
+  .verification-outer-container :is(h1, h2, h3, h4, h5, h6) :global(a) {
+    display: none !important;
   }
 </style>

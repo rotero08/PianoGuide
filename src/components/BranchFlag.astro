@@ -27,7 +27,7 @@ const { text } = Astro.props;
     border: 1px solid rgba(212, 118, 138, 0.4) !important;
     border-radius: 999px !important;
     padding: 0.3rem 0.75rem !important;
-    margin-bottom: 1rem !important;
+    margin-bottom: 0.5rem !important; /* Reduced bottom margin */
     width: max-content !important;
   }
   :root[data-theme="light"] .branch-flag {
@@ -46,5 +46,13 @@ const { text } = Astro.props;
   }
   :root[data-theme="light"] .legend-dot.opt {
     border-color: var(--badge-branch) !important;
+  }
+
+  /* 
+    Adjacent sibling selector matching Starlight's heading wrapper div.
+    This overrides the default margin-top (52.5px) to collapse the gap.
+  */
+  .branch-flag + :global(.sl-heading-wrapper) {
+    margin-top: 0.5rem !important;
   }
 </style>
