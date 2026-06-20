@@ -71,6 +71,11 @@ const GLOBAL_TASK_REGISTRY: TaskMap = {
     'check-lvl7-chorale',
     'check-lvl7-loop',
     'check-lvl7-checkpoint'
+  ],
+  leadsheets: [
+    'check-lead-level1',
+    'check-lead-triads',
+    'check-lead-drill'
   ]
 };
 

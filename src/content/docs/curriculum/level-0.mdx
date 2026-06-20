@@ -3,4 +3,147 @@ title: Level 0 (Linear Reading)
 description: Locked-position linear reading with both hands.
 ---
 
-Placeholder content for Level 0.
+import Callout from '@components/Callout.astro';
+import Grid from '@components/Grid.astro';
+import ResourceColumn from '@components/ResourceColumn.astro';
+import Resource from '@components/Resource.astro';
+import AlternativesBox from '@components/AlternativesBox.astro';
+import VerificationBox from '@components/VerificationBox.astro';
+import BenchmarkGuide from '@components/BenchmarkGuide.astro';
+import Task from '@components/Task.astro';
+import Card from '@components/Card.astro';
+
+*Level 0 · the staff appears*
+
+<Callout bordered={true} accentColor="gold" label="Your goal for this level" icon="target">
+  Read single notes on the grand staff with both hands together in a fixed five-finger (C) position, recognising intervals by their shape rather than spelling out every letter, while staying physically relaxed.
+</Callout>
+
+The five-line staff arrives. To keep the mental load low, your hands stay locked in one position, so almost all of your attention can go to the new job of tracking two staves at once.
+
+<Grid cols={2}>
+  <ResourceColumn id="reading" title="Sight-Reading" subtitle="Stationary five-finger reading with no shifts and no leaps, just two clefs moving together." accentColor="rose">
+    <Resource
+      variant="drawer"
+      id="lvl0-kravchuk"
+      title="Kravchuk: 354 Reading Exercises in C"
+      tagline="The free fixed-position reading catalog to establish coordinate hands-together tracking."
+      link="https://michaelkravchuk.com/sight-reading-354-reading-exercises-in-c-position-by-michael-kravchuk/"
+      tags="free"
+      practicePlan="Read three to five new exercises a day with the three-repeat rule."
+      doneWhen="You can sight-read about 30 of them smoothly on the first try."
+    >
+      Michael Kravchuk, a performance graduate who publishes his books free as PDFs, wrote these specifically to fix the most common beginner flaw of neglecting the left hand. Every six-bar exercise keeps both hands in a fixed C position, so by removing all shifts and leaps it frees your whole attention to learn the one new skill of reading two clefs together.
+    </Resource>
+
+    <AlternativesBox>
+      <Resource variant="drawer" id="lvl0-hannah" title="Hannah Smith: Progressive Sight-Reading" tagline="A widely used progressive sight-reading supplement adding slight step-by-step difficulty." link="https://www.amazon.com/Progressive-Sight-Reading-Exercises-Technique/dp/0793552621" tags="paid" isAlternative={true} pinTo="reading">
+        A widely used graded sight-reading book that adds a little difficulty on every page. It is an optional paid supplement for when you want more fixed-position material than the free Kravchuk set provides, organised in a clear progression.
+      </Resource>
+      <Resource variant="drawer" id="lvl0-mango" title="Alexandra Goia: The Mango Piano Method" tagline="A free online beginner method with simple staff reading in a fixed hand position." link="https://alexandragoia.wordpress.com/the-mango-book/" tags="free" isAlternative={true} pinTo="reading">
+        A free online beginner method with simple staff reading in a fixed hand position.
+      </Resource>
+      <Resource variant="drawer" id="lvl0-factory" title="Sight Reading Factory (Piano Level 1/2)" tagline="Auto-generates unlimited new sight-reading at your level, so you never re-read from memory." link="https://www.sightreadingfactory.com/practice/sr/play?keySigs=C%20Major&timeSigs=4/4&levelId=s~0&mediumId=piano" tags="free" isAlternative={true} pinTo="reading">
+        Auto-generates unlimited new sight-reading at your level, so you never re-read the same bar from memory.
+      </Resource>
+      <Resource variant="drawer" id="lvl0-cole1" title="Mayron Cole: Level 1" tagline="The first graded level of the free Mayron Cole method, real little pieces in a fixed position." link="https://www.freepianomethod.com/level-1.html" tags="free" isAlternative={true} pinTo="reading">
+        The first graded level of the free Mayron Cole method, real little pieces in a fixed position.
+      </Resource>
+      <Resource variant="drawer" id="lvl0-cole-adult" title="Mayron Cole: Older Beginner Level 1" tagline="The older-beginner edition of Level 1, paced specifically for adult learners." link="https://www.freepianomethod.com/older-beginner-level-1.html" tags="free" isAlternative={true} pinTo="reading">
+        The older-beginner edition of Level 1, paced for adult learners.
+      </Resource>
+      <Resource variant="drawer" id="lvl0-gradus" title="Jeff Manookian: Gradus (Volume 1)" tagline="Progressive studies starting in C major, previewing shifts at the end." link="https://imslp.org/wiki/Gradus:_Progressive_Piano_Repertoire_in_12_Volumes_(Manookian%2C_Jeff)" tags="imslp" isAlternative={true} pinTo="reading">
+        A free twelve-volume progressive set; Volume 1 starts here and its end pieces preview the next level.
+      </Resource>
+    </AlternativesBox>
+  </ResourceColumn>
+
+  <ResourceColumn id="technique" title="Technique Support" subtitle="Develop key decoding away from the bench to prevent working memory overload.">
+    <Resource
+      variant="drawer"
+      id="lvl0-dandelot"
+      title="Georges Dandelot: Manuel Pratique"
+      tagline="Speak note names aloud away from the keys to isolate visual decoding."
+      link="/skills/rhythm-clefs/"
+      tags="paid"
+      practicePlan="Five minutes daily at 60 BPM."
+      doneWhen="You read a full grand-staff line with no hesitation."
+    >
+      A classic note-naming drill book. The method is to speak note names aloud with a metronome at a slow tempo, away from the piano, which separates pure visual decoding from the job of moving your hands and stops your working memory from overloading.
+    </Resource>
+    
+    <Resource
+      variant="drawer"
+      id="lvl0-westenra"
+      title="Westenra: Read Music FAST (Part 1)"
+      tagline="Landmark and interval reading maps up to a fifth."
+      link="/skills/reading-music/"
+      tags="paid"
+      practicePlan="Ten minutes daily; Part 1 only for now."
+      doneWhen="You name any interval up to a fifth instantly."
+    >
+      A focused course built around landmark reading. Instead of the slow routine of recalling a mnemonic and counting lines, it anchors your eyes on reference notes such as Bass C, Middle C, and Treble C, then teaches you to read the distance from them straight into a finger span.
+    </Resource>
+  </ResourceColumn>
+</Grid>
+
+<VerificationBox trackId="lvl0" title="Level 0 Verification & Checkpoint" subtitle="Confirm stable, locked-position linear reading" levelInfo="≈ ABRSM/RCM Grade 1 Reading">
+  <BenchmarkGuide title="How to use these benchmarks & calibrate difficulty">
+    A benchmark is a short, real piece, not an exercise. Its only job is to prove that the reading you built at this level actually transfers to music before you move up. Do not drill it like repertoire.
+    
+    1. **Listen** to the recording once so you know the target sound.
+    2. **Sight-read** the score cold, hands together, slow but steady — no stopping to fix notes.
+    3. **Pass:** You get through it on the first or second attempt with a steady pulse and without watching your hands.
+    4. **Stall:** If three honest attempts still fall apart, you are not ready. Don't grind it — drop back, read easier material, then return. (This is the chart’s "New Game +".)
+    
+    **Measuring your reading level via PianoSyllabus:** Go to the [PianoSyllabus search form](https://pianosyllabus.com). Enter a piece you currently play comfortably with correct phrasing. Check its normalized grade. If it is listed as RCM/ABRSM Grade 3, that represents your current *playing ceiling*. Subtract 2 or 3 grades to find your *sight-reading band* (Grade 1). Pull three unseen pieces from Grade 1 and attempt to sight-read them. If you read them with a steady pulse on the first pass, your coordinates are fully aligned [1.4].
+    
+    The free Mayron Cole Audition Book page is the quick pass/fail gate. Passing this level lines up roughly with ABRSM / RCM Grade 1 reading.
+  </BenchmarkGuide>
+
+  <Grid cols={2}>
+    <Card variant="flat">
+      ### CHECKLIST & VERIFICATION
+
+      <Task id="check-lvl0-dandelot" trackId="lvl0" tag="none" link="/skills/rhythm-clefs/" linkText="go →">
+        **Off-keyboard note decode:** Speak treble and bass note names at 60 BPM with no hesitation.
+      </Task>
+
+      <Task id="check-lvl0-intervals" trackId="lvl0" tag="none" link="/skills/reading-music/" linkText="go →">
+        **Interval drill:** Identify seconds through fifths instantly on the staff.
+      </Task>
+
+      <Task id="check-lvl0-kravchuk" trackId="lvl0" tag="none" link="https://michaelkravchuk.com/sight-reading-354-reading-exercises-in-c-position-by-michael-kravchuk/" linkText="open ↗">
+        **Coordinate reading:** Three Kravchuk exercises hands-together at a slow tempo, eyes up. Done when about 30 read smoothly first try.
+      </Task>
+
+      <Task id="check-lvl0-chang" trackId="lvl0" tag="none" link="https://www.pianopractice.org/" linkText="open ↗">
+        **Relaxation pass:** Apply Chang's loop to a method-book page and release tension on every rest.
+      </Task>
+
+      <Task id="check-lvl0-checkpoint" trackId="lvl0" tag="none">
+        **Self-audit check:** Confirm that fixed-position reading is automatic and tension-free.
+        
+        * Sight-read three random [Kravchuk exercises](https://michaelkravchuk.com/sight-reading-354-reading-exercises-in-c-position-by-michael-kravchuk/) hands-together, first attempt, with no tension.
+        * Speak a full grand-staff line at 60 BPM with no hesitation on [Dandelot drills](/skills/rhythm-clefs/).
+        * Show complete hand relaxation on every chord release (Chang's own test) on [Fundamentals of Piano Practice](https://www.pianopractice.org/).
+        * Confirm the pieces you are physically learning are about 2 to 3 grades above this reading material on [PianoSyllabus.com](https://pianosyllabus.com).
+      </Task>
+    </Card>
+
+    <Card variant="flat">
+      ### PRIMARY AUDITION GATE
+
+      <Resource
+        variant="card"
+        title="Cole Audition Book — Pages 5 or 6"
+        focus="Mayron Cole"
+        link="https://www.freepianomethod.com/supplemental-items-for-teachers.html"
+        buttonText="Get Audition Book ↗"
+        tags="free audition"
+      >
+        Play through this page hands-together at a steady pulse without pausing or staring down at your fingers to pass.
+      </Resource>
+    </Card>
+  </Grid>
+</VerificationBox>

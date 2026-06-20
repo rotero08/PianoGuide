@@ -3,4 +3,118 @@ title: Technique 1 (Body & Arm Weight)
 description: Sitting relaxed and utilizing gravity instead of fingers.
 ---
 
-Placeholder content for Technique 1.
+import Callout from '@components/Callout.astro';
+import Grid from '@components/Grid.astro';
+import ResourceColumn from '@components/ResourceColumn.astro';
+import Resource from '@components/Resource.astro';
+import VerificationBox from '@components/VerificationBox.astro';
+import Task from '@components/Task.astro';
+import Card from '@components/Card.astro';
+
+*Technique Foundation 1 · before any reading*
+
+<Callout bordered={true} accentColor="gold" label="Your goal for this level" icon="target">
+  Sit relaxed at the correct height with level wrists, and learn to make sound by dropping a loose arm into the key instead of pressing with the fingers. No notation or sight-reading yet—just a calm, tension-free body.
+</Callout>
+
+This guide puts **technique before sight-reading**. Before a single note is read, you build the relaxed physical habit that everything else depends on. Almost every self-taught stall traces back to tension that set in early, so this is where you start.
+
+<Grid cols={1}>
+  <ResourceColumn id="technique" title="Posture, Biomechanics & Arm Weight" subtitle="Posture, bench height, and the arm-weight drop. Watch each demonstration once, then practise the motion away from any printed music.">
+    <Resource
+      variant="drawer"
+      id="tech1-belkin"
+      title="Alan Belkin: Arm Weight & Posture"
+      tagline="The single most important physical habit for beginners."
+      link="https://youtube.com/@AlanBelkinComposer"
+      tags="video recommended"
+      practicePlan="Watch once, then drop each hand daily."
+      doneWhen="Your wrist stays loose and springy on every note."
+    >
+      A conservatory professor demonstrates letting a relaxed arm fall into the key rather than pressing with the fingers. Copying this loose, springy wrist drop prevents the stiff, finger-driven habit that causes most early tension.
+    </Resource>
+    
+    <Resource
+      variant="drawer"
+      id="tech1-mortensen"
+      title="Dr. John Mortensen: Piano Technique"
+      tagline="Free, high-standard technical series covering physical alignment."
+      link="https://www.youtube.com/watch?v=i6gRfn5XrW8&list=PL753730BB176690A0"
+      tags="video"
+      practicePlan="Watch the early videos, copy the motions."
+      doneWhen="Posture and alignment feel natural."
+    >
+      Provides a comprehensive pedagogical framework covering fundamental wrist drop, hand alignment, and correct bench heights without complex terminology.
+    </Resource>
+    
+    <Resource
+      variant="drawer"
+      id="tech1-pianocareer"
+      title="PianoCareer: Playing Fundamentals"
+      tagline="Demonstrations of seating, arm weight, and fingertip contact."
+      link="https://www.youtube.com/watch?v=InqmH-o1cX0&list=PLY5GZdhvOUHvfXpeZfA5kMiZfYBzpCCZv"
+      tags="video"
+      practicePlan="Watch the first few, mirror the demonstrations."
+      doneWhen="Your contact point feels consistent."
+    >
+      Visual demonstrations of seating, arm weight, and fingertip contact, providing an invaluable second angle on the same fundamentals.
+    </Resource>
+    
+    <Resource
+      variant="drawer"
+      id="tech1-chang"
+      title="Chuan C. Chang: Fundamentals of Piano Practice"
+      tagline="The physical relaxation rules behind efficient practicing."
+      link="https://www.pianopractice.org/"
+      tags="free"
+      practicePlan="Read Ch.1 §1–5 once, then apply daily."
+      doneWhen="Full relaxation on every release is automatic."
+    >
+      Read Chapter 1, Sections 1 to 5 for the relaxation principle: release tension fully on every single note and rest.
+    </Resource>
+  </ResourceColumn>
+</Grid>
+
+<VerificationBox trackId="tech1" title="Technique 1 Verification & Checkpoint" subtitle="Confirm stable, relaxed alignment and full muscle release" levelInfo="Posture foundation · no grade yet">
+  <Grid cols={2}>
+    <Card variant="flat">
+      ### CHECKLIST & VERIFICATION
+
+      <Task id="check-tech1-posture" trackId="tech1" tag="none" link="https://youtube.com/@AlanBelkinComposer" linkText="open ↗">
+        **Relaxed seated posture:** Correct bench height, level wrists, shoulders down, breathing freely.
+      </Task>
+
+      <Task id="check-tech1-drop" trackId="tech1" tag="none" link="/technique/technique-1/" linkText="go →">
+        **Arm-weight drop:** Sound a key by dropping a loose arm, with a springy wrist and no finger stiffness.
+      </Task>
+
+      <Task id="check-tech1-release" trackId="tech1" tag="none" link="https://www.pianopractice.org/" linkText="open ↗">
+        **Full release:** Let all tension go the instant a key is down (Chang's relaxation test).
+      </Task>
+
+      <Task id="check-tech1-checkpoint" trackId="tech1" tag="none">
+        **Readiness check:** Complete your self-audit at this foundation level before proceeding.
+      </Task>
+    </Card>
+
+    <Card variant="flat">
+      ### READINESS CHECKLIST
+
+      <Resource
+        variant="card"
+        title="Checkpoint Criteria: Am I ready for Technique 2?"
+        focus="Biomechanical Gate"
+        link="/technique/technique-2/"
+        buttonText="Am I Ready? ↗"
+        tags="free"
+      >
+        Confirm that the body is calm before any coordination is added on top of it:
+        
+        * Sit with correct height, level wrists, and relaxed shoulders without thinking about it.
+        * Sound any key by dropping a loose arm, wrist springy, fingers soft.
+        * Release all tension the moment the key is down, every time.
+        * Play with no pain anywhere in the hand, wrist, arm, or shoulder.
+      </Resource>
+    </Card>
+  </Grid>
+</VerificationBox>
