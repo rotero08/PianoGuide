@@ -1,6 +1,5 @@
 ---
 // src/components/BenchmarkSelector.astro
-import Icon from './Icon.astro';
 
 export interface Props {
   level: string;
@@ -21,7 +20,7 @@ const { level } = Astro.props;
       </svg>
       <h3>Choose Your Primary Era Benchmark</h3>
     </div>
-    <p>Please select <strong>one</strong> era piece to focus on for this level. Once chosen, the alternative pieces will automatically move to the "Alternative Era Benchmark Pieces" drawer below. You can change this selection later or pin additional pieces using the pin icons.</p>
+    <p>Please select <strong>one</strong> era piece to focus on for this level. Once chosen, the alternative pieces will automatically move to the "Alternative Era Benchmark Pieces" drawer below. You can change your focus at any time by clicking the pin icon on any active card.</p>
   </div>
 
   <!-- Primary Active List Area -->
@@ -36,8 +35,6 @@ const { level } = Astro.props;
         <polyline points="9 18 15 12 9 6"></polyline>
       </svg>
       <h3>Alternative Era Benchmark Pieces</h3>
-      <!-- Subtly integrated Reset Selection Button -->
-      <button class="reset-primary-btn" id={`reset-bench-btn-${level}`} style="display: none;">Reset Selection</button>
     </summary>
     <div class="alternatives-content-body">
       <div class="alt-benchmarks-list" id={`bench-alt-list-${level}`}>
@@ -184,34 +181,6 @@ const { level } = Astro.props;
     box-sizing: border-box !important;
   }
 
-  /* Reset Focus Button Style */
-  .reset-primary-btn {
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 0.68rem !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.04em !important;
-    background: transparent !important;
-    border: 1px solid rgba(212, 118, 138, 0.4) !important;
-    color: var(--rose) !important;
-    padding: 0.3rem 0.65rem !important;
-    border-radius: 4px !important;
-    cursor: pointer !important;
-    transition: all 0.15s ease-in-out !important;
-    margin-left: auto !important; /* Pushes button beautifully to the right */
-  }
-  :root[data-theme="light"] .reset-primary-btn {
-    color: var(--badge-branch) !important;
-    border-color: rgba(168, 80, 105, 0.4) !important;
-  }
-  .reset-primary-btn:hover {
-    background-color: rgba(212, 118, 138, 0.08) !important;
-    border-color: var(--rose) !important;
-  }
-  :root[data-theme="light"] .reset-primary-btn:hover {
-    background-color: rgba(168, 80, 105, 0.08) !important;
-    border-color: var(--badge-branch) !important;
-  }
 </style>
 
 <script is:inline define:vars={{ level }}>
@@ -221,162 +190,137 @@ const { level } = Astro.props;
       if (!container) return;
 
       const mainList = document.getElementById(`bench-main-list-${level}`);
-      const altList = document.getElementById(`bench-alt-list-${level}`);
-      const drawer = document.getElementById(`alt-benchmarks-drawer-${level}`);
-      const calloutBox = document.getElementById(`bench-select-callout-${level}`);
-      const resetBtn = document.getElementById(`reset-bench-btn-${level}`);
-      
-      if (!mainList || !altList || !drawer || !calloutBox || !resetBtn) {
-        console.error(`Benchmark selectors not fully found for level ${level}`);
-        return;
-      }
+      const altList  = document.getElementById(`bench-alt-list-${level}`);
+      const drawer   = document.getElementById(`alt-benchmarks-drawer-${level}`);
+      const callout  = document.getElementById(`bench-select-callout-${level}`);
 
-      // Track all benchmarks
-      const initialChildren = Array.from(mainList.children).filter(el => el.classList.contains('uv-bench-item'));
-      initialChildren.forEach(child => {
-        if (!child.hasAttribute('data-initial-parent')) {
-          child.setAttribute('data-initial-parent', 'main');
-        }
-      });
+      if (!mainList || !altList || !drawer || !callout) return;
 
-      // Storage keys
-      const primaryKey = `cp-primary-bench-${level}`;
-      const pinnedKey = `cp-pinned-bench-${level}`;
+      const primaryKey   = `cp-primary-bench-${level}`;
+      const pinnedKey    = `cp-pinned-bench-${level}`;
       const completedKey = `cp-completed-bench-${level}`;
 
-      let primaryId = localStorage.getItem(primaryKey);
-      let pinnedStates = JSON.parse(localStorage.getItem(pinnedKey) || '{}');
+      let primaryId     = localStorage.getItem(primaryKey);
+      let pinnedStates  = JSON.parse(localStorage.getItem(pinnedKey)    || '{}');
       let completedStates = JSON.parse(localStorage.getItem(completedKey) || '{}');
 
       function saveStates() {
-        if (primaryId) {
-          localStorage.setItem(primaryKey, primaryId);
-        } else {
-          localStorage.removeItem(primaryKey);
-        }
-        localStorage.setItem(pinnedKey, JSON.stringify(pinnedStates));
+        if (primaryId) localStorage.setItem(primaryKey, primaryId);
+        else           localStorage.removeItem(primaryKey);
+        localStorage.setItem(pinnedKey,    JSON.stringify(pinnedStates));
         localStorage.setItem(completedKey, JSON.stringify(completedStates));
       }
 
       function renderLayout() {
-        let altCount = 0;
         const allBenchmarks = Array.from(container.querySelectorAll('.uv-bench-item'));
 
-        // Clear layout lists
-        while (mainList.firstChild) mainList.removeChild(mainList.firstChild);
-        while (altList.firstChild) altList.removeChild(altList.firstChild);
+        // A card is "active" if it is the primary selection OR explicitly pinned.
+        // hasActive drives callout visibility, CTA button visibility, and whether
+        // inactive cards go to the alt drawer or stay in the main list for selection.
+        const hasActive = !!primaryId || allBenchmarks.some(c => {
+          const id = c.getAttribute('data-bench-id');
+          return id && !!pinnedStates[id];
+        });
 
-        // Render instruction and re-selection triggers conditionally
-        if (!primaryId) {
-          calloutBox.style.display = 'block';
-          resetBtn.style.display = 'none';
-        } else {
-          calloutBox.style.display = 'none';
-          resetBtn.style.display = 'block';
-        }
+        while (mainList.firstChild) mainList.removeChild(mainList.firstChild);
+        while (altList.firstChild)  altList.removeChild(altList.firstChild);
+
+        callout.style.display = hasActive ? 'none' : 'block';
+
+        let altCount = 0;
 
         allBenchmarks.forEach((card) => {
-          const benchId = card.getAttribute('data-bench-id');
+          const benchId   = card.getAttribute('data-bench-id');
           if (!benchId) return;
 
-          const checkbox = card.querySelector('.bench-done-checkbox');
-          const pinBtn = card.querySelector('.bench-pin-btn');
+          const checkbox  = card.querySelector('.bench-done-checkbox');
+          const pinBtn    = card.querySelector('.bench-pin-btn');
           const selectBtn = card.querySelector('.select-bench-btn');
 
-          // Sync checkbox completion status
           if (checkbox) {
             checkbox.checked = !!completedStates[benchId];
-            if (checkbox.checked) card.classList.add('completed');
-            else card.classList.remove('completed');
+            card.classList.toggle('completed', checkbox.checked);
           }
 
-          // Sync pin status
-          if (pinBtn) {
-            if (!!pinnedStates[benchId]) {
-              pinBtn.classList.add('active');
-              card.setAttribute('data-pinned', 'true');
-            } else {
-              pinBtn.classList.remove('active');
-              card.setAttribute('data-pinned', 'false');
-            }
-          }
+          // "Select This Benchmark" CTA: only visible in the pre-selection state
+          if (selectBtn) selectBtn.style.display = hasActive ? 'none' : 'flex';
 
-          // Place cards based on selection state
-          if (!primaryId) {
-            // No selection chosen: show everything in main list with target select CTA button
+          const isActive = (benchId === primaryId) || !!pinnedStates[benchId];
+
+          if (isActive) {
+            // Active card (primary or pinned): solid selected border, pin shows as gold
             mainList.appendChild(card);
-            card.classList.add('dashed');
-            card.classList.remove('selected');
-            if (selectBtn) {
-              selectBtn.style.display = 'flex';
+            card.classList.remove('dashed'); card.classList.add('selected');
+            if (pinBtn) {
+              card.setAttribute('data-pinned', 'true');
+              pinBtn.classList.add('active');
             }
+          } else if (hasActive) {
+            // Something else is active → inactive cards go to the alt drawer
+            altList.appendChild(card);
+            card.classList.remove('selected'); card.classList.add('dashed');
+            if (pinBtn) {
+              card.setAttribute('data-pinned', 'false');
+              pinBtn.classList.remove('active');
+            }
+            altCount++;
           } else {
-            // Benchmark IS chosen: completely hide select focus CTA buttons on all cards
-            if (selectBtn) {
-              selectBtn.style.display = 'none';
-            }
-
-            if (benchId === primaryId) {
-              mainList.appendChild(card);
-              card.classList.add('selected');
-              card.classList.remove('dashed');
-            } else if (!!pinnedStates[benchId]) {
-              mainList.appendChild(card);
-              card.classList.add('dashed');
-              card.classList.remove('selected');
-            } else {
-              altList.appendChild(card);
-              card.classList.add('dashed');
-              card.classList.remove('selected');
-              altCount++;
+            // Nothing selected yet: all cards visible in main for initial selection
+            mainList.appendChild(card);
+            card.classList.remove('selected'); card.classList.add('dashed');
+            if (pinBtn) {
+              card.setAttribute('data-pinned', 'false');
+              pinBtn.classList.remove('active');
             }
           }
         });
 
-        // Hide/show the alternatives collapsible details drawer
-        if (drawer) {
-          if (altCount > 0) {
-            drawer.style.display = 'block';
-            drawer.open = true;
-          } else {
-            drawer.style.display = 'none';
-          }
-        }
+        drawer.style.display = altCount > 0 ? 'block' : 'none';
+        if (altCount > 0) drawer.open = true;
       }
 
-      function attachListenersToBenchmarks() {
-        const allBenchmarks = container.querySelectorAll('.uv-bench-item');
-        allBenchmarks.forEach(card => {
+      function attachListeners() {
+        container.querySelectorAll('.uv-bench-item').forEach(card => {
           const benchId = card.getAttribute('data-bench-id');
           if (!benchId) return;
 
-          const checkbox = card.querySelector('.bench-done-checkbox');
-          const pinBtn = card.querySelector('.bench-pin-btn');
+          const checkbox  = card.querySelector('.bench-done-checkbox');
+          const pinBtn    = card.querySelector('.bench-pin-btn');
           const selectBtn = card.querySelector('.select-bench-btn');
 
-          if (checkbox && !checkbox.hasAttribute('data-listener-attached')) {
-            checkbox.setAttribute('data-listener-attached', 'true');
+          if (checkbox && !checkbox.hasAttribute('data-bs-bound')) {
+            checkbox.setAttribute('data-bs-bound', 'true');
             checkbox.addEventListener('change', () => {
               completedStates[benchId] = checkbox.checked;
               saveStates();
               renderLayout();
-              window.dispatchEvent(new CustomEvent('cp-resource-state-changed', { detail: { id: `bench-${benchId}`, checked: checkbox.checked } }));
+              window.dispatchEvent(new CustomEvent('cp-resource-state-changed', {
+                detail: { id: `bench-${benchId}`, checked: checkbox.checked }
+              }));
             });
           }
 
-          if (pinBtn && !pinBtn.hasAttribute('data-listener-attached')) {
-            pinBtn.setAttribute('data-listener-attached', 'true');
+          if (pinBtn && !pinBtn.hasAttribute('data-bs-bound')) {
+            pinBtn.setAttribute('data-bs-bound', 'true');
             pinBtn.addEventListener('click', (e) => {
               e.stopPropagation();
-              pinnedStates[benchId] = !pinnedStates[benchId];
+              if (benchId === primaryId) {
+                // Clicking pin on the primary card deselects it — moves it back to alternatives
+                primaryId = null;
+                pinnedStates[benchId] = false;
+              } else {
+                pinnedStates[benchId] = !pinnedStates[benchId];
+              }
               saveStates();
               renderLayout();
-              window.dispatchEvent(new CustomEvent('cp-resource-pin-changed', { detail: { id: `bench-${benchId}`, pinned: pinnedStates[benchId] } }));
+              window.dispatchEvent(new CustomEvent('cp-resource-pin-changed', {
+                detail: { id: `bench-${benchId}`, pinned: !!pinnedStates[benchId] }
+              }));
             });
           }
 
-          if (selectBtn && !selectBtn.hasAttribute('data-listener-attached')) {
-            selectBtn.setAttribute('data-listener-attached', 'true');
+          if (selectBtn && !selectBtn.hasAttribute('data-bs-bound')) {
+            selectBtn.setAttribute('data-bs-bound', 'true');
             selectBtn.addEventListener('click', () => {
               primaryId = benchId;
               saveStates();
@@ -384,33 +328,18 @@ const { level } = Astro.props;
             });
           }
         });
-
-        // Attach listener to Reset Focus Button
-        if (resetBtn && !resetBtn.hasAttribute('data-listener-attached')) {
-          resetBtn.setAttribute('data-listener-attached', 'true');
-          resetBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation(); // Prevents collapsing/expanding parent details summaries
-            primaryId = null;
-            saveStates();
-            renderLayout();
-          });
-        }
       }
 
-      // Initial execution
       renderLayout();
-      attachListenersToBenchmarks();
-
-      // Astro Page Soft Navigation rebindings
-      document.addEventListener('astro:page-load', () => {
-        primaryId = localStorage.getItem(primaryKey);
-        pinnedStates = JSON.parse(localStorage.getItem(pinnedKey) || '{}');
-        completedStates = JSON.parse(localStorage.getItem(completedKey) || '{}');
-        renderLayout();
-        attachListenersToBenchmarks();
-      });
+      attachListeners();
     }
+
+    // Deduplicate the astro:page-load handler across is:inline script re-executions
+    // (Astro soft-nav re-runs the script tag each time, which would accumulate listeners).
+    const handlerKey = `__bsInit_${level}`;
+    if (window[handlerKey]) document.removeEventListener('astro:page-load', window[handlerKey]);
+    window[handlerKey] = initBenchmarkSelector;
+    document.addEventListener('astro:page-load', window[handlerKey]);
 
     initBenchmarkSelector();
   })();

@@ -406,17 +406,19 @@ declare module '@components/BenchmarkSelector.astro' {
 
 declare module '@components/UnlockBanner.astro' {
   export interface Props {
+    title?: string;
     link: string;
     buttonText?: string;
     slot?: string;
   }
   /**
    * ### UnlockBanner Component
-   * 
+   *
    * A clean, dashed-border banner notifying students when a chord-based branching pathway has unlocked.
-   * Both the title (as an H3/H4 header) and body text are populated using standard markdown inside the slot.
-   * 
+   * The title is passed as a prop; body text is populated via the slot.
+   *
    * #### Parameters & Options:
+   * * `title` *(string)* — Banner heading text. **Default: `"Optional Branch Unlocked"`**
    * * `link` *(string)* — **Required.** Destination URL link.
    * * `buttonText` *(string)* — Custom text displayed inside the link action button. **Default: `"Open Lead Sheets →"`**
    */

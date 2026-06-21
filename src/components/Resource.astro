@@ -78,8 +78,11 @@ const TAG_DICTIONARY: Record<string, { text: string; type: string; tip: string }
 
 const tagList = tags ? tags.trim().split(/\s+/).filter(Boolean) : [];
 
+const isAuditionCard = tagList.includes('audition');
 const resolvedBadges: Badge[] = tagList
-  .filter(tag => !['audition', 'recommended'].includes(tag)) 
+  // For audition-mode cards, exclude 'free' from the lower badge row — it's already shown
+  // inline next to the METHOD AUDITION label in audition-top-badges.
+  .filter(tag => !['audition', 'recommended'].includes(tag) && !(isAuditionCard && tag === 'free'))
   .map(tag => {
     const match = TAG_DICTIONARY[tag];
     if (match) return match;
@@ -110,7 +113,9 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
         {tagList.includes('audition') && (
           <div class="audition-top-badges">
             <span class="audition-badge-method">METHOD AUDITION</span>
-            {tagList.includes('free') && <span class="audition-badge-free">FREE</span>}
+            {tagList.includes('free') && (
+              <span class="badge free" data-tip="Completely free, open-source, or public-domain resource. Sourced at zero cost.">Free</span>
+            )}
           </div>
         )}
         {icon && icon !== 'none' && (
@@ -381,17 +386,6 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
     letter-spacing: 0.08em !important;
     text-transform: uppercase !important;
     color: var(--rose) !important;
-    font-weight: 700;
-  }
-  .audition-badge-free {
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 0.54rem !important;
-    letter-spacing: 0.08em !important;
-    background-color: rgba(111, 181, 138, 0.15) !important;
-    color: var(--badge-free) !important;
-    border: 1px solid rgba(111, 181, 138, 0.3) !important;
-    padding: 0.15rem 0.35rem !important;
-    border-radius: 4px !important;
     font-weight: 700;
   }
   .audition-composer {
@@ -876,36 +870,35 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
     margin-bottom: 1rem !important;
   }
   
-  /* Corrected: Reverted to transparent background link style that user liked */
+  /* Sheet / Audio links — solid style matching the .btn-link on generic cards */
   .uv-bench-link {
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 0.75rem !important;
-    letter-spacing: 0.02em !important;
-    color: var(--gold) !important;
-    background-color: rgba(201, 168, 76, 0.06) !important;
-    text-decoration: none !important;
-    border: 1px solid var(--border-color) !important;
-    border-radius: 4px !important;
-    padding: 0.45rem 0.85rem !important;
-    transition: all 0.15s !important;
-    font-weight: 600 !important;
+    flex: 1 !important;
     display: inline-flex !important;
     align-items: center !important;
-  }
-  :root[data-theme="light"] .uv-bench-link {
-    color: var(--sl-color-accent) !important;
-    background-color: rgba(154, 116, 32, 0.05) !important;
+    justify-content: center !important;
+    text-align: center !important;
+    background-color: var(--bg-card2) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-main) !important;
+    padding: 0.55rem 1rem !important;
+    border-radius: 6px !important;
+    font-size: 0.82rem !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+    transition: all 0.2s !important;
+    cursor: pointer !important;
+    box-sizing: border-box !important;
   }
   .uv-bench-link:hover {
+    background-color: var(--gold) !important;
+    color: var(--sl-color-black) !important;
     border-color: var(--gold) !important;
-    color: var(--gold) !important;
-    background-color: rgba(201, 168, 76, 0.15) !important;
     text-decoration: none !important;
   }
   :root[data-theme="light"] .uv-bench-link:hover {
+    background-color: var(--sl-color-accent) !important;
+    color: var(--sl-color-white) !important;
     border-color: var(--sl-color-accent) !important;
-    color: var(--sl-color-accent) !important;
-    background-color: rgba(154, 116, 32, 0.15) !important;
   }
 
   .select-bench-btn {
@@ -921,7 +914,7 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
     text-transform: uppercase !important;
     letter-spacing: 0.06em !important;
     cursor: pointer !important;
-    display: flex !important;
+    display: flex; /* No !important — allows JS style.display to override */
     align-items: center !important;
     justify-content: center !important;
     gap: 0.45rem !important;
