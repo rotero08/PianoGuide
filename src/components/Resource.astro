@@ -11,21 +11,28 @@ interface Badge {
 export interface Props {
   id?: string;
   title: string;
-  link: string;
+  link?: string; // Generic link for regular cards/drawers
   buttonText?: string;
   borderLeft?: boolean;
   accentColor?: 'gold' | 'rose' | 'none';
   icon?: 'info' | 'target' | 'warning' | 'play-box' | 'link' | 'speed-wall' | 'app-trap' | 'acronym-trap' | 'repeat' | 'moon' | 'retreat' | 'chevron-down' | 'star' | 'map' | 'none';
   subs?: string;
-  focus?: string;
+  focus?: string; // For general focus tag or composer for audition/benchmark
   tags?: string;
   variant?: 'card' | 'drawer';
-  tagline?: string;
-  isAlternative?: boolean;
-  pinTo?: 'reading' | 'technique';
-  practicePlan?: string;
-  doneWhen?: string;
-  slot?: string;
+  tagline?: string; // For drawer variant
+  isAlternative?: boolean; // For drawer variant in AlternativesBox
+  pinTo?: 'reading' | 'technique'; // For drawer variant to move between columns
+  practicePlan?: string; 
+  doneWhen?: string; 
+
+  // Benchmark-specific props
+  isBenchmark?: boolean;
+  era?: string;
+  composer?: string; // Alternative to focus for benchmarks
+  sheetUrl?: string; // Specific sheet music link for benchmarks
+  audioUrl?: string; // Specific audio link for benchmarks
+  isPrimarySelectable?: boolean; // Flag to show "Select This Benchmark" button
 }
 
 const {
@@ -44,81 +51,39 @@ const {
   isAlternative = false,
   pinTo,
   practicePlan,
-  doneWhen
+  doneWhen,
+  isBenchmark = false,
+  era,
+  composer,
+  sheetUrl,
+  audioUrl,
+  isPrimarySelectable = false
 } = Astro.props;
+
+// For badges: common tags vs. benchmark badges
+const TAG_DICTIONARY: Record<string, { text: string; type: string; tip: string }> = {
+  acoustics: { text: "Acoustics & DSP", type: "accent", tip: "Acoustics, digital signal processing, and physical modeling resources." },
+  pedagogy: { text: "Piano Manuals", type: "warning", tip: "Core piano manuals, methods, and anatomical approach books." },
+  theory: { text: "Theory & Cognition", type: "theory", tip: "Music theory, harmonic analyses, and cognitive research." },
+  free: { text: "Free", type: "success", tip: "Completely free, open-source, or public-domain resource. Sourced at zero cost." },
+  paid: { text: "Paid", type: "paid", tip: "A physical book or structured paid material. Requires purchase." },
+  freevideo: { text: "Free Video", type: "video", tip: "High-quality, free video lesson." },
+  imslp: { text: "IMSLP", type: "alternate", tip: "International Music Score Library Project (IMSLP). Free public domain sheet music repository." },
+  blueprint: { text: "Blueprint", type: "blueprint", tip: "Structured roadmap." },
+  alternate: { text: "Alternate", type: "alternate", tip: "Alternative roadmap options." },
+  video: { text: "Video", type: "video", tip: "High-quality video lesson." },
+  branch: { text: "Branch", type: "branch", tip: "An optional branching track." },
+  recommended: { text: "★ RECOMMENDED", type: "recommended", tip: "Highly recommended resource by the community." }
+};
 
 const tagList = tags ? tags.trim().split(/\s+/).filter(Boolean) : [];
 
-const TAG_DICTIONARY: Record<string, { text: string; type: string; tip: string }> = {
-  acoustics: { 
-    text: "Acoustics & DSP", 
-    type: "accent", 
-    tip: "Acoustics, digital signal processing, and physical modeling resources." 
-  },
-  pedagogy: { 
-    text: "Piano Manuals", 
-    type: "warning", 
-    tip: "Core piano manuals, methods, and anatomical approach books." 
-  },
-  theory: { 
-    text: "Theory & Cognition", 
-    type: "theory", 
-    tip: "Music theory, harmonic analyses, and cognitive research." 
-  },
-  free: { 
-    text: "Free", 
-    type: "success", 
-    tip: "Completely free domain material." 
-  },
-  paid: { 
-    text: "Paid", 
-    type: "paid", 
-    tip: "A physical book or structured paid material." 
-  },
-  freevideo: { 
-    text: "Free Video", 
-    type: "video", 
-    tip: "High-quality, free video lesson." 
-  },
-  imslp: { 
-    text: "IMSLP", 
-    type: "alternate", 
-    tip: "IMSLP public domain score database." 
-  },
-  blueprint: { 
-    text: "Blueprint", 
-    type: "blueprint", 
-    tip: "Structured roadmap." 
-  },
-  alternate: { 
-    text: "Alternate", 
-    type: "alternate", 
-    tip: "Alternative roadmap options." 
-  },
-  video: { 
-    text: "Video", 
-    type: "video", 
-    tip: "High-quality video lesson." 
-  },
-  branch: { 
-    text: "Branch", 
-    type: "branch", 
-    tip: "An optional branching track." 
-  }
-};
-
 const resolvedBadges: Badge[] = tagList
-  .filter(tag => {
-    if (tag === 'audition') return false;
-    if (tag === 'free' && tagList.includes('audition')) return false;
-    return true;
-  })
+  .filter(tag => !['audition', 'recommended'].includes(tag)) 
   .map(tag => {
     const match = TAG_DICTIONARY[tag];
     if (match) return match;
-    const formattedText = tag
-      .replace(/-/g, ' ')
-      .replace(/\b\w/g, c => c.toUpperCase());
+    const formattedText = tag.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
     return {
       text: formattedText,
       type: 'accent',
@@ -126,17 +91,19 @@ const resolvedBadges: Badge[] = tagList
     };
   });
 
-const tagStyles: Record<string, { label: string; class: string }> = {
-  free: { label: 'FREE', class: 'free' },
-  recommended: { label: '★ RECOMMENDED', class: 'recommended' },
-  paid: { label: 'PAID', class: 'paid' },
-  'paid-book': { label: 'PAID BOOK', class: 'paid' }
+// Specific styles for tags inside drawers and special cards
+const customTagStyles: Record<string, { label: string; class: string }> = {
+  free: { label: 'FREE', class: 'tag-free' },
+  recommended: { label: '★ RECOMMENDED', class: 'tag-recommended' },
+  paid: { label: 'PAID', class: 'tag-paid' },
+  'paid-book': { label: 'PAID BOOK', class: 'tag-paid' },
+  audition: { label: 'METHOD AUDITION', class: 'tag-audition' }
 };
 
 const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(t)) || '';
 ---
 
-{variant === 'card' ? (
+{variant === 'card' && !isBenchmark ? (
   <div class:list={['resource-card', { 'has-border-left': borderLeft, [accentColor]: borderLeft }]} data-category={category}>
     <div class="resource-header">
       <div class="resource-header-left">
@@ -178,11 +145,61 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
       <slot />
     </div>
 
-    <a href={link} target="_blank" rel="noopener" class="btn-link">
-      {buttonText}
-    </a>
+    {link && (
+      <a href={link} target="_blank" rel="noopener" class="btn-link">
+        {buttonText}
+      </a>
+    )}
+  </div>
+) : variant === 'card' && isBenchmark ? (
+  <!-- Benchmark Card variant -->
+  <div class="uv-bench-item" data-bench-id={id} id={`card-${id}`} data-bench-era={era} data-bench-composer={composer} data-sheet-url={sheetUrl} data-audio-url={audioUrl}>
+    <div class="uv-bench-top">
+      <div class="uv-bench-meta-left">
+        {era && <span class="uv-bench-era">{era}</span>}
+        {tagList.includes('free') && <span class="badge free" data-tip="Completely free, open-source, or public-domain resource. Sourced at zero cost.">Free</span>}
+        {tagList.includes('paid') && <span class="badge paid" data-tip="A physical book or structured paid material. Requires purchase.">Paid</span>}
+        {tagList.includes('imslp') && <span class="badge imslp" data-tip="International Music Score Library Project (IMSLP). Free public domain sheet music repository.">IMSLP</span>}
+      </div>
+      <div class="bench-controls">
+        <button class="bench-pin-btn" title="Pin / Unpin to benchmarks grid" data-pin-id={id}>
+          <span class="pin-icon-on">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pin-svg">
+              <line x1="12" y1="17" x2="12" y2="22"></line>
+              <path d="M5 17h14v-1.76a2 2 0 0 0-.44-1.24l-2.12-2.65A1 1 0 0 1 16 10.76V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v5.76a1 1 0 0 1-.44.59l-2.12 2.65a2 2 0 0 0-.44 1.24Z"></path>
+            </svg>
+          </span>
+          <span class="pin-icon-off">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pin-svg">
+              <line x1="12" y1="17" x2="12" y2="22"></line>
+              <path d="M5 17h14v-1.76a2 2 0 0 0-.44-1.24l-2.12-2.65A1 1 0 0 1 16 10.76V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v5.76a1 1 0 0 1-.44.59l-2.12 2.65a2 2 0 0 0-.44 1.24Z"></path>
+              <line x1="2" y1="2" x2="22" y2="22" stroke="currentColor" stroke-width="2.5"></line>
+            </svg>
+          </span>
+        </button>
+        <input type="checkbox" class="bench-done-checkbox" id={`check-bench-${id}`} data-check-id={id} title="Mark benchmark as completed" />
+      </div>
+    </div>
+    <span class="uv-bench-title">{title}</span>
+    {composer && <span class="uv-bench-composer">{composer}</span>}
+    <p><slot /></p>
+    <div class="uv-bench-links">
+      {sheetUrl && <a class="uv-bench-link" href={sheetUrl} target="_blank" rel="noopener">Sheet ↗</a>}
+      {audioUrl && <a class="uv-bench-link" href={audioUrl} target="_blank" rel="noopener">Audio ↗</a>}
+    </div>
+    {isPrimarySelectable && (
+      <button class="select-bench-btn" data-select-id={id}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="select-target-svg">
+          <circle cx="12" cy="12" r="9"></circle>
+          <circle cx="12" cy="12" r="4"></circle>
+          <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"></circle>
+        </svg>
+        <span class="select-btn-text">Select This Benchmark</span>
+      </button>
+    )}
   </div>
 ) : (
+  <!-- Drawer variant -->
   <details 
     class="res-item-drawer resource-row-container" 
     data-res-id={id} 
@@ -200,7 +217,7 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
           <div class="res-title-badge-row">
             <span class="res-title-label">{title}</span>
             {tagList.map(tag => {
-              const style = tagStyles[tag] || { label: tag.toUpperCase(), class: 'paid' };
+              const style = customTagStyles[tag] || { label: tag.toUpperCase(), class: 'tag-paid' };
               const match = TAG_DICTIONARY[tag] || { tip: `Tag: ${tag}` };
               const isRecommended = tag === 'recommended';
               return (
@@ -223,7 +240,7 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
 
       <div class="res-controls-right">
         {isAlternative && (
-          <button class="res-pin-toggle-btn" aria-label="Pin resource to main list" data-pin-btn-id={id}>
+          <button class="res-pin-toggle-btn" aria-label="Pin resource to main list" data-pin-id={id}>
             <span class="pin-icon-on">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pin-svg">
                 <line x1="12" y1="17" x2="12" y2="22"></line>
@@ -240,7 +257,7 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
           </button>
         )}
         
-        <button class="res-done-checkbox" aria-label="Mark resource as completed" data-checkbox-id={id}>
+        <button class="res-done-checkbox" aria-label="Mark resource as completed" data-check-id={id}>
           <svg viewBox="0 0 24 24" fill="none" class="res-checkmark-svg">
             <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
           </svg>
@@ -270,8 +287,8 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
         )}
 
         <div class="res-foot">
-          <a class="res-open" href={link} target="_blank" rel="noopener">Open resource ↗</a>
-          <button class="res-mark-btn" data-res-id={id}>Mark as done</button>
+          {link && <a class="res-open" href={link} target="_blank" rel="noopener">{buttonText}</a>}
+          <button class="res-mark-btn" data-check-id={id}>Mark as done</button>
         </div>
       </div>
     </div>
@@ -279,15 +296,16 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
 )}
 
 <style>
-  .resource-card {
+  /* Base Card Styles */
+  .resource-card, .uv-bench-item {
     background-color: var(--sl-color-gray-6);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 1.2rem !important; /* Spacing gap reduction */
+    padding: 1.2rem !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-start !important;
-    gap: 0.45rem !important; /* Spacing gap reduction */
+    gap: 0.45rem !important;
     transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     box-sizing: border-box !important;
     height: 100% !important;
@@ -307,6 +325,7 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
   .resource-card.has-border-left.gold { border-left-color: var(--gold) !important; }
   :root[data-theme="light"] .resource-card.has-border-left.gold { border-left-color: var(--sl-color-accent) !important; }
 
+  /* Generic Resource Card Header */
   .resource-header {
     display: flex !important;
     justify-content: space-between !important;
@@ -391,7 +410,7 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
   }
   .focus-tag { 
     font-family: 'JetBrains Mono', monospace !important; 
-    font-size: 0.71rem !important; /* Accessible enlarged typography */
+    font-size: 0.71rem !important;
     letter-spacing: 0.08em !important; 
     text-transform: uppercase !important; 
     color: var(--rose) !important; 
@@ -401,7 +420,23 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
   }
   .resource-desc { font-size: 0.95rem !important; color: var(--text-muted) !important; margin: 0 0 0.8rem 0 !important; line-height: 1.6 !important; flex-grow: 1 !important; }
   .resource-desc :global(p) { margin: 0 !important; padding: 0 !important; font-size: inherit !important; line-height: inherit !important; color: inherit !important; }
-  .btn-link { display: inline-block !important; text-align: center !important; background-color: var(--bg-card2) !important; border: 1px solid var(--border-color) !important; color: var(--text-main) !important; padding: 0.6rem 1rem !important; border-radius: 6px !important; font-size: 0.85rem !important; text-decoration: none !important; font-weight: 600 !important; transition: all 0.2s !important; cursor: pointer !important; width: 100% !important; box-sizing: border-box !important; margin-top: auto !important; }
+  .btn-link { 
+    display: inline-block !important; 
+    text-align: center !important; 
+    background-color: var(--bg-card2) !important; 
+    border: 1px solid var(--border-color) !important; 
+    color: var(--text-main) !important; 
+    padding: 0.6rem 1rem !important; 
+    border-radius: 6px !important; 
+    font-size: 0.85rem !important; 
+    text-decoration: none !important; 
+    font-weight: 600 !important; 
+    transition: all 0.2s !important; 
+    cursor: pointer !important; 
+    width: 100% !important; 
+    box-sizing: border-box !important; 
+    margin-top: auto !important; 
+  }
   .btn-link:hover { background-color: var(--gold) !important; color: var(--sl-color-black) !important; border-color: var(--gold) !important; text-decoration: none !important; }
   :root[data-theme="light"] .btn-link:hover { background-color: var(--sl-color-accent) !important; color: var(--sl-color-white) !important; border-color: var(--sl-color-accent) !important; }
 
@@ -419,9 +454,10 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
   .badge.accent { background-color: rgba(201, 168, 76, 0.13); color: var(--gold); border: 1px solid rgba(201, 168, 76, 0.3); }
   :root[data-theme="light"] .badge.accent { background-color: rgba(154, 116, 32, 0.13); color: var(--sl-color-accent); border-color: rgba(154, 116, 32, 0.3); }
 
+  /* Drawer Variant Styles */
   .resource-row-container {
     display: block !important;
-    border: none !important; 
+    border: none !important;
     border-bottom: 1px solid var(--border-color) !important;
     width: 100% !important;
     box-sizing: border-box !important;
@@ -446,7 +482,7 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
     width: 100% !important;
     gap: 0.5rem !important;
     box-sizing: border-box !important;
-    padding: 0.4rem 1rem !important; 
+    padding: 0.4rem 1rem !important;
   }
   .res-item-summary::-webkit-details-marker,
   .res-item-summary::marker {
@@ -513,10 +549,10 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
   }
   .res-tag-badge {
     font-family: 'JetBrains Mono', monospace !important;
-    font-size: 0.65rem !important; 
+    font-size: 0.65rem !important;
     letter-spacing: 0.08em !important;
     text-transform: uppercase !important;
-    padding: 0.15rem 0.45rem !important; 
+    padding: 0.15rem 0.45rem !important;
     border-radius: 4px !important;
     font-weight: 700 !important;
   }
@@ -559,6 +595,7 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
     flex-shrink: 0 !important;
     margin-top: 0.1rem !important;
   }
+
   .res-pin-toggle-btn {
     background: none !important;
     border: none !important;
@@ -636,8 +673,8 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
   }
 
   .res-item-expanded-content {
-    padding-left: 1.8rem !important; 
-    padding-right: 1.4rem !important; 
+    padding-left: 1.8rem !important;
+    padding-right: 1.4rem !important;
     padding-top: 0.55rem !important;
     padding-bottom: 0.25rem !important;
     font-size: 0.86rem !important;
@@ -760,137 +797,358 @@ const category = tagList.find(t => ['acoustics', 'pedagogy', 'theory'].includes(
     transform: none !important;
     bottom: 135% !important;
   }
-</style>
 
-<script>
-  function initResourceControls() {
-    const checkedStates = JSON.parse(localStorage.getItem('cp-checked-resources') || '{}');
-    const pinnedStates = JSON.parse(localStorage.getItem('cp-pinned-resources') || '{}');
-    const rows = document.querySelectorAll('.resource-row-container');
-
-    rows.forEach(row => {
-      const resId = row.getAttribute('data-res-id');
-      if (resId === null) return;
-      const resourceId = resId;
-
-      const checkbox = row.querySelector('.res-done-checkbox');
-      const pinBtn = row.querySelector('.res-pin-toggle-btn');
-      const markBtn = row.querySelector('.res-mark-btn');
-
-      const initialParent = row.getAttribute('data-initial-parent') || 
-        (row.closest('.alternatives-list-container') ? 'alt' : 'main');
-
-      const hasUserSetting = pinnedStates.hasOwnProperty(resourceId);
-      const isPinned = hasUserSetting 
-        ? (pinnedStates[resourceId] === true || pinnedStates[resourceId] === 'true')
-        : (initialParent === 'main');
-
-      if (isPinned) {
-        row.classList.add('pinned');
-        if (pinBtn) pinBtn.classList.add('active');
-      } else {
-        row.classList.remove('pinned');
-        if (pinBtn) pinBtn.classList.remove('active');
-      }
-
-      function updateCompletedState(isCompleted: boolean) {
-        if (isCompleted) {
-          row.classList.add('done');
-          if (checkbox) checkbox.classList.add('checked');
-          if (markBtn) {
-            markBtn.classList.add('completed');
-            markBtn.textContent = 'Done ✓';
-          }
-        } else {
-          row.classList.remove('done');
-          if (checkbox) checkbox.classList.remove('checked');
-          if (markBtn) {
-            markBtn.classList.remove('completed');
-            markBtn.textContent = 'Mark as done';
-          }
-        }
-      }
-
-      updateCompletedState(!!checkedStates[resourceId]);
-
-      function toggleDone() {
-        const currentChecked = JSON.parse(localStorage.getItem('cp-checked-resources') || '{}');
-        const targetState = !currentChecked[resourceId];
-        currentChecked[resourceId] = targetState;
-        localStorage.setItem('cp-checked-resources', JSON.stringify(currentChecked));
-
-        document.querySelectorAll(`[data-res-id="${resourceId}"]`).forEach(el => {
-          const cb = el.querySelector('.res-done-checkbox');
-          const mb = el.querySelector('.res-mark-btn');
-          if (targetState) {
-            el.classList.add('done');
-            if (cb) cb.classList.add('checked');
-            if (mb) {
-              mb.classList.add('completed');
-              mb.textContent = 'Done ✓';
-            }
-          } else {
-            el.classList.remove('done');
-            if (cb) cb.classList.remove('checked');
-            if (mb) {
-              mb.classList.remove('completed');
-              mb.textContent = 'Mark as done';
-            }
-          }
-        });
-
-        window.dispatchEvent(new CustomEvent('cp-resource-state-changed', { detail: { id: resourceId, checked: targetState } }));
-      }
-
-      if (checkbox && !checkbox.hasAttribute('data-listener-bound')) {
-        checkbox.setAttribute('data-listener-bound', 'true');
-        checkbox.addEventListener('click', (e) => {
-          e.stopPropagation(); 
-          e.preventDefault();
-          toggleDone();
-        });
-      }
-
-      if (markBtn && !markBtn.hasAttribute('data-listener-bound')) {
-        markBtn.setAttribute('data-listener-bound', 'true');
-        markBtn.addEventListener('click', (e) => {
-          e.stopPropagation(); 
-          e.preventDefault();
-          toggleDone();
-        });
-      }
-
-      if (pinBtn && !pinBtn.hasAttribute('data-listener-bound')) {
-        pinBtn.setAttribute('data-listener-bound', 'true');
-        pinBtn.addEventListener('click', (e) => {
-          e.stopPropagation(); 
-          e.preventDefault();
-
-          const currentPins = JSON.parse(localStorage.getItem('cp-pinned-resources') || '{}');
-          const targetPin = !currentPins[resourceId];
-          currentPins[resourceId] = targetPin;
-          localStorage.setItem('cp-pinned-resources', JSON.stringify(currentPins));
-
-          document.querySelectorAll(`[data-res-id="${resourceId}"]`).forEach(el => {
-            const pb = el.querySelector('.res-pin-toggle-btn');
-            if (pb) {
-              if (targetPin) {
-                el.classList.add('pinned');
-                pb.classList.add('active');
-              } else {
-                el.classList.remove('pinned');
-                pb.classList.remove('active');
-              }
-            }
-          });
-
-          window.dispatchEvent(new CustomEvent('cp-resource-pin-changed', { detail: { id: resourceId, pinned: targetPin } }));
-        });
-      }
-    });
+  /* Benchmark-specific styles (uv-bench-item) */
+  .uv-bench-item {
+    background: var(--sl-color-gray-6) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 8px !important;
+    padding: 1.1rem !important;
+    position: relative !important;
+    transition: transform 0.2s, border-color 0.2s !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.3rem !important;
+  }
+  .uv-bench-item.dashed {
+    border: 1.5px dashed var(--gold) !important;
+  }
+  :root[data-theme="light"] .uv-bench-item.dashed {
+    border-color: var(--sl-color-accent) !important;
+  }
+  .uv-bench-item.selected {
+    border: 2px solid var(--gold) !important;
+    box-shadow: 0 4px 20px -2px rgba(201, 168, 76, 0.15) !important;
+  }
+  :root[data-theme="light"] .uv-bench-item.selected {
+    border-color: var(--sl-color-accent) !important;
+    box-shadow: 0 4px 20px -2px rgba(154, 116, 32, 0.15) !important;
+  }
+  .uv-bench-item.completed {
+    opacity: 0.65 !important;
+  }
+  .uv-bench-item.completed .uv-bench-title {
+    text-decoration: line-through !important;
+    text-decoration-color: var(--text-faint) !important;
+  }
+  .uv-bench-top {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-bottom: 0.4rem !important;
+  }
+  .uv-bench-meta-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+  }
+  .uv-bench-era {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.58rem !important;
+    letter-spacing: 0.05em !important;
+    text-transform: uppercase !important;
+    color: var(--rose) !important;
+    font-weight: 700 !important;
+  }
+  .uv-bench-title {
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+    color: var(--text-main) !important;
+    margin: 0.2rem 0 !important;
+    font-family: 'Playfair Display', serif !important;
+  }
+  .uv-bench-composer {
+    font-size: 0.78rem !important;
+    color: var(--text-muted) !important;
+    display: block !important;
+    margin-bottom: 0.4rem !important;
+  }
+  .uv-bench-item p {
+    font-size: 0.92rem !important;
+    color: var(--text-muted) !important;
+    line-height: 1.5 !important;
+    margin: 0 0 0.8rem 0 !important;
+  }
+  .uv-bench-links {
+    display: flex !important;
+    gap: 0.5rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  /* Corrected: Reverted to transparent background link style that user liked */
+  .uv-bench-link {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.02em !important;
+    color: var(--gold) !important;
+    background-color: rgba(201, 168, 76, 0.06) !important;
+    text-decoration: none !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 4px !important;
+    padding: 0.45rem 0.85rem !important;
+    transition: all 0.15s !important;
+    font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+  :root[data-theme="light"] .uv-bench-link {
+    color: var(--sl-color-accent) !important;
+    background-color: rgba(154, 116, 32, 0.05) !important;
+  }
+  .uv-bench-link:hover {
+    border-color: var(--gold) !important;
+    color: var(--gold) !important;
+    background-color: rgba(201, 168, 76, 0.15) !important;
+    text-decoration: none !important;
+  }
+  :root[data-theme="light"] .uv-bench-link:hover {
+    border-color: var(--sl-color-accent) !important;
+    color: var(--sl-color-accent) !important;
+    background-color: rgba(154, 116, 32, 0.15) !important;
   }
 
-  initResourceControls();
-  window.addEventListener('cp-rebind-listeners', initResourceControls);
-  document.addEventListener('astro:page-load', initResourceControls);
+  .select-bench-btn {
+    width: 100% !important;
+    background: rgba(201, 168, 76, 0.06) !important;
+    border: 1px solid rgba(201, 168, 76, 0.45) !important;
+    color: var(--gold) !important;
+    padding: 0.55rem 1rem !important;
+    border-radius: 6px !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.45rem !important;
+    transition: all 0.2s ease !important;
+    margin-top: auto !important;
+  }
+  :root[data-theme="light"] .select-bench-btn {
+    background-color: rgba(154, 116, 32, 0.05) !important;
+    border-color: rgba(154, 116, 32, 0.45) !important;
+    color: var(--sl-color-accent) !important;
+  }
+  .select-bench-btn:hover {
+    background: rgba(201, 168, 76, 0.15) !important;
+    border-color: var(--gold) !important;
+  }
+  :root[data-theme="light"] .select-bench-btn:hover {
+    background: rgba(154, 116, 32, 0.15) !important;
+    border-color: var(--sl-color-accent) !important;
+  }
+  .select-target-svg {
+    width: 14px !important;
+    height: 14px !important;
+    color: inherit !important;
+  }
+
+  .uv-bench-item.selected .select-bench-btn {
+    background: var(--gold) !important;
+    color: var(--sl-color-black) !important;
+    border-color: var(--gold) !important;
+    cursor: default !important;
+    pointer-events: none !important;
+  }
+  :root[data-theme="light"] .uv-bench-item.selected .select-bench-btn {
+    background: var(--sl-color-accent) !important;
+    color: var(--sl-color-white) !important;
+    border-color: var(--sl-color-accent) !important;
+  }
+
+  /* Controls for pinning and checking (applies to both drawer and benchmark cards) */
+  .bench-controls {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.6rem !important;
+  }
+  .bench-pin-btn {
+    background: none !important;
+    border: none !important;
+    color: var(--text-faint) !important;
+    cursor: pointer !important;
+    padding: 5px !important;
+    border-radius: 4px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: color 0.15s, background-color 0.15s !important;
+    flex-shrink: 0 !important;
+  }
+  .bench-pin-btn:hover {
+    color: var(--gold) !important;
+    background-color: rgba(201, 168, 76, 0.08) !important;
+  }
+  :root[data-theme="light"] .bench-pin-btn:hover {
+    color: var(--sl-color-accent) !important;
+    background-color: rgba(154, 116, 32, 0.08) !important;
+  }
+  .uv-bench-item[data-pinned="true"] .bench-pin-btn {
+    color: var(--gold) !important;
+  }
+  :root[data-theme="light"] .uv-bench-item[data-pinned="true"] .bench-pin-btn {
+    color: var(--sl-color-accent) !important;
+  }
+  .pin-svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+  .bench-pin-btn .pin-icon-off { display: none !important; }
+  .uv-bench-item[data-pinned="true"] .bench-pin-btn:hover .pin-icon-on { display: none !important; }
+  .uv-bench-item[data-pinned="true"] .bench-pin-btn:hover .pin-icon-off { display: block !important; }
+
+  .bench-done-checkbox {
+    width: 20px !important;
+    height: 20px !important;
+    border: 2px solid rgba(128, 128, 128, 0.25) !important;
+    border-radius: 50% !important;
+    background: transparent !important;
+    flex-shrink: 0 !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: background-color 0.15s, border-color 0.15s !important;
+    padding: 0 !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+  }
+  .bench-done-checkbox::after {
+    content: "" !important;
+    position: absolute !important;
+    left: 5px !important;
+    top: 2px !important;
+    width: 4.5px !important;
+    height: 9px !important;
+    border: solid var(--sl-color-black) !important;
+    border-width: 0 2.5px 2.5px 0 !important;
+    transform: rotate(45deg) !important;
+    opacity: 0 !important;
+    transition: opacity 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  }
+  :root[data-theme="light"] .bench-done-checkbox::after {
+    border-color: var(--sl-color-white) !important;
+  }
+  .bench-done-checkbox:checked::after {
+    opacity: 1 !important;
+  }
+  .bench-done-checkbox:hover { border-color: var(--gold) !important; }
+  :root[data-theme="light"] .bench-done-checkbox:hover { border-color: var(--sl-color-accent) !important; }
+  .bench-done-checkbox:checked {
+    background-color: var(--gold) !important;
+    border-color: var(--gold) !important;
+  }
+  :root[data-theme="light"] .bench-done-checkbox:checked {
+    background-color: var(--sl-color-accent) !important;
+    border-color: var(--sl-color-accent) !important;
+  }
+</style>
+
+<script is:inline>
+  (function() {
+    function initResourceControls() {
+      const checkedStates = JSON.parse(localStorage.getItem('cp-checked-resources') || '{}');
+      const pinnedStates = JSON.parse(localStorage.getItem('cp-pinned-resources') || '{}');
+      
+      const checkableElements = document.querySelectorAll('.res-done-checkbox, .task-checkbox-input');
+      checkableElements.forEach(el => {
+        const id = el.getAttribute('data-check-id') || el.id;
+        if (!id) return;
+
+        if (id in checkedStates) {
+          el.checked = checkedStates[id];
+        } else {
+          el.checked = false;
+        }
+
+        const parentRow = el.closest('.resource-row-container, .task-row-container, .uv-bench-item');
+        if (parentRow) {
+          if (el.checked) {
+            parentRow.classList.add('done');
+            if (el.classList.contains('res-done-checkbox')) el.classList.add('checked');
+          } else {
+            parentRow.classList.remove('done');
+            if (el.classList.contains('res-done-checkbox')) el.classList.remove('checked');
+          }
+        }
+
+        if (!el.hasAttribute('data-listener-bound')) {
+          el.setAttribute('data-listener-bound', 'true');
+          el.addEventListener('change', (e) => {
+            const targetCheckbox = e.target;
+            const elementId = targetCheckbox.getAttribute('data-check-id') || targetCheckbox.id;
+            const newState = targetCheckbox.checked;
+
+            const currentStates = JSON.parse(localStorage.getItem('cp-checked-resources') || '{}');
+            currentStates[elementId] = newState;
+            localStorage.setItem('cp-checked-resources', JSON.stringify(currentStates));
+
+            document.querySelectorAll(`[data-check-id="${elementId}"], #${elementId}`).forEach(item => {
+              const itemParent = item.closest('.resource-row-container, .task-row-container, .uv-bench-item');
+              if (itemParent) {
+                if (newState) {
+                  itemParent.classList.add('done');
+                  if (item.classList.contains('res-done-checkbox')) item.classList.add('checked');
+                } else {
+                  itemParent.classList.remove('done');
+                  if (item.classList.contains('res-done-checkbox')) item.classList.remove('checked');
+                }
+                item.checked = newState;
+              }
+            });
+            window.dispatchEvent(new CustomEvent('cp-resource-state-changed', { detail: { id: elementId, checked: newState } }));
+          });
+        }
+      });
+
+      const pinButtons = document.querySelectorAll('.res-pin-toggle-btn, .bench-pin-btn');
+      pinButtons.forEach(btn => {
+        const id = btn.getAttribute('data-pin-id');
+        if (!id) return;
+
+        const isPinned = !!pinnedStates[id];
+        const parentItem = btn.closest('.resource-row-container, .uv-bench-item');
+        
+        if (isPinned) {
+          btn.classList.add('active');
+          if (parentItem) parentItem.setAttribute('data-pinned', 'true');
+        } else {
+          btn.classList.remove('active');
+          if (parentItem) parentItem.setAttribute('data-pinned', 'false');
+        }
+
+        if (!btn.hasAttribute('data-listener-bound')) {
+          btn.setAttribute('data-listener-bound', 'true');
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const elementId = btn.getAttribute('data-pin-id');
+            const currentPinnedStates = JSON.parse(localStorage.getItem('cp-pinned-resources') || '{}');
+            const newState = !currentPinnedStates[elementId];
+            currentPinnedStates[elementId] = newState;
+            localStorage.setItem('cp-pinned-resources', JSON.stringify(currentPinnedStates));
+
+            document.querySelectorAll(`[data-pin-id="${elementId}"]`).forEach(itemBtn => {
+              const itemParent = itemBtn.closest('.resource-row-container, .uv-bench-item');
+              if (newState) {
+                itemBtn.classList.add('active');
+                if (itemParent) itemParent.setAttribute('data-pinned', 'true');
+              } else {
+                itemBtn.classList.remove('active');
+                if (itemParent) itemParent.setAttribute('data-pinned', 'false');
+              }
+            });
+            window.dispatchEvent(new CustomEvent('cp-resource-pin-changed', { detail: { id: elementId, pinned: newState } }));
+          });
+        }
+      });
+    }
+
+    initResourceControls();
+    window.addEventListener('cp-rebind-listeners', initResourceControls);
+    document.addEventListener('astro:page-load', initResourceControls);
+  })();
 </script>

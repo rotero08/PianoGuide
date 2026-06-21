@@ -1,0 +1,158 @@
+---
+// src/components/UnlockBanner.astro
+
+export interface Props {
+  tag?: string;
+  link: string;
+  buttonText?: string;
+}
+
+const { link, buttonText = "Open Lead Sheets →" } = Astro.props;
+---
+
+<div class="unlock-banner-container">
+  <div class="unlock-logo-wrapper">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="unlock-lock-svg">
+      <rect x="5" y="11" width="14" height="9" rx="2"></rect>
+      <path d="M8 11V7a4 4 0 0 1 7.9-.9"></path>
+    </svg>
+  </div>
+  <div class="unlock-text-column">
+    <div class="unlock-markdown-content">
+      <slot /> <!-- Populates standard parsed markdown title and description -->
+    </div>
+    <a href={link} class="unlock-action-btn">{buttonText}</a>
+  </div>
+</div>
+
+<style>
+  .unlock-banner-container {
+    display: flex !important;
+    gap: 1.1rem !important;
+    align-items: flex-start !important;
+    border: 1px dashed rgba(212, 118, 138, 0.45) !important;
+    background: rgba(212, 118, 138, 0.05) !important;
+    border-radius: var(--radius) !important;
+    padding: 1.4rem !important;
+    margin-top: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+    box-sizing: border-box !important;
+  }
+  :root[data-theme="light"] .unlock-banner-container {
+    background: rgba(168, 80, 105, 0.05) !important;
+    border-color: rgba(168, 80, 105, 0.45) !important;
+  }
+
+  .unlock-logo-wrapper {
+    flex-shrink: 0 !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 9px !important;
+    background: rgba(212, 118, 138, 0.15) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  :root[data-theme="light"] .unlock-logo-wrapper {
+    background: rgba(168, 80, 105, 0.15) !important;
+  }
+  .unlock-lock-svg {
+    width: 18px !important;
+    height: 18px !important;
+    color: var(--rose) !important;
+  }
+  :root[data-theme="light"] .unlock-lock-svg {
+    color: var(--badge-branch) !important;
+  }
+
+  .unlock-text-column {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    flex-grow: 1 !important;
+    min-width: 0 !important;
+  }
+
+  /* Target markdown headings used inside the slot to act as titles */
+  .unlock-markdown-content :global(h1),
+  .unlock-markdown-content :global(h2),
+  .unlock-markdown-content :global(h3),
+  .unlock-markdown-content :global(h4),
+  .unlock-markdown-content :global(h5),
+  .unlock-markdown-content :global(h6) {
+    display: inline-block !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.58rem !important;
+    letter-spacing: 0.09em !important;
+    text-transform: uppercase !important;
+    font-weight: 700 !important;
+    color: var(--rose) !important;
+    margin-top: 0 !important;
+    margin-bottom: 0.25rem !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+  :root[data-theme="light"] .unlock-markdown-content :global(h1),
+  :root[data-theme="light"] .unlock-markdown-content :global(h2),
+  :root[data-theme="light"] .unlock-markdown-content :global(h3),
+  :root[data-theme="light"] .unlock-markdown-content :global(h4),
+  :root[data-theme="light"] .unlock-markdown-content :global(h5),
+  :root[data-theme="light"] .unlock-markdown-content :global(h6) {
+    color: var(--badge-branch) !important;
+  }
+
+  .unlock-markdown-content :global(p) {
+    font-size: 0.88rem !important;
+    line-height: 1.6 !important;
+    color: var(--text-muted) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .unlock-markdown-content :global(strong) {
+    color: var(--text-main) !important;
+    font-weight: 700 !important;
+  }
+  /* Collapse standard paragraph gaps */
+  .unlock-markdown-content :global(p:first-of-type) {
+    margin-top: 0 !important;
+  }
+  .unlock-markdown-content :global(p:last-of-type) {
+    margin-bottom: 0 !important;
+  }
+
+  .unlock-action-btn {
+    display: inline-flex !important;
+    align-self: flex-start !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.68rem !important;
+    letter-spacing: 0.04em !important;
+    font-weight: 600 !important;
+    color: var(--gold-light) !important;
+    background: rgba(201, 168, 76, 0.06) !important;
+    text-decoration: none !important;
+    border: 1px solid rgba(201, 168, 76, 0.35) !important;
+    border-radius: 999px !important;
+    padding: 0.45rem 1rem !important;
+    transition: all 0.18s !important;
+    cursor: pointer !important;
+    margin-top: 0.4rem !important;
+  }
+  .unlock-action-btn:hover {
+    border-color: var(--gold) !important;
+    color: var(--gold) !important;
+    background: rgba(201, 168, 76, 0.13) !important;
+    text-decoration: none !important;
+  }
+  :root[data-theme="light"] .unlock-action-btn {
+    color: var(--sl-color-accent) !important;
+    background: rgba(154, 116, 32, 0.06) !important;
+    border-color: rgba(154, 116, 32, 0.35) !important;
+  }
+  :root[data-theme="light"] .unlock-action-btn:hover {
+    border-color: var(--sl-color-accent) !important;
+    color: var(--sl-color-accent) !important;
+    background: rgba(154, 116, 32, 0.13) !important;
+  }
+</style>

@@ -1,0 +1,417 @@
+---
+// src/components/BenchmarkSelector.astro
+import Icon from './Icon.astro';
+
+export interface Props {
+  level: string;
+}
+
+const { level } = Astro.props;
+---
+
+<div class="benchmark-selector-wrapper" id={`bench-selector-container-${level}`}>
+  
+  <!-- Introductory Callout Box -->
+  <div class="bench-select-callout" id={`bench-select-callout-${level}`}>
+    <div class="bench-select-callout-head">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="target-svg">
+        <circle cx="12" cy="12" r="9"></circle>
+        <circle cx="12" cy="12" r="4"></circle>
+        <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"></circle>
+      </svg>
+      <h3>Choose Your Primary Era Benchmark</h3>
+    </div>
+    <p>Please select <strong>one</strong> era piece to focus on for this level. Once chosen, the alternative pieces will automatically move to the "Alternative Era Benchmark Pieces" drawer below. You can change this selection later or pin additional pieces using the pin icons.</p>
+  </div>
+
+  <!-- Primary Active List Area -->
+  <div class="bench-main-active-list" id={`bench-main-list-${level}`}>
+    <slot />
+  </div>
+
+  <!-- Collapsible Alternatives Drawer -->
+  <details class="alternatives-drawer" id={`alt-benchmarks-drawer-${level}`} open>
+    <summary class="alternatives-header">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="alternatives-chev">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+      <h3>Alternative Era Benchmark Pieces</h3>
+      <!-- Subtly integrated Reset Selection Button -->
+      <button class="reset-primary-btn" id={`reset-bench-btn-${level}`} style="display: none;">Reset Selection</button>
+    </summary>
+    <div class="alternatives-content-body">
+      <div class="alt-benchmarks-list" id={`bench-alt-list-${level}`}>
+        <!-- Alternatives are placed here dynamically by JS -->
+      </div>
+    </div>
+  </details>
+
+</div>
+
+<style>
+  .benchmark-selector-wrapper {
+    margin-top: 1.5rem !important;
+    width: 100% !important;
+  }
+
+  /* Core selection callout */
+  .bench-select-callout {
+    background: linear-gradient(135deg, rgba(201, 168, 76, 0.05) 0%, rgba(19, 27, 46, 0.2) 100%) !important;
+    border: 1px solid var(--border-color) !important;
+    border-left: 4px solid var(--gold) !important;
+    border-radius: var(--radius) !important;
+    padding: 1.25rem 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+    box-sizing: border-box !important;
+  }
+  :root[data-theme="light"] .bench-select-callout {
+    border-left-color: var(--sl-color-accent) !important;
+    background: linear-gradient(135deg, rgba(154, 116, 32, 0.03) 0%, rgba(244, 239, 231, 0.2) 100%) !important;
+  }
+  .bench-select-callout-head {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.55rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+  .bench-select-callout-head h3 {
+    margin: 0 !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 1.05rem !important;
+    color: var(--gold) !important;
+    line-height: 1.2 !important;
+  }
+  :root[data-theme="light"] .bench-select-callout-head h3 {
+    color: var(--sl-color-accent) !important;
+  }
+  .target-svg {
+    width: 18px !important;
+    height: 18px !important;
+    color: var(--gold) !important;
+  }
+  :root[data-theme="light"] .target-svg {
+    color: var(--sl-color-accent) !important;
+  }
+  .bench-select-callout p {
+    font-size: 0.9rem !important;
+    line-height: 1.6 !important;
+    color: var(--text-muted) !important;
+    margin: 0 !important;
+  }
+  .bench-select-callout strong {
+    color: var(--text-main) !important;
+  }
+
+  /* List Grid layouts */
+  .bench-main-active-list, .alt-benchmarks-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.1rem !important;
+  }
+  .bench-main-active-list {
+    margin-bottom: 1.5rem !important;
+  }
+
+  /* Alternatives Box integration */
+  .alternatives-drawer {
+    margin-top: 1.5rem !important;
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius) !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+  .alternatives-header {
+    background-color: rgba(201, 168, 76, 0.04) !important;
+    padding: 0.9rem 1.6rem !important;
+    cursor: pointer !important;
+    user-select: none !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    gap: 0.55rem !important;
+    list-style: none !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0 !important;
+    margin: 0 !important;
+  }
+  .alternatives-header::-webkit-details-marker,
+  .alternatives-header::marker {
+    display: none !important;
+    content: "" !important;
+  }
+  :root[data-theme="light"] .alternatives-header {
+    background-color: rgba(154, 116, 32, 0.04) !important;
+  }
+  .alternatives-header h3 {
+    margin: 0 !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 0.95rem !important;
+    color: var(--gold) !important;
+  }
+  :root[data-theme="light"] .alternatives-header h3 {
+    color: var(--sl-color-accent) !important;
+  }
+  .alternatives-chev {
+    width: 12px !important;
+    height: 12px !important;
+    color: var(--gold) !important;
+    transition: transform 0.2s ease, color 0.15s ease !important;
+    flex-shrink: 0 !important;
+  }
+  :root[data-theme="light"] .alternatives-chev {
+    color: var(--sl-color-accent) !important;
+  }
+  .alternatives-drawer[open] .alternatives-chev {
+    transform: rotate(90deg) !important;
+  }
+  .alternatives-content-body {
+    border-top: 1px solid var(--border-color) !important;
+    padding: 0.8rem 1rem !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+  .alt-benchmarks-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.8rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Reset Focus Button Style */
+  .reset-primary-btn {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.04em !important;
+    background: transparent !important;
+    border: 1px solid rgba(212, 118, 138, 0.4) !important;
+    color: var(--rose) !important;
+    padding: 0.3rem 0.65rem !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease-in-out !important;
+    margin-left: auto !important; /* Pushes button beautifully to the right */
+  }
+  :root[data-theme="light"] .reset-primary-btn {
+    color: var(--badge-branch) !important;
+    border-color: rgba(168, 80, 105, 0.4) !important;
+  }
+  .reset-primary-btn:hover {
+    background-color: rgba(212, 118, 138, 0.08) !important;
+    border-color: var(--rose) !important;
+  }
+  :root[data-theme="light"] .reset-primary-btn:hover {
+    background-color: rgba(168, 80, 105, 0.08) !important;
+    border-color: var(--badge-branch) !important;
+  }
+</style>
+
+<script is:inline define:vars={{ level }}>
+  (function() {
+    function initBenchmarkSelector() {
+      const container = document.getElementById(`bench-selector-container-${level}`);
+      if (!container) return;
+
+      const mainList = document.getElementById(`bench-main-list-${level}`);
+      const altList = document.getElementById(`bench-alt-list-${level}`);
+      const drawer = document.getElementById(`alt-benchmarks-drawer-${level}`);
+      const calloutBox = document.getElementById(`bench-select-callout-${level}`);
+      const resetBtn = document.getElementById(`reset-bench-btn-${level}`);
+      
+      if (!mainList || !altList || !drawer || !calloutBox || !resetBtn) {
+        console.error(`Benchmark selectors not fully found for level ${level}`);
+        return;
+      }
+
+      // Track all benchmarks
+      const initialChildren = Array.from(mainList.children).filter(el => el.classList.contains('uv-bench-item'));
+      initialChildren.forEach(child => {
+        if (!child.hasAttribute('data-initial-parent')) {
+          child.setAttribute('data-initial-parent', 'main');
+        }
+      });
+
+      // Storage keys
+      const primaryKey = `cp-primary-bench-${level}`;
+      const pinnedKey = `cp-pinned-bench-${level}`;
+      const completedKey = `cp-completed-bench-${level}`;
+
+      let primaryId = localStorage.getItem(primaryKey);
+      let pinnedStates = JSON.parse(localStorage.getItem(pinnedKey) || '{}');
+      let completedStates = JSON.parse(localStorage.getItem(completedKey) || '{}');
+
+      function saveStates() {
+        if (primaryId) {
+          localStorage.setItem(primaryKey, primaryId);
+        } else {
+          localStorage.removeItem(primaryKey);
+        }
+        localStorage.setItem(pinnedKey, JSON.stringify(pinnedStates));
+        localStorage.setItem(completedKey, JSON.stringify(completedStates));
+      }
+
+      function renderLayout() {
+        let altCount = 0;
+        const allBenchmarks = Array.from(container.querySelectorAll('.uv-bench-item'));
+
+        // Clear layout lists
+        while (mainList.firstChild) mainList.removeChild(mainList.firstChild);
+        while (altList.firstChild) altList.removeChild(altList.firstChild);
+
+        // Render instruction and re-selection triggers conditionally
+        if (!primaryId) {
+          calloutBox.style.display = 'block';
+          resetBtn.style.display = 'none';
+        } else {
+          calloutBox.style.display = 'none';
+          resetBtn.style.display = 'block';
+        }
+
+        allBenchmarks.forEach((card) => {
+          const benchId = card.getAttribute('data-bench-id');
+          if (!benchId) return;
+
+          const checkbox = card.querySelector('.bench-done-checkbox');
+          const pinBtn = card.querySelector('.bench-pin-btn');
+          const selectBtn = card.querySelector('.select-bench-btn');
+
+          // Sync checkbox completion status
+          if (checkbox) {
+            checkbox.checked = !!completedStates[benchId];
+            if (checkbox.checked) card.classList.add('completed');
+            else card.classList.remove('completed');
+          }
+
+          // Sync pin status
+          if (pinBtn) {
+            if (!!pinnedStates[benchId]) {
+              pinBtn.classList.add('active');
+              card.setAttribute('data-pinned', 'true');
+            } else {
+              pinBtn.classList.remove('active');
+              card.setAttribute('data-pinned', 'false');
+            }
+          }
+
+          // Place cards based on selection state
+          if (!primaryId) {
+            // No selection chosen: show everything in main list with target select CTA button
+            mainList.appendChild(card);
+            card.classList.add('dashed');
+            card.classList.remove('selected');
+            if (selectBtn) {
+              selectBtn.style.display = 'flex';
+            }
+          } else {
+            // Benchmark IS chosen: completely hide select focus CTA buttons on all cards
+            if (selectBtn) {
+              selectBtn.style.display = 'none';
+            }
+
+            if (benchId === primaryId) {
+              mainList.appendChild(card);
+              card.classList.add('selected');
+              card.classList.remove('dashed');
+            } else if (!!pinnedStates[benchId]) {
+              mainList.appendChild(card);
+              card.classList.add('dashed');
+              card.classList.remove('selected');
+            } else {
+              altList.appendChild(card);
+              card.classList.add('dashed');
+              card.classList.remove('selected');
+              altCount++;
+            }
+          }
+        });
+
+        // Hide/show the alternatives collapsible details drawer
+        if (drawer) {
+          if (altCount > 0) {
+            drawer.style.display = 'block';
+            drawer.open = true;
+          } else {
+            drawer.style.display = 'none';
+          }
+        }
+      }
+
+      function attachListenersToBenchmarks() {
+        const allBenchmarks = container.querySelectorAll('.uv-bench-item');
+        allBenchmarks.forEach(card => {
+          const benchId = card.getAttribute('data-bench-id');
+          if (!benchId) return;
+
+          const checkbox = card.querySelector('.bench-done-checkbox');
+          const pinBtn = card.querySelector('.bench-pin-btn');
+          const selectBtn = card.querySelector('.select-bench-btn');
+
+          if (checkbox && !checkbox.hasAttribute('data-listener-attached')) {
+            checkbox.setAttribute('data-listener-attached', 'true');
+            checkbox.addEventListener('change', () => {
+              completedStates[benchId] = checkbox.checked;
+              saveStates();
+              renderLayout();
+              window.dispatchEvent(new CustomEvent('cp-resource-state-changed', { detail: { id: `bench-${benchId}`, checked: checkbox.checked } }));
+            });
+          }
+
+          if (pinBtn && !pinBtn.hasAttribute('data-listener-attached')) {
+            pinBtn.setAttribute('data-listener-attached', 'true');
+            pinBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              pinnedStates[benchId] = !pinnedStates[benchId];
+              saveStates();
+              renderLayout();
+              window.dispatchEvent(new CustomEvent('cp-resource-pin-changed', { detail: { id: `bench-${benchId}`, pinned: pinnedStates[benchId] } }));
+            });
+          }
+
+          if (selectBtn && !selectBtn.hasAttribute('data-listener-attached')) {
+            selectBtn.setAttribute('data-listener-attached', 'true');
+            selectBtn.addEventListener('click', () => {
+              primaryId = benchId;
+              saveStates();
+              renderLayout();
+            });
+          }
+        });
+
+        // Attach listener to Reset Focus Button
+        if (resetBtn && !resetBtn.hasAttribute('data-listener-attached')) {
+          resetBtn.setAttribute('data-listener-attached', 'true');
+          resetBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation(); // Prevents collapsing/expanding parent details summaries
+            primaryId = null;
+            saveStates();
+            renderLayout();
+          });
+        }
+      }
+
+      // Initial execution
+      renderLayout();
+      attachListenersToBenchmarks();
+
+      // Astro Page Soft Navigation rebindings
+      document.addEventListener('astro:page-load', () => {
+        primaryId = localStorage.getItem(primaryKey);
+        pinnedStates = JSON.parse(localStorage.getItem(pinnedKey) || '{}');
+        completedStates = JSON.parse(localStorage.getItem(completedKey) || '{}');
+        renderLayout();
+        attachListenersToBenchmarks();
+      });
+    }
+
+    initBenchmarkSelector();
+  })();
+</script>

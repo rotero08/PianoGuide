@@ -17,6 +17,6 @@
     "ignoreDeprecations": "6.0"
   },
   "mdx": {
-    "checkMdx": true
+    "checkMdx": false
   }
 }

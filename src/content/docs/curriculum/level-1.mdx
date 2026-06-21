@@ -1,6 +1,217 @@
 ---
 title: Level 1 (Intervals + Chords)
-description: Vertical chunking, two-note intervals, and primary triads.
+description: Read two notes at once, triads as single shapes, and play Lead Sheets.
 ---
 
-Placeholder content for Level 1.
+import Callout from '@components/Callout.astro';
+import Grid from '@components/Grid.astro';
+import ResourceColumn from '@components/ResourceColumn.astro';
+import Resource from '@components/Resource.astro';
+import AlternativesBox from '@components/AlternativesBox.astro';
+import VerificationBox from '@components/VerificationBox.astro';
+import BenchmarkGuide from '@components/BenchmarkGuide.astro';
+import BenchmarkSelector from '@components/BenchmarkSelector.astro';
+import UnlockBanner from '@components/UnlockBanner.astro';
+import Task from '@components/Task.astro';
+import Card from '@components/Card.astro';
+
+*Level 1 · vertical chunking*
+
+<Callout bordered={true} accentColor="gold" label="Your goal for this level" icon="target">
+  Read two notes at once and simple triads as single visual shapes, and play your first chord-symbol lead sheets, which connects printed reading to playing harmony at the keyboard.
+</Callout>
+
+Instead of one note at a time, your brain now learns to grab whole vertical shapes. This is also where the harmony track joins the main path for good.
+
+<Grid cols={2}>
+  <ResourceColumn id="technique" title="Technique Support" subtitle="Learn chords as physical shapes your hand can grab by feel, which is the foundation of the harmony track.">
+    <Resource
+      variant="drawer"
+      id="lvl1-siskind"
+      title="Jeremy Siskind: Jazz Piano (Ch. 1 to 4)"
+      tagline="Triads and inversions structured as geographic gestures rather than stacked letters."
+      link="https://jeremysiskind.com/product/jazz-piano-fundamentals-book-1/"
+      tags="paid"
+    >
+      Siskind is an award-winning jazz pianist and educator whose method is prized for teaching chords as geometric hand shapes rather than stacks of separate notes. Building triads and their inversions with the smallest possible motion means your hand learns to land a chord as one gesture.
+    </Resource>
+    
+    <Resource
+      variant="drawer"
+      id="lvl1-leadsheets"
+      title="Lead Sheets & Harmony track"
+      tagline="The home of the chord-based branch."
+      link="/harmony/lead-sheets/"
+      tags="free"
+    >
+      Improvise chords under simple melodies directly from symbols in the Lead Sheets tab.
+    </Resource>
+  </ResourceColumn>
+
+  <ResourceColumn id="reading" title="Sight-Reading" subtitle="Graded reading of two-note intervals and simple triads, kept well below your physical limit and played with both hands." accentColor="rose">
+    <Resource
+      variant="drawer"
+      id="lvl1-bartok"
+      title="Bartók: Mikrokosmos, Book 1"
+      tagline="Real graded music to practice chunking two notes at once rather than dry exercises."
+      link="https://imslp.org/wiki/Mikrokosmos%2C_Sz.107_(Bart%C3%B3k%2C_B%C3%A9la)"
+      tags="imslp recommended"
+      practicePlan="Read two or three pieces a day."
+      doneWhen="You chunk intervals without spelling letters."
+    >
+      Mikrokosmos is a famous set of 153 progressive pieces Bartók wrote to teach reading and technique from the very beginning, free on IMSLP. The first book stays in simple intervals, so it gives you real, musical material to practise chunking two notes at once rather than dry exercises.
+    </Resource>
+
+    <AlternativesBox>
+      <Resource variant="drawer" id="lvl1-kravchuk" title="Michael Kravchuk: 354 Exercises in C" tagline="Carry the fixed-position catalog forward to stabilize vertical coordinate reading." link="https://michaelkravchuk.com/sight-reading-354-reading-exercises-in-c-position-by-michael-kravchuk/" tags="free" isAlternative={true} pinTo="reading">
+        Keep utilizing C-position exercises to stabilize interval reading.
+      </Resource>
+      <Resource variant="drawer" id="lvl1-julie-split" title="Julie Lind: Levels 1 to 2" tagline="Free graded library with optional guides to keep reading inside the easy calibration band." link="https://www.pianosongdownload.com/freemusiclevels.html" tags="free" isAlternative={true} pinTo="reading">
+        PianoSongDownload's free graded library, which can be shown with optional letter names and chord symbols. Being able to dial the support up or down lets you keep your reading firmly inside the easy band the calibration rule asks for.
+      </Resource>
+      <Resource variant="drawer" id="lvl1-essential" title="Essential Keyboard Repertoire, Vol. 1" tagline="Short early-grade pieces drawn from across the classical repertoire." link="https://www.amazon.com/Essential-Keyboard-Repertoire-Intermediate-Selections/dp/0882848577" tags="paid" isAlternative={true} pinTo="reading">
+        A well-edited anthology of short early-grade pieces drawn from across the classical repertoire. It is valued for giving beginners genuine music at a carefully controlled difficulty, which makes it a reliable source of fresh reading material at this level.
+      </Resource>
+    </AlternativesBox>
+  </ResourceColumn>
+</Grid>
+
+<VerificationBox trackId="lvl1" title="Level 1 Verification & Checkpoint" subtitle="Confirm even dyad chunking and chord visualization" levelInfo="≈ ABRSM/RCM Grade 1 to 2 Reading">
+  <BenchmarkGuide title="How to use these benchmarks & calibrate difficulty">
+    A benchmark is a short, real piece, not an exercise. Its only job is to prove that the reading you built at this level actually transfers to music before you move up. Do not drill it like repertoire.
+    
+    1. **Listen** to the recording once so you know the target sound.
+    2. **Sight-read** the score cold, hands together, slow but steady — no stopping to fix notes.
+    3. **Pass:** You get through it on the first or second attempt with a steady pulse and without watching your hands.
+    4. **Stall:** If three honest attempts still fall apart, you are not ready. Don't grind it — drop back, read easier material, then return. (This is the chart’s "New Game +".)
+    
+    **Measuring your reading level via PianoSyllabus:** Go to the [PianoSyllabus search form](https://pianosyllabus.com). Enter a piece you currently play comfortably with correct phrasing. Check its normalized grade. If it is listed as RCM/ABRSM Grade 3, that represents your current *playing ceiling*. Subtract 2 or 3 grades to find your *sight-reading band* (Grade 1). Pull three unseen pieces from Grade 1 and attempt to sight-read them. If you read them with a steady pulse on the first pass, your coordinates are fully aligned [1.4].
+    
+    **The Era Repertoire Rule:** You only need to successfully sight-read **one** of the era benchmark pieces to clear a level and advance. The five historical eras (Baroque, Classical, Romantic, C20, and Modern) are provided as options to give you flexibility. If one piece isn't clicking, try another! However, returning to these benchmarks later and passing **all five** is recommended to prove your reading is general and versatile rather than pattern-matched to a single composer.
+    
+    The five era pieces test the same reading across different musical styles. The free Mayron Cole Audition Book page is the quick pass/fail gate. Passing this level lines up roughly with ABRSM / RCM Grade 1–2 reading.
+  </BenchmarkGuide>
+
+  <Grid cols={2}>
+    <Card variant="flat">
+      ### CHECKLIST & VERIFICATION
+
+      <Task id="check-lvl1-triads" trackId="lvl1" tag="none" link="https://jeremysiskind.com/product/jazz-piano-fundamentals-book-1/" linkText="open ↗">
+        **Triad shapes:** Major and minor triads in any key, all inversions, with minimal motion.
+      </Task>
+
+      <Task id="check-lvl1-dyads" trackId="lvl1" tag="none" link="https://imslp.org/wiki/Mikrokosmos%2C_Sz.107_(Bart%C3%B3k%2C_B%C3%A9la)" linkText="open ↗">
+        **Chunk intervals:** Read Bartók Book 1 intervals hands-together without spelling letters.
+      </Task>
+
+      <Task id="check-lvl1-leadsheet" trackId="lvl1" tag="none" link="/harmony/lead-sheets/" linkText="go →">
+        **Lead-sheet playing:** Three Level 1 to 2 lead sheets with smooth left-hand inversions.
+      </Task>
+
+      <Task id="check-lvl1-checkpoint" trackId="lvl1" tag="none">
+        **Self-audit check:** Confirm genuine vertical reading in shapes, rather than one letter at a time:
+        
+        * Read three new Level 1 reading pieces on [Mikrokosmos](https://imslp.org/wiki/Mikrokosmos%2C_Sz.107_(Bart%C3%B3k%2C_B%C3%A9la)) cleanly on the first or second attempt.
+        * Play the major and minor triads of any key in all inversions by feel based on [Siskind guides](https://jeremysiskind.com/product/jazz-piano-fundamentals-book-1/).
+        * Play three lead sheets hands-together with smooth left-hand inversions in the [Lead Sheets tab](/harmony/lead-sheets/).
+        * Run a quick relative-pitch check on the [Functional Ear Trainer](https://apps.apple.com/us/app/functional-ear-trainer/id1088761926) at around 80 percent.
+      </Task>
+    </Card>
+
+    <Card variant="flat">
+      ### PRIMARY GATE & GRADED BENCHMARKS
+
+      <Resource
+        variant="card"
+        isBenchmark={true}
+        id="lvl1-cole-p78"
+        era="Method Audition"
+        tags="free audition"
+        title="Cole Audition Book — Pages 7 or 8"
+        composer="Mayron Cole"
+        sheetUrl="https://www.freepianomethod.com/supplemental-items-for-teachers.html"
+        audioUrl="https://www.freepianomethod.com/supplemental-items-for-teachers.html"
+        isPrimarySelectable={false}
+      >
+        Sight-read this page cleanly to verify standard linear interval mapping.
+      </Resource>
+
+      <BenchmarkSelector level="lvl1">
+        <Resource
+          variant="card"
+          isBenchmark={true}
+          id="lvl1-telemann"
+          era="Baroque"
+          tags="free"
+          title="Telemann: Vite"
+          composer=""
+          sheetUrl="https://musescore.com/user/32106469/scores/6124296"
+          audioUrl="https://youtu.be/gHnXlDfxgYY"
+          isPrimarySelectable={true}
+        >
+          A short, elegant movement by Telemann that tests early independence and coordination.
+        </Resource>
+        <Resource
+          variant="card"
+          isBenchmark={true}
+          id="lvl1-haydn"
+          era="Classical"
+          tags="free"
+          title="Haydn: Quadrille"
+          composer=""
+          sheetUrl="https://michaelkravchuk.com/free-piano-sheet-music-quadrille-haydn/"
+          audioUrl="https://youtu.be/aqPOHCuoghg"
+          isPrimarySelectable={true}
+        >
+          A short, cheerful classical piece offered as this level's benchmark, with a free score and a recording to hear first. Use it to test whether your interval reading has become fluent on real music.
+        </Resource>
+        <Resource
+          variant="card"
+          isBenchmark={true}
+          id="lvl1-beyer"
+          era="Romantic"
+          tags="free"
+          title="Beyer: Lyrical Piece, Op. 101 No. 39"
+          composer=""
+          sheetUrl="https://www.free-scores.com/sheetmusic?p=atPUuSv5tB"
+          audioUrl="https://youtu.be/8uYfiH5JR-4"
+          isPrimarySelectable={true}
+        >
+          An expressive, song-like romantic study that helps transition your ears to lyrical balance.
+        </Resource>
+        <Resource
+          variant="card"
+          isBenchmark={true}
+          id="lvl1-kabalevsky"
+          era="C20"
+          tags="free"
+          title="Kabalevsky: Funny Event, Op. 39 No. 7"
+          composer=""
+          sheetUrl="https://michaelkravchuk.com/free-piano-sheet-music-funny-event-op-39-no-7-kabalevsky/"
+          audioUrl="https://youtu.be/SsC9lH_nJq4"
+          isPrimarySelectable={true}
+        >
+          Dmitri Kabalevsky's short C20 miniature that highlights articulation and expressive offset rhythms.
+        </Resource>
+        <Resource
+          variant="card"
+          isBenchmark={true}
+          id="lvl1-wedgwood"
+          era="Modern"
+          tags="free"
+          title="Wedgwood: Antics"
+          composer=""
+          sheetUrl="https://www.oktav.com/en/do/fa5ed152"
+          audioUrl="https://youtu.be/Q_BvXxTT1gg"
+          isPrimarySelectable={true}
+        >
+          Pam Wedgwood's modern character piece that builds gentle off-beat control.
+        </Resource>
+      </BenchmarkSelector>
+    </Card>
+  </Grid>
+</VerificationBox>
+
+<UnlockBanner link="/harmony/lead-sheets/">
+  **Lead Sheets** is now available. Once you can read simple intervals, most teachers say you are ready to start playing from chord symbols. It is optional, run it alongside the spine if you want to accompany yourself or improvise.
+</UnlockBanner>

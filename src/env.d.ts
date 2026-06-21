@@ -73,7 +73,7 @@ declare module '@components/Resource.astro' {
   export interface Props {
     id?: string;
     title: string;
-    link: string;
+    link?: string;
     buttonText?: string;
     borderLeft?: boolean;
     accentColor?: 'gold' | 'rose' | 'none';
@@ -87,35 +87,49 @@ declare module '@components/Resource.astro' {
     pinTo?: 'reading' | 'technique';
     practicePlan?: string;
     doneWhen?: string;
+    isBenchmark?: boolean; // New prop for benchmark cards
+    era?: string; // New prop for benchmark cards
+    composer?: string; // New prop for benchmark cards
+    sheetUrl?: string; // New prop for benchmark cards
+    audioUrl?: string; // New prop for benchmark cards
+    isPrimarySelectable?: boolean; // New prop for benchmark cards
     slot?: string;
   }
   /**
    * ### Resource Component
-   * 
+   *
    * A structured card to reference books, videos, and PDFs, supporting stylized status badges.
    * Supports standard boxed layout ('card') or collapsible row drawer layouts ('drawer').
-   * 
+   * Can also render a specialized benchmark card layout when `isBenchmark` is true.
+   *
    * #### Parameters & Options:
    * * `title` *(string)* — **Required.** The primary header title of the resource.
-   * * `link` *(string)* — **Required.** Destination URL link.
-   * * `id` *(string)* — Unique identifier for progress state storage. **Required when `variant="drawer"`.**
+   * * `link` *(string)* — **Required for non-benchmark cards.** Destination URL link.
+   * * `id` *(string)* — Unique identifier for progress state storage. **Required when `variant="drawer"` or `isBenchmark` is true.**
    * * `buttonText` *(string)* — Custom text displayed inside the link anchor CTA button. **Default: `"Open ↗"`**
-   * * `borderLeft` *(boolean)* — If true, applies a 4px left decorative accent border line. Only applies to `variant="card"`. **Default: `false`**
+   * * `borderLeft` *(boolean)* — If true, applies a 4px left decorative accent border line. Only applies to `variant="card"` (generic). **Default: `false`**
    * * `accentColor` *(string)* — Accent border theme preset color applied when `borderLeft` is active. Options: `'gold' | 'rose' | 'none'`. **Default: `"rose"`**
    * * `icon` *(string)* — Optional icon lookup identifier name. **Default: `"none"`**
    * * `subs` *(string)* — Secondary subtitle stats string aligned to the top-right corner.
-   * * `focus` *(string)* — Subtitle tagline displayed above card descriptions. In `'audition'` tags, this behaves as the composer's name.
+   * * `focus` *(string)* — Subtitle tagline displayed above card descriptions (for generic cards) or composer's name (for audition/benchmark cards).
    * * `tags` *(string)* — Space-separated category tag labels mapping to status badges.
    * * `variant` *(string)* — Specifies the layout style: `'card'` (static grid tile) or `'drawer'` (collapsible row drawer layout). **Default: `"card"`**
    * * `tagline` *(string)* — A short tagline description displayed when collapsed. Only applies to `variant="drawer"`.
    * * `isAlternative` *(boolean)* — Marks if this item belongs to the alternatives block. Only applies to `variant="drawer"`. **Default: `false`**
-   * * `pinTo` *(string)* — The target column ID to move this item into when pinned (e.g. 'reading' or 'technique').
+   * * `pinTo` *(string)* — The target column ID to move this item into when pinned (e.g. 'reading' or 'technique'). Only applies to `variant="drawer"`.
    * * `practicePlan` *(string)* — Optional task-management practice plan details. Only applies to `variant="drawer"`.
    * * `doneWhen` *(string)* — Optional completion benchmark specifications. Only applies to `variant="drawer"`.
+   * * `isBenchmark` *(boolean)* — When true, renders a specialized benchmark card layout. **Default: `false`**
+   * * `era` *(string)* — The historical era of the benchmark piece (e.g., "Baroque"). Only applies when `isBenchmark` is true.
+   * * `composer` *(string)* — The composer's name for the benchmark piece. Only applies when `isBenchmark` is true.
+   * * `sheetUrl` *(string)* — URL for the sheet music. Only applies when `isBenchmark` is true.
+   * * `audioUrl` *(string)* — URL for the audio recording. Only applies when `isBenchmark` is true.
+   * * `isPrimarySelectable` *(boolean)* — When true, displays a "Select This Benchmark" button. Only applies when `isBenchmark` is true. **Default: `false`**
    */
   const Component: (props: Props) => any;
   export default Component;
 }
+
 
 declare module '@components/Task.astro' {
   export interface Props {
@@ -367,6 +381,44 @@ declare module '@components/AlternativesBox.astro' {
    * 
    * #### Parameters & Options:
    * * `title` *(string)* — The heading title of the collapsible alternatives container. **Default: `"Alternative Method Books & Resources"`**
+   */
+  const Component: (props: Props) => any;
+  export default Component;
+}
+
+declare module '@components/BenchmarkSelector.astro' {
+  export interface Props {
+    level: string;
+    slot?: string;
+  }
+  /**
+   * ### BenchmarkSelector Component
+   * 
+   * Renders the interactive, conditional choose-your-benchmark interface.
+   * Integrates dynamically with Starlight markdown layout lists and manages primary/alternative card routing.
+   * 
+   * #### Parameters & Options:
+   * * `level` *(string)* — **Required.** Graded level index identifier (e.g. `"lvl1"`).
+   */
+  const Component: (props: Props) => any;
+  export default Component;
+}
+
+declare module '@components/UnlockBanner.astro' {
+  export interface Props {
+    link: string;
+    buttonText?: string;
+    slot?: string;
+  }
+  /**
+   * ### UnlockBanner Component
+   * 
+   * A clean, dashed-border banner notifying students when a chord-based branching pathway has unlocked.
+   * Both the title (as an H3/H4 header) and body text are populated using standard markdown inside the slot.
+   * 
+   * #### Parameters & Options:
+   * * `link` *(string)* — **Required.** Destination URL link.
+   * * `buttonText` *(string)* — Custom text displayed inside the link action button. **Default: `"Open Lead Sheets →"`**
    */
   const Component: (props: Props) => any;
   export default Component;
