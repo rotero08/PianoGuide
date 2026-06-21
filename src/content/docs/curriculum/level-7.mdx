@@ -3,4 +3,114 @@ title: Level 7 (Polytonal Independence)
 description: Dense four-voice chorales and advanced independent sight-reading.
 ---
 
-Placeholder content for Level 7.
+import Callout from '@components/Callout.astro';
+import Grid from '@components/Grid.astro';
+import ResourceColumn from '@components/ResourceColumn.astro';
+import Resource from '@components/Resource.astro';
+import AlternativesBox from '@components/AlternativesBox.astro';
+import VerificationBox from '@components/VerificationBox.astro';
+import BenchmarkGuide from '@components/BenchmarkGuide.astro';
+import Task from '@components/Task.astro';
+import Card from '@components/Card.astro';
+
+*Level 7 · the open road*
+
+<Callout bordered={true} accentColor="gold" label="Your goal for this level" icon="target">
+  Sight-read dense, non-traditional, and polyphonic scores of up to four voices hands-together, and run a self-sustaining practice loop that keeps improving you indefinitely.
+</Callout>
+
+There is no finish line. From here, improvement is simply a matter of reading and solving ever more diverse, dense material, for as long as you play.
+
+<Grid cols={2}>
+  <ResourceColumn id="technique" title="Technique Support" subtitle="From here, technique is not separate from reading; use all your acquired tools on demand.">
+    <Resource
+      variant="drawer"
+      id="lvl7-lifetime"
+      title="The Lifetime Practice Loop"
+      tagline="Continuous exploration of advanced classical structures using custom workflows."
+      link="https://pianosyllabus.com/"
+      tags="free"
+    >
+      Continually explore advanced classical works on [PianoSyllabus](https://pianosyllabus.com). Apply the Chord Attack loop, dotted rhythm transitions, and targeted Anki reviews on any hard segments.
+    </Resource>
+  </ResourceColumn>
+
+  <ResourceColumn id="reading" title="Sight-Reading" subtitle="The densest common reading load: four-voice chorales and polytonal textures." accentColor="rose">
+    <Resource
+      variant="drawer"
+      id="lvl7-bach"
+      title="Bach: 371 Harmonized Chorales"
+      tagline="Continuous four-voice vocal tracking to develop the ultimate horizontal reading span."
+      link="https://imslp.org/wiki/371_Harmonized_Chorales_(Bach,_Johann_Sebastian)"
+      tags="imslp recommended"
+      practicePlan="Read a fresh chorale daily."
+      doneWhen="All four voices read cleanly on first pass."
+    >
+      A free collection of 371 four-voice chorales, an almost endless supply of dense reading. Reading a fresh one every day keeps your eye-hand span stretching, because four simultaneous voices is about the heaviest reading load you will meet.
+    </Resource>
+
+    <AlternativesBox>
+      <Resource variant="drawer" id="lvl7-cole8" title="Mayron Cole: Level 8" tagline="The final free method book closing out the entire graded course." link="https://www.freepianomethod.com/level-8.html" tags="free" isAlternative={true} pinTo="reading">
+        The final free volume of the method, closing out the graded path you started in Pre-Staff. It gives you advanced repertoire from a source whose style you already know well.
+      </Resource>
+      <Resource variant="drawer" id="lvl7-bartok" title="Bela Bartók: Mikrokosmos (Book 4)" tagline="Polytonal modal structures and shifting metric accents to build general reading." link="https://imslp.org/wiki/Mikrokosmos%2C_Sz.107_(Bart%C3%B3k%2C_B%C3%A9la)" tags="imslp" isAlternative={true} pinTo="reading">
+        The later books move into polytonal counterpoint and advanced rhythm. They train you to read harmony that does not follow familiar major and minor patterns, which is what makes your reading truly general.
+      </Resource>
+    </AlternativesBox>
+  </ResourceColumn>
+</Grid>
+
+<Callout bordered={true} accentColor="gold" label="How the two halves connect here" icon="link">
+  By this level reading and technique have merged. A fresh chorale is itself the technique session: you read four live voices hands-together, and the instant anything resists, every hands-separate tool you have built is already on hand. The loop sustains itself, which is what lifelong playing actually looks like.
+</Callout>
+
+<VerificationBox trackId="lvl7" title="Level 7 Verification & Checkpoint" subtitle="Confirm self-sustaining, advanced sight-reading autonomy" levelInfo="≈ Grade 7 to 8 & Beyond">
+  <BenchmarkGuide title="Why there is no single test piece here">
+    The source chart ends its graded benchmarks before Level 7: past this point reading is open-ended, so there is no one piece that certifies you. Instead, keep your own rolling benchmark — pull a fresh piece a grade above your comfort level and sight-read it cold, exactly as in earlier levels.
+
+    Use [PianoSyllabus benchmarks](https://pianosyllabus.com) to keep finding graded test pieces, and the [Mayron Cole Audition Book](https://www.freepianomethod.com/supplemental-items-for-teachers.html) for earlier-level self-checks.
+  </BenchmarkGuide>
+
+  <Grid cols={2}>
+    <Card variant="flat">
+      ### UNIFIED AUTONOMY CHECKLIST
+
+      <Task id="check-lvl7-chorale" trackId="lvl7" tag="none" link="https://imslp.org/wiki/371_Harmonized_Chorales_(Bach,_Johann_Sebastian)" linkText="open ↗">
+        **Four-voice reading:** Sight-read a fresh Bach chorale hands-together with all voices intact.
+      </Task>
+
+      <Task id="check-lvl7-loop" trackId="lvl7" tag="none" link="https://apps.ankiweb.net/" linkText="open ↗">
+        **Run the loop:** Mine bottlenecks in Anki and apply a hands-separate tool to any run that resists.
+      </Task>
+
+      <Task id="check-lvl7-newpiece" trackId="lvl7" tag="none" link="https://pianosyllabus.com/" linkText="open ↗">
+        **New repertoire:** Fold a new, higher-grade piece into your rotation.
+      </Task>
+
+      <Task id="check-lvl7-checkpoint" trackId="lvl7" tag="none">
+        **Ongoing audit:** Confirm the self-sustaining, deliberate practice loop is running:
+
+        * Sight-read an unseen four-voice chorale hands-together with all voices intact on [Bach's 371 Chorales](https://imslp.org/wiki/371_Harmonized_Chorales_(Bach,_Johann_Sebastian)).
+        * Keep the reading-versus-playing gap honest, with reading material two to three grades under your hardest pieces.
+        * Maintain a clear [Anki deck](https://apps.ankiweb.net/) and reach for the right hands-separate tool automatically.
+        * Keep widening your repertoire. Compare grades and pick new challenges at [PianoSyllabus.com](https://pianosyllabus.com/).
+      </Task>
+    </Card>
+
+    <Card variant="flat">
+      ### NO GRADED BENCHMARK GATE
+
+      <Resource
+        variant="card"
+        id="lvl7-rolling"
+        era="Advanced Autonomy"
+        title="Rolling Repertoire Analysis"
+        tags=""
+        link="https://pianosyllabus.com/"
+        buttonText="Browse PianoSyllabus ↗"
+      >
+        At Level 7, your reading path is open-ended. Continue exploring diverse Baroque fugues, Romantic etudes, and modern structures to keep expanding your playing for life.
+      </Resource>
+    </Card>
+  </Grid>
+</VerificationBox>

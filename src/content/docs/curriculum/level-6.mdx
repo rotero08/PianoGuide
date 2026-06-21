@@ -3,4 +3,193 @@ title: Level 6 (Counterpoint + Phrasing)
 description: Complex intermediate phrasing and relaxed parallel octaves.
 ---
 
-Placeholder content for Level 6.
+import Callout from '@components/Callout.astro';
+import Grid from '@components/Grid.astro';
+import ResourceColumn from '@components/ResourceColumn.astro';
+import Resource from '@components/Resource.astro';
+import AlternativesBox from '@components/AlternativesBox.astro';
+import VerificationBox from '@components/VerificationBox.astro';
+import BenchmarkGuide from '@components/BenchmarkGuide.astro';
+import BenchmarkSelector from '@components/BenchmarkSelector.astro';
+import Task from '@components/Task.astro';
+import Card from '@components/Card.astro';
+
+*Level 6 · counterpoint and tone*
+
+<Callout bordered={true} accentColor="gold" label="Your goal for this level" icon="target">
+  Read fluent classical scores with ornaments, phrasing, and syncopation on a first pass, sustain genuine two-voice independence, and play moving octaves without forearm fatigue.
+</Callout>
+
+Your reading is now strong enough for real intermediate music, and technique adds relaxed octave playing.
+
+<Grid cols={2}>
+  <ResourceColumn id="technique" title="Technique Support" subtitle="Ensure loose hand mechanics under dense performance textures.">
+    <Resource
+      variant="drawer"
+      id="lvl6-octave-hinge"
+      title="Parallel Octave Speed-Hinge"
+      tagline="Bouncing wrist hinge technique to play moving octaves without fatigue."
+      link="https://www.reddit.com/r/piano/comments/oqz0h/tips_for_playing_fastmoving_parallel_octaves/"
+      tags="free"
+    >
+      A community technique for fast octaves. You lock the hand into a stable octave frame but keep the wrist loose as a bouncing hinge, letting gravity strike each octave while the wrist releases. This prevents the fatigue that stiff octaves cause.
+    </Resource>
+  </ResourceColumn>
+
+  <ResourceColumn id="reading" title="Sight-Reading" subtitle="Detailed classical repertoire with ornaments, phrasing, and ledger lines." accentColor="rose">
+    <Resource
+      variant="drawer"
+      id="lvl6-cole7"
+      title="Mayron Cole: Level 7"
+      tagline="Late-intermediate method repertoire exploring detailed, expressive writing."
+      link="https://www.freepianomethod.com/level-7.html"
+      tags="free recommended"
+      practicePlan="Work through in order."
+      doneWhen="Ornaments and phrasing read on a first pass."
+    >
+      A late-intermediate free volume of the method. It keeps giving you coherent repertoire to read as the writing becomes more detailed and expressive.
+    </Resource>
+
+    <AlternativesBox>
+      <Resource variant="drawer" id="lvl6-gradus" title="Jeff Manookian: Gradus (Volume 4)" tagline="Advanced-intermediate studies introducing complex stylistic patterns in manageable steps." link="https://imslp.org/wiki/Gradus:_Progressive_Piano_Repertoire_in_12_Volumes_(Manookian%2C_Jeff)" tags="imslp" isAlternative={true} pinTo="reading">
+        Volume 4 of the free progressive set, now at an advanced intermediate standard. The gradual climb continues to add difficulty in small, manageable steps.
+      </Resource>
+    </AlternativesBox>
+  </ResourceColumn>
+</Grid>
+
+<VerificationBox trackId="lvl6" title="Level 6 Verification & Checkpoint" subtitle="Confirm expressive classical coordination and relaxed octave articulation" levelInfo="≈ ABRSM/RCM Grade 6 Reading">
+  <BenchmarkGuide title="How to use these benchmarks & calibrate difficulty">
+    A benchmark is a short, real piece, not an exercise. Its only job is to prove that the reading you built at this level actually transfers to music before you move up. Do not drill it like repertoire.
+
+    1. **Listen** to the recording once so you know the target sound.
+    2. **Sight-read** the score cold, hands together, slow but steady — no stopping to fix notes.
+    3. **Pass:** You get through it on the first or second attempt with a steady pulse and without watching your hands.
+    4. **Stall:** If three honest attempts still fall apart, you are not ready. Don't grind it — drop back, read easier material, then return. (This is the chart's "New Game +".)
+
+    **Measuring your reading level via PianoSyllabus:** Go to the [PianoSyllabus search form](https://pianosyllabus.com). Enter a piece you currently play comfortably with correct phrasing. Check its normalized grade. If it is listed as RCM/ABRSM Grade 8 / Diploma, that represents your current *playing ceiling*. Subtract 2 or 3 grades to find your *sight-reading band* (Grade 5–6). Pull three unseen pieces from Grade 5 or 6 and attempt to sight-read them. If you read them with a steady pulse on the first pass, your coordinates are fully aligned [1.4].
+
+    **The Era Repertoire Rule:** You only need to successfully sight-read **one** of the era benchmark pieces to clear a level and advance. The five historical eras (Baroque, Classical, Romantic, C20, and Modern) are provided as options to give you flexibility. If one piece isn't clicking, try another! However, returning to these benchmarks later and passing **all five** is recommended to prove your reading is general and versatile rather than pattern-matched to a single composer.
+
+    The five era pieces test the same reading across different musical styles. The free Mayron Cole Audition Book page is the quick pass/fail gate. Passing this level lines up roughly with ABRSM / RCM Grade 5–6.
+  </BenchmarkGuide>
+
+  <Grid cols={2}>
+    <Card variant="flat">
+      ### CHECKLIST & VERIFICATION
+
+      <Task id="check-lvl6-octaves" trackId="lvl6" tag="none" link="https://www.reddit.com/r/piano/comments/oqz0h/tips_for_playing_fastmoving_parallel_octaves/" linkText="open ↗">
+        **Tension-free octaves:** Play moving octaves evenly without forearm fatigue.
+      </Task>
+
+      <Task id="check-lvl6-phrasing" trackId="lvl6" tag="none" link="https://www.freepianomethod.com/level-7.html" linkText="open ↗">
+        **Phrased reading:** Read with ornaments, phrasing, and syncopation on the first pass.
+      </Task>
+
+      <Task id="check-lvl6-invention6" trackId="lvl6" tag="none" link="https://michaelkravchuk.com/free-piano-sheet-music-invention-no-6-bwv-777-bach/" linkText="open ↗">
+        **Counterpoint:** Play Bach Invention 6 or the Chopin waltz musically.
+      </Task>
+
+      <Task id="check-lvl6-checkpoint" trackId="lvl6" tag="none">
+        **Self-audit check:** Confirm phrasing-level reading and relaxed octaves:
+
+        * Sight-read a Bach invention with phrasing and ornaments intact on [Invention 6](https://michaelkravchuk.com/free-piano-sheet-music-invention-no-6-bwv-777-bach/).
+        * Play moving octaves evenly without forearm fatigue using the [Speed-Hinge routine](https://www.reddit.com/r/piano/comments/oqz0h/tips_for_playing_fastmoving_parallel_octaves/).
+        * Play ten Kunz canons hands-together at tempo with no timing lag.
+        * Run the four-part self-audit at Grade 6.
+      </Task>
+    </Card>
+
+    <Card variant="flat">
+      ### PRIMARY GATE & GRADED BENCHMARKS
+
+      <Resource
+        variant="card"
+        isBenchmark={true}
+        id="lvl6-cole-p14"
+        era="Method Audition"
+        tags="free audition"
+        title="Cole Audition Book — Page 14"
+        composer="Mayron Cole"
+        sheetUrl="https://www.freepianomethod.com/supplemental-items-for-teachers.html"
+        audioUrl="https://www.freepianomethod.com/supplemental-items-for-teachers.html"
+        isPrimarySelectable={false}
+      >
+        Sight-read this page cleanly to confirm standard linear interval mapping.
+      </Resource>
+
+      <BenchmarkSelector level="lvl6">
+        <Resource
+          variant="card"
+          isBenchmark={true}
+          id="lvl6-bach-invention"
+          era="Baroque"
+          tags="free"
+          title="Bach: Invention No. 6, BWV 777"
+          composer=""
+          sheetUrl="https://michaelkravchuk.com/free-piano-sheet-music-invention-no-6-bwv-777-bach/"
+          audioUrl="https://youtu.be/FpxwQa9jmZw"
+          isPrimarySelectable={true}
+        >
+          A more demanding two-part invention offered as a benchmark. Its long, intertwining lines test whether you can read counterpoint and still phrase it.
+        </Resource>
+        <Resource
+          variant="card"
+          isBenchmark={true}
+          id="lvl6-mozart-sonatina"
+          era="Classical"
+          tags="imslp"
+          title="Mozart: Viennese Sonatina No. 1 in C, K. 439b"
+          composer=""
+          sheetUrl="https://imslp.org/wiki/6_Wiener_Sonatinen_(Mozart%2C_Wolfgang_Amadeus)"
+          audioUrl="https://youtu.be/ieV2UdzOpvo"
+          isPrimarySelectable={true}
+        >
+          A highly elegant Classical Sonatina movement requiring clean dynamic balancing and rapid shifts.
+        </Resource>
+        <Resource
+          variant="card"
+          isBenchmark={true}
+          id="lvl6-chopin-waltz"
+          era="Romantic"
+          tags="imslp"
+          title="Chopin: Waltz in A minor, B. 150"
+          composer=""
+          sheetUrl="https://imslp.org/wiki/Waltz_in_A_minor,_B.150_(Chopin,_Fr%C3%A9d%C3%A9ric)"
+          audioUrl="https://youtu.be/ewLmCETf1HU"
+          isPrimarySelectable={true}
+        >
+          A short, accessible Chopin waltz, also a benchmark. A chance to read Romantic phrasing and rubato on real concert-composer music.
+        </Resource>
+        <Resource
+          variant="card"
+          isBenchmark={true}
+          id="lvl6-prokofiev"
+          era="C20"
+          tags="free"
+          title="Prokofiev: Tarantella in D minor, Op. 65 No. 4"
+          composer=""
+          sheetUrl="https://www.free-scores.com/sheetmusic?p=afUhhKsyYU"
+          audioUrl="https://youtu.be/k1HBVNOwllE"
+          isPrimarySelectable={true}
+        >
+          A rapid, modern C20 dance highlighting off-beat accents and fast coordinate mapping.
+        </Resource>
+        <Resource
+          variant="card"
+          isBenchmark={true}
+          id="lvl6-norton-flower"
+          era="Modern"
+          tags="free"
+          title="Christopher Norton: Oriental Flower"
+          composer=""
+          sheetUrl="https://www.oktav.com/en/do/095192ec"
+          audioUrl="https://youtu.be/aDJcxonXlM8"
+          isPrimarySelectable={true}
+        >
+          An expressive modern syncopated miniature displaying advanced lyrical balancing.
+        </Resource>
+      </BenchmarkSelector>
+    </Card>
+  </Grid>
+</VerificationBox>

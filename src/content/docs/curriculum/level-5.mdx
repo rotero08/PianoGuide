@@ -3,4 +3,204 @@ title: Level 5 (Early Polyphony)
 description: True two-part counterpoint and progressive learning loops.
 ---
 
-Placeholder content for Level 5.
+import Callout from '@components/Callout.astro';
+import Grid from '@components/Grid.astro';
+import ResourceColumn from '@components/ResourceColumn.astro';
+import Resource from '@components/Resource.astro';
+import AlternativesBox from '@components/AlternativesBox.astro';
+import VerificationBox from '@components/VerificationBox.astro';
+import BenchmarkGuide from '@components/BenchmarkGuide.astro';
+import BenchmarkSelector from '@components/BenchmarkSelector.astro';
+import Task from '@components/Task.astro';
+import Card from '@components/Card.astro';
+
+*Level 5 · real polyphony*
+
+<Callout bordered={true} accentColor="gold" label="Your goal for this level" icon="target">
+  Read and play genuinely independent two-voice counterpoint, such as a Bach two-part invention, and run a spaced-repetition system that grinds down any passage that resists you.
+</Callout>
+
+You enter real classical polyphony. From here on, progress becomes an ongoing development loop powered by deliberate practice.
+
+<Grid cols={2}>
+  <ResourceColumn id="technique" title="Technique Support" subtitle="Maintain hand balance in contrapuntal textures using specialized spacing routines.">
+    <Resource
+      variant="drawer"
+      id="lvl5-bach-spacing"
+      title="Gradus Vol. 1 / Bach 371 Spacing"
+      tagline="Short vocal textures to isolate hand dynamics and voice-leading."
+      link="https://imslp.org/wiki/Gradus:_Progressive_Piano_Repertoire_in_12_Volumes_(Manookian%2C_Jeff)"
+      tags="imslp"
+    >
+      Short contrapuntal studies, free on IMSLP, where each hand carries an independent line. Working them hands-separate and then together forces the left hand to stop merely following the right.
+    </Resource>
+
+    <Resource
+      variant="drawer"
+      id="lvl5-anki"
+      title="Anki spaced repetition"
+      tagline="A free card-based system to manage and review isolated runs daily."
+      link="https://apps.ankiweb.net/"
+      tags="free"
+    >
+      A free flashcard app built on spaced repetition, the scheduling method proven to maximise long-term retention. Make a deck called Piano Bottlenecks, cut a hard passage into a two-bar cell, and let the app resurface it on the optimal day.
+    </Resource>
+  </ResourceColumn>
+
+  <ResourceColumn id="reading" title="Sight-Reading" subtitle="Two fully independent contrapuntal voices, plus lyrical intermediate repertoire." accentColor="rose">
+    <Resource
+      variant="drawer"
+      id="lvl5-cole6"
+      title="Mayron Cole: Level 6"
+      tagline="Intermediate method repertoire providing clean coordination mapping."
+      link="https://www.freepianomethod.com/level-6.html"
+      tags="free recommended"
+      practicePlan="Work through in order."
+      doneWhen="Pieces translate steadily on first pass."
+    >
+      The next free method volume, now at an intermediate standard. It provides familiar, coherent repertoire to read alongside the harder contrapuntal material.
+    </Resource>
+
+    <AlternativesBox>
+      <Resource variant="drawer" id="lvl5-bartok" title="Bela Bartók: Mikrokosmos (Book 3)" tagline="Contrapuntal reading introducing polyphony in small, deliberate steps." link="https://imslp.org/wiki/Mikrokosmos%2C_Sz.107_(Bart%C3%B3k%2C_B%C3%A9la)" tags="imslp" isAlternative={true} pinTo="reading">
+        The middle books of Mikrokosmos move into genuine polyphonic reading while staying free on IMSLP. They keep the difficulty climbing in small, deliberate steps, which is exactly what you want as the texture thickens.
+      </Resource>
+    </AlternativesBox>
+  </ResourceColumn>
+</Grid>
+
+<VerificationBox trackId="lvl5" title="Level 5 Verification & Checkpoint" subtitle="Confirm genuine melodic hand independence and systematic practice habits" levelInfo="≈ ABRSM/RCM Grade 5 Reading">
+  <BenchmarkGuide title="How to use these benchmarks & calibrate difficulty">
+    A benchmark is a short, real piece, not an exercise. Its only job is to prove that the reading you built at this level actually transfers to music before you move up. Do not drill it like repertoire.
+
+    1. **Listen** to the recording once so you know the target sound.
+    2. **Sight-read** the score cold, hands together, slow but steady — no stopping to fix notes.
+    3. **Pass:** You get through it on the first or second attempt with a steady pulse and without watching your hands.
+    4. **Stall:** If three honest attempts still fall apart, you are not ready. Don't grind it — drop back, read easier material, then return. (This is the chart's "New Game +".)
+
+    **Measuring your reading level via PianoSyllabus:** Go to the [PianoSyllabus search form](https://pianosyllabus.com). Enter a piece you currently play comfortably with correct phrasing. Check its normalized grade. If it is listed as RCM/ABRSM Grade 7, that represents your current *playing ceiling*. Subtract 2 or 3 grades to find your *sight-reading band* (Grade 4–5). Pull three unseen pieces from Grade 4 or 5 and attempt to sight-read them. If you read them with a steady pulse on the first pass, your coordinates are fully aligned [1.4].
+
+    **The Era Repertoire Rule:** You only need to successfully sight-read **one** of the era benchmark pieces to clear a level and advance. The five historical eras (Baroque, Classical, Romantic, C20, and Modern) are provided as options to give you flexibility. If one piece isn't clicking, try another! However, returning to these benchmarks later and passing **all five** is recommended to prove your reading is general and versatile rather than pattern-matched to a single composer.
+
+    The five era pieces test the same reading across different musical styles. The free Mayron Cole Audition Book page is the quick pass/fail gate. Passing this level lines up roughly with ABRSM / RCM Grade 4–5.
+  </BenchmarkGuide>
+
+  <Grid cols={2}>
+    <Card variant="flat">
+      ### CHECKLIST & VERIFICATION
+
+      <Task id="check-lvl5-gradus" trackId="lvl5" tag="none" link="https://imslp.org/wiki/Gradus:_Progressive_Piano_Repertoire_in_12_Volumes_(Manookian%2C_Jeff)" linkText="open ↗">
+        **Independent voices:** Play Gradus Vol. 1 studies cleanly hands-together with relaxed wrists.
+      </Task>
+
+      <Task id="check-lvl5-anki" trackId="lvl5" tag="none" link="https://apps.ankiweb.net/" linkText="open ↗">
+        **Bottleneck mining:** Keep the Anki deck clear, with no overdue micro-cells.
+      </Task>
+
+      <Task id="check-lvl5-invention" trackId="lvl5" tag="none" link="https://michaelkravchuk.com/free-piano-sheet-music-invention-no-1-bwv-772-bach/" linkText="open ↗">
+        **Polyphony reading:** Read Bach Invention 1 or Bartók Book 3 hands-together.
+      </Task>
+
+      <Task id="check-lvl5-checkpoint" trackId="lvl5" tag="none">
+        **Self-audit check:** Confirm independent voices and a working deliberate-practice loop:
+
+        * Read a two-part invention on [Bach Invention 1](https://michaelkravchuk.com/free-piano-sheet-music-invention-no-1-bwv-772-bach/) hands-together with both voices intact.
+        * Play the [Gradus Vol. 1 studies](https://imslp.org/wiki/Gradus:_Progressive_Piano_Repertoire_in_12_Volumes_(Manookian%2C_Jeff)) cleanly with relaxed wrists.
+        * Maintain a clear [Anki bottleneck deck](https://apps.ankiweb.net/) for two weeks.
+        * Run the four-part self-audit at Grade 5.
+      </Task>
+    </Card>
+
+    <Card variant="flat">
+      ### PRIMARY GATE & GRADED BENCHMARKS
+
+      <Resource
+        variant="card"
+        isBenchmark={true}
+        id="lvl5-cole-p13"
+        era="Method Audition"
+        tags="free audition"
+        title="Cole Audition Book — Page 13"
+        composer="Mayron Cole"
+        sheetUrl="https://www.freepianomethod.com/supplemental-items-for-teachers.html"
+        audioUrl="https://www.freepianomethod.com/supplemental-items-for-teachers.html"
+        isPrimarySelectable={false}
+      >
+        Sight-read this page cleanly to confirm standard linear interval mapping.
+      </Resource>
+
+      <BenchmarkSelector level="lvl5">
+        <Resource
+          variant="card"
+          isBenchmark={true}
+          id="lvl5-bach-invention"
+          era="Baroque"
+          tags="free"
+          title="Bach: Invention No. 1, BWV 772"
+          composer=""
+          sheetUrl="https://michaelkravchuk.com/free-piano-sheet-music-invention-no-1-bwv-772-bach/"
+          audioUrl="https://youtu.be/xzU7xQmmXGE"
+          isPrimarySelectable={true}
+        >
+          The most famous first step into two-part counterpoint. Both hands carry an equal melodic line, the clearest test of real independence.
+        </Resource>
+        <Resource
+          variant="card"
+          isBenchmark={true}
+          id="lvl5-haydn-allegro"
+          era="Classical"
+          tags="free"
+          title="Haydn: Allegro in F major"
+          composer=""
+          sheetUrl="https://michaelkravchuk.com/free-piano-sheet-music-allegro-in-f-major-haydn/"
+          audioUrl="https://youtu.be/0E0qAMZZPZ0"
+          isPrimarySelectable={true}
+        >
+          A highly structured classical movement demanding absolute dynamic control and articulation offset.
+        </Resource>
+        <Resource
+          variant="card"
+          isBenchmark={true}
+          id="lvl5-grieg-watchman"
+          era="Romantic"
+          tags="free"
+          title="Grieg: Watchman's Song, Op. 12 No. 3"
+          composer=""
+          sheetUrl="https://michaelkravchuk.com/free-piano-sheet-music-watchmans-song-op-12-no-3-grieg/"
+          audioUrl="https://youtu.be/5tIUSGQwa7E"
+          isPrimarySelectable={true}
+        >
+          A lyrical Romantic piece, also a benchmark. It balances the strict counterpoint with expressive, song-like reading.
+        </Resource>
+        <Resource
+          variant="card"
+          isBenchmark={true}
+          id="lvl5-gillock"
+          era="C20"
+          tags="paid"
+          title="Gillock: The Constant Bass"
+          composer=""
+          sheetUrl="https://www.amazon.com/New-Orleans-Jazz-Styles-Complete/dp/1458411761"
+          audioUrl="https://youtu.be/36dPJeQV3E0"
+          isPrimarySelectable={true}
+        >
+          William Gillock's rhythmic C20 miniature requiring a steady left-hand ostinato under melodic shifts.
+        </Resource>
+        <Resource
+          variant="card"
+          isBenchmark={true}
+          id="lvl5-norton"
+          era="Modern"
+          tags="free"
+          title="Christopher Norton: Rocking Turkey"
+          composer=""
+          sheetUrl="https://www.oktav.com/en/do/7dbc92e0"
+          audioUrl="https://www.youtube.com/watch?v=NnuU8KPYa6Q"
+          isPrimarySelectable={true}
+        >
+          A fun, modern syncopated character piece that builds rapid chord-voicing adjustments.
+        </Resource>
+      </BenchmarkSelector>
+    </Card>
+  </Grid>
+</VerificationBox>
