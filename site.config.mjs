@@ -22,9 +22,8 @@ export const SITE_URL = 'https://piano-guide.delfost.workers.dev';
  * Slug of the GitHub App through which the admin on the live site signs people in and saves to
  * GitHub (the last part of `https://github.com/apps/<slug>`). While it is empty the live site
  * shows no "Edit page" links, because the admin could not sign anyone in.
- * See "Editing on the live site" in the README.
  */
-export const KEYSTATIC_GITHUB_APP_SLUG = '';
+export const KEYSTATIC_GITHUB_APP_SLUG = 'rotero08-pianoguide-keystatic';
 
 /**
  * The Worker's `workers.dev` host. Cloudflare serves the preview build of a branch at

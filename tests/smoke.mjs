@@ -1,8 +1,8 @@
 // tests/smoke.mjs
 //
 // Browser smoke test for the interactive parts of the site: checklists and progress bars,
-// resource drawers (done / pin), the benchmark picker, citations and the bibliography, the
-// searchable grid and the piano. It drives the *built* site in a headless browser, so run
+// resource drawers (done / pin), the benchmark picker, the "On this page" outline, citations and
+// the bibliography, the searchable grid and the piano. It drives the *built* site in a headless browser, so run
 // `pnpm build` first, then `pnpm test`.
 //
 // The checks use the Level 1 page as their fixture (ids like `lvl1-siskind`, `check-lvl1-triads`,
@@ -138,6 +138,23 @@ try {
   await click(page, `${bench('lvl1-haydn')} .pin-btn`);
   check('unpinning everything returns to the "choose" state', (await benchIds(page, '.bench-main-active-list')).split(',').length === 5 && (await callout()));
   check('Level 1 runs without script errors', page.errors.length === 0, page.errors.join(' | '));
+  await page.close();
+
+  // ---------- "On this page" ----------
+  page = await open('/curriculum/level-1/');
+  const marked = () => page.$eval('starlight-toc a[aria-current="true"]', (link) => link.textContent.trim());
+  const outline = (await page.$$eval('starlight-toc a', (links) => links.map((link) => link.textContent.trim()))).join(' | ');
+  check('outline lists the sections that components render, in order', outline === 'Overview | Technique Support | Sight-Reading | Level 1 Verification & Checkpoint | Checklist & Verification | Primary Gate & Graded Benchmarks', outline);
+  check('every outline entry has its heading on the page', await page.$$eval('starlight-toc a', (links) => links.every((link) => document.getElementById(decodeURIComponent(link.hash.slice(1))))));
+  await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+  await sleep(400);
+  check('the last entry is marked at the end of the page', (await marked()) === 'Primary Gate & Graded Benchmarks', await marked());
+  await page.evaluate(() => scrollTo(0, 0));
+  await sleep(400);
+  await page.evaluate(() => document.querySelectorAll('starlight-toc a')[1].click());
+  await sleep(1300);
+  check('a clicked entry is the marked one', (await marked()) === 'Technique Support', await marked());
+  check('the outline runs without script errors', page.errors.length === 0, page.errors.join(' | '));
   await page.close();
 
   // ---------- Progress dashboard (tasks that live on other pages) ----------

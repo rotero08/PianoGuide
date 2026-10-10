@@ -1,7 +1,7 @@
 // Cloudflare Workers configuration. @astrojs/cloudflare fills in the rest at build time
 // (worker entrypoint, the static-assets directory and bindings), so only project-level
-// settings belong here. `pnpm build` then `pnpm exec wrangler deploy` publishes; the README
-// lists the secrets the admin needs.
+// settings belong here. Cloudflare builds and deploys every push to main; by hand it is
+// `pnpm build` then `pnpm exec wrangler deploy`.
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "piano-guide",

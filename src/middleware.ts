@@ -1,9 +1,9 @@
 // src/middleware.ts
 //
 // The admin on a built site signs people in through a GitHub App, whose credentials are secrets
-// of the Worker (README, "Editing on the live site"). Where they are missing, which is the case
-// before that setup is done and on every branch preview, Keystatic's own routes fail with a bare
-// error. This answers for them with an explanation instead.
+// of the Worker (KEYSTATIC_GITHUB_CLIENT_ID, KEYSTATIC_GITHUB_CLIENT_SECRET, KEYSTATIC_SECRET).
+// Where they are missing, which is the case on every branch preview, Keystatic's own routes fail
+// with a bare error. This answers for them with an explanation instead.
 
 import { getSecret } from 'astro:env/server';
 import { defineMiddleware } from 'astro:middleware';
@@ -24,7 +24,7 @@ export const onRequest = defineMiddleware((context, next) => {
     'The editor is not available here',
     [
       'Editing has not been set up at this address. If this is a preview of a branch, open the editor on the live site instead.',
-      'Maintainers: the steps are in the README of the repository, under "Editing on the live site".',
+      'Maintainers: this Worker does not have the secrets of the GitHub App the editor signs in with.',
     ],
     [
       { text: 'Back to the site', href: '/' },

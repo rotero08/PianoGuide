@@ -89,6 +89,7 @@ Other MDX details that bite:
 
 - Boolean and number props need braces: `bordered={true}`, `cols={2}`. `bordered="true"` is a non-empty string and happens to work, `bordered="false"` is also truthy.
 - Markdown inside a component needs its own lines; a `###` heading or a list must be preceded by a blank line or it renders as literal text.
+- Write headings in normal case (`### Checklist & Verification`). The verification box shows its headings in small capitals by itself, and the text you type is what "On this page" lists. That list also picks up the titles of the resource columns and of the verification box, so a level page needs no extra headings to be navigable.
 - `link` buttons on cards and drawers open in a new tab, including internal links.
 - Don't hand-format to match Keystatic's output or "fix" what it wrote: `<Callout label="…" bordered>` and `<Callout bordered={true} accentColor="gold" label="…">` are the same thing, and Keystatic leaves out props that are at their default.
 

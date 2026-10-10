@@ -53,6 +53,8 @@ export default defineConfig({
 			customCss: [
 				'./src/styles/custom.css',
 			],
+			// Adds the section titles that components render to each page's "On this page" list.
+			routeMiddleware: './src/routeData.ts',
 			social: [
 				{ icon: 'github', label: 'GitHub', href: `https://github.com/${GITHUB_REPO}` }
 			],

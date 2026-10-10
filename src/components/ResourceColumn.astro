@@ -1,6 +1,7 @@
 ---
 // src/components/ResourceColumn.astro
 import Icon from './Icon.astro';
+import { sectionAnchor } from '../utils/outline';
 
 /**
  * One of the two study columns at the top of a level ("Technique" and "Sight-Reading"). Holds
@@ -18,7 +19,10 @@ export interface Props {
    * "THE EYES · HANDS-TOGETHER" tag. Use each value at most once per page.
    */
   id: 'technique' | 'reading';
-  /** Heading of the column. */
+  /**
+   * Heading of the column. Listed in the page's "On this page" outline.
+   * @outline 2
+   */
   title: string;
   /**
    * Description under the heading. Supports Markdown-style links: `[text](url)`.
@@ -42,7 +46,7 @@ const subtitleHtml = subtitle?.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2"
   <div class="res-column-header">
     <div class="res-title-box">
       <Icon name={id === 'technique' ? 'hand' : 'eye'} class="col-header-svg" strokeWidth={1.8} />
-      <h3>{title}</h3>
+      <h3 id={sectionAnchor(title)}>{title}</h3>
       {id === 'reading' && <span class="res-reading-tag-meta">THE EYES · HANDS-TOGETHER</span>}
     </div>
 

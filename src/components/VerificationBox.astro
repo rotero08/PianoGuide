@@ -1,6 +1,7 @@
 ---
 // src/components/VerificationBox.astro
 import { getContentIndex } from '../utils/contentIndex';
+import { sectionAnchor } from '../utils/outline';
 
 /**
  * The gold-edged "Verification & Checkpoint" panel that closes a level. Its header shows the
@@ -18,7 +19,11 @@ export interface Props {
    * @example trackId="lvl1"
    */
   trackId: string;
-  /** Heading of the panel. */
+  /**
+   * Heading of the panel. Listed in the page's "On this page" outline; the `###` headings
+   * inside the panel are listed under it.
+   * @outline 2
+   */
   title: string;
   /** One-line description under the heading. */
   subtitle?: string;
@@ -36,7 +41,7 @@ const taskIds = (await getContentIndex()).tasks[trackId] ?? [];
 <div class="verification-outer-container">
   <div class="verification-header-box">
     <div class="vh-header-top-row">
-      <h2 class="vh-title-text">{title}</h2>
+      <h2 class="vh-title-text" id={sectionAnchor(title)}>{title}</h2>
       <div class="vh-right-content">
         {levelInfo && <span class="vh-level-badge">{levelInfo}</span>}
         <div class="vh-progress-bar-wrapper" data-progress-tasks={taskIds.join(' ')}>
@@ -171,7 +176,7 @@ const taskIds = (await getContentIndex()).tasks[trackId] ?? [];
     margin-top: 0 !important;
     margin-bottom: 0.85rem !important;
   }
-  /* Rose is for the section headings written in the page ("### CHECKLIST…"), which Starlight
+  /* Rose is for the section headings written in the page ("### Checklist…"), which Starlight
      wraps; headings that components render inside the box keep their own colour. */
   .verification-body-content :global(.sl-heading-wrapper h3) {
     color: var(--rose) !important;

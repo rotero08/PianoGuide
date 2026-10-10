@@ -132,6 +132,14 @@ starlight-menu-button button[aria-expanded="true"] {
 /* ==========================================
    RIGHT SIDEBAR / TABLE OF CONTENTS CONTRAST
    ========================================== */
+/* The column "On this page" sits in is (viewport - content width) / 2 wide. Starlight sizes the
+   list for its default content width; with the wider one set above, the list was wider than its
+   column and long entries ran off the edge of the screen instead of wrapping. */
+@media (min-width: 72rem) {
+  .right-sidebar-panel > .sl-container {
+    max-width: calc((100vw - var(--sl-content-width)) / 2 - 2 * var(--sl-sidebar-pad-x));
+  }
+}
 .right-sidebar a {
   color: var(--sl-color-gray-2) !important; 
   opacity: 0.85 !important;
@@ -159,6 +167,27 @@ starlight-menu-button button[aria-expanded="true"] {
 }
 .sidebar-content::-webkit-scrollbar, aside::-webkit-scrollbar, [class*="sidebar"]::-webkit-scrollbar, .right-sidebar::-webkit-scrollbar {
   display: none !important; 
+}
+
+/* ==========================================
+   PAGE FOOTER SPACING
+   ========================================== */
+/* Starlight stacks three gaps above the Previous / Next links: the bottom margin of the page's
+   last block, 1.5rem above the footer and 3rem above its "Edit page" row. Reduced to one 2rem
+   gap that is the same on every page, whatever the page ends with. */
+.sl-markdown-content > :nth-last-child(1 of :not(script, style)) {
+  margin-bottom: 0 !important;
+}
+.sl-container > footer {
+  margin-top: 2rem;
+  gap: 1rem;
+}
+.sl-container > footer > .meta {
+  margin-top: 0;
+}
+/* The row is empty on a build without edit links. */
+.sl-container > footer > .meta:not(:has(*)) {
+  display: none;
 }
 
 /* ==========================================

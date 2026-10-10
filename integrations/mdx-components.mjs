@@ -69,10 +69,14 @@ function parseDoc(doc) {
   const firstTag = lines.findIndex((line) => line.trimStart().startsWith('@'));
   const description = (firstTag < 0 ? lines : lines.slice(0, firstTag)).join('\n').trim();
   const tags = firstTag < 0 ? '' : lines.slice(firstTag).join('\n').trim();
-  return { description, tags, default: tags.match(/@default\s+(.+)/)?.[1].trim() };
+  return { description, tags, default: tags.match(/@default\s+(.+)/)?.[1].trim(), outline: Number(tags.match(/@outline\s+([2-6])\b/)?.[1]) || undefined };
 }
 
-/** Splits an interface body into its members: `{ name, optional, type, description, default }`. */
+/**
+ * Splits an interface body into its members: `{ name, optional, type, description, default, outline }`.
+ * `outline` is the level given by an `@outline <level>` tag: the prop is a section title that
+ * belongs in the page's "On this page" list (see src/routeData.ts).
+ */
 function members(body) {
   const list = [];
   let start = 0;
@@ -83,7 +87,7 @@ function members(body) {
     const doc = parseDoc([...chunk.matchAll(/\/\*\*((?:(?!\*\/)[\s\S])*)\*\//g)].at(-1)?.[1] ?? '');
     const declaration = chunk.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '').trim();
     const parts = declaration.match(/^(\w+)(\?)?\s*:\s*([\s\S]+)$/);
-    if (parts) list.push({ name: parts[1], optional: !!parts[2], type: parts[3].replace(/\s+/g, ' '), description: doc.description, default: doc.default });
+    if (parts) list.push({ name: parts[1], optional: !!parts[2], type: parts[3].replace(/\s+/g, ' '), description: doc.description, default: doc.default, outline: doc.outline });
   });
   return list;
 }
@@ -163,7 +167,7 @@ function editorTypes(components, external) {
     ].join('\n')}\n}`,
     [
       `declare module '${VIRTUAL_ID}' {`,
-      '  export interface PropInfo { name: string; optional: boolean; type: string; description: string; default?: string }',
+      '  export interface PropInfo { name: string; optional: boolean; type: string; description: string; default?: string; outline?: number }',
       '  export interface ComponentInfo { name: string; description: string; hasSlot: boolean; props: PropInfo[]; types: Record<string, PropInfo[]> }',
       '  const components: ComponentInfo[];',
       '  export default components;',

@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 "The Complete Pianist": a self-paced piano curriculum published as a docs site. Astro 6 + Starlight; the content is MDX in `src/content/docs/`, built from custom components in `src/components/` and editable through the Keystatic admin. Readers tick off tasks, mark resources done and pick benchmarks; all of that state lives in their browser (localStorage), there is no backend.
 
-`README.md` describes the project for people (what it is, how to run, deploy and set up editing); this file is about working in the code. `site.config.mjs` holds the facts several files share: the GitHub repository, the production branch, the site's addresses, the GitHub App slug and the list of sidebar sections.
+`README.md` is the public description of the project: what it is and what it does, kept short on purpose. Technical and setup detail belongs in this file, not there. `site.config.mjs` holds the facts several files share: the GitHub repository, the production branch, the site's addresses, the GitHub App slug and the list of sidebar sections.
 
 ## Commands
 
@@ -68,13 +68,25 @@ Keystatic drops any frontmatter key its form does not list, so a page's frontmat
 `keystatic.config.ts` defines one collection per section, a singleton for the home page and the "Editing guide" singleton. Where it stores content is decided by `usesGitHub` in `src/keystatic/admin.ts`:
 
 - **`pnpm dev`: local mode.** Save writes the `.mdx` files of the working copy. The dev server runs on Node without the Cloudflare adapter (`isDev` in `astro.config.mjs`) because this needs a real filesystem.
-- **Builds (and `pnpm dev:github`): GitHub mode.** The admin and its API are on-demand routes of the Worker. People sign in with GitHub through a GitHub App; someone with write access commits straight to the branch (on `main` that publishes), anyone else is taken through forking the repository and opening a pull request. That behaviour is Keystatic's own; nothing here implements it. It needs three Worker secrets (`KEYSTATIC_GITHUB_CLIENT_ID`, `KEYSTATIC_GITHUB_CLIENT_SECRET`, `KEYSTATIC_SECRET`) and the app's slug in `site.config.mjs`; the README has the setup steps. Until the secrets exist `src/middleware.ts` answers the admin routes with an explanation instead of Keystatic's bare error.
+- **Builds (and `pnpm dev:github`): GitHub mode.** The admin and its API are on-demand routes of the Worker. People sign in with GitHub through a GitHub App; someone with write access commits straight to the branch (on `main` that publishes), anyone else is taken through forking the repository and opening a pull request. That behaviour is Keystatic's own; nothing here implements it. It needs three Worker secrets (`KEYSTATIC_GITHUB_CLIENT_ID`, `KEYSTATIC_GITHUB_CLIENT_SECRET`, `KEYSTATIC_SECRET`) and the app's slug in `site.config.mjs`. Where the secrets are missing (branch previews) `src/middleware.ts` answers the admin routes with an explanation instead of Keystatic's bare error.
+
+  The GitHub App was created with Keystatic's own setup screen (`pnpm dev:github`, then `/keystatic`), which writes the four values to an untracked `.env`; `wrangler secret bulk .env` uploads them. The app only accepts sign-ins from the callback addresses registered with it, so if the site moves, add `https://<new address>/api/keystatic/github/oauth/callback` in the app's settings on GitHub. It must be installed on the repository for saves to work.
 
 Pieces around it:
 
 - **"Edit page" link** (`src/components/overrides/EditLink.astro`) at the foot of every page opens that page's editor. Admin addresses differ by mode (GitHub mode puts `/branch/<name>/` in them); build them with `adminPath()` from `src/keystatic/admin.ts`. A build renders the link only when `KEYSTATIC_GITHUB_APP_SLUG` is set and it is the production branch being built.
 - **Preview button** (`previewUrl` in the config, answered by `src/pages/api/preview.ts`). Pages are built ahead of time, so a branch cannot be rendered on demand: the endpoint sends the editor to where that branch is built, which is the site itself for `main` and Cloudflare's per-branch preview build for anything else. It only ever redirects to a path of this site or to that preview host; keep it that way.
 - **Editing guide** (`src/keystatic/guide.tsx`) is a tutorial inside the admin: a form field that renders text and stores nothing (`src/keystatic/guide.yaml` exists only so the entry does not show as "unsaved"). The public version is `src/content/docs/reference/contributing.mdx`. Both describe the editor's actual buttons, so change them together and check the wording against the running admin.
+
+### "On this page"
+
+Starlight builds the outline in the right-hand column from a page's Markdown headings. Level pages have only two of those; their real sections get their titles from component props. So:
+
+- A component marks a section-title prop with `@outline <level>` in its JSDoc and gives the heading it renders `id={sectionAnchor(title)}` (`src/utils/outline.ts`). `ResourceColumn` and `VerificationBox` do this.
+- `src/routeData.ts` (Starlight route middleware) scans the page source for those tags and merges the titles with the Markdown headings, in document order. If its count of heading lines ever disagrees with the compiler's, it leaves Starlight's list alone.
+- `src/scripts/toc.ts` adds two rules to Starlight's highlighting: at the end of the page the last entry is marked (short final sections never reach the top of the window), and a clicked entry stays marked until the reader scrolls again (`scripts/citations.ts` centres every `#target`, so it would otherwise not be the marked one).
+
+Write headings in normal case. `VerificationBox` capitalises its `###` headings with CSS; typing them in capitals puts capitals in the outline.
 
 ### Interactivity: plain modules, no framework
 
@@ -100,6 +112,7 @@ It reads through `getCollection`, not the filesystem, so it works in any runtime
 - Starlight sets `scopedStyleStrategy: 'where'`: scoped selectors add no specificity, so ties between components are decided by source order. Most existing rules carry `!important` for that reason; match the surrounding file rather than stripping it.
 - A parent can style a child component's root by passing `class` (the parent's scope class travels with it); use `:global()` for slotted Markdown.
 - Buttons shared by several components (`.btn-link`, `.btn-pill`) are global, in `custom.css`.
+- `custom.css` also sets the space between the end of a page and its Previous / Next links (one 2rem gap, whatever block the page ends with) and keeps the outline list inside its column.
 - `VerificationBox` restyles every `h3` inside it as a small uppercase section heading but only colours the ones written in the page (Starlight wraps those in `.sl-heading-wrapper`); a component rendering its own `h3` there keeps its own colour.
 
 ### Logo
@@ -114,7 +127,8 @@ The on-demand routes (`export const prerender = false`) are the Keystatic admin 
 
 - **A new on-demand route must be added to `assets.run_worker_first` in `wrangler.jsonc`.** With `not_found_handling: "404-page"`, Cloudflare answers a browser navigation to a path that is not a file with the 404 page without running the Worker. Such a route works with `curl` and 404s in the browser; `tests/routes.mjs` exists to catch exactly that.
 - `astro.config.mjs` names a session driver only to stop the adapter from defaulting to a Cloudflare KV store (nothing uses sessions), and excludes `@keystatic/astro` from dependency pre-bundling because esbuild cannot resolve the virtual module its routes import. Both look removable and are not.
-- Branch previews come from Workers Builds running `wrangler preview` for branches other than `main`; they are served at `<branch>-<worker>.<account>.workers.dev` and get none of the production secrets (the `previews` block in `wrangler.jsonc`), so the admin does not work there.
+- Cloudflare (Workers Builds) is connected to the repository and builds and deploys every push to `main` (`pnpm run build`, then `npx wrangler deploy`), which is how a save in the live editor reaches the site. `site.config.mjs` holds the site's addresses; change `SITE_URL` there if it gets its own domain.
+- Branch previews come from Workers Builds running `wrangler preview` for branches other than `main`, when preview builds are enabled for the Worker; they are served at `<branch>-<worker>.<account>.workers.dev` and get none of the production secrets (the `previews` block in `wrangler.jsonc`), so the admin does not work there.
 
 ## Project skills
 
