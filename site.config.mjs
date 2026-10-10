@@ -16,7 +16,7 @@ export const PRODUCTION_BRANCH = 'main';
  * Public address of the live site, without a trailing slash. Empty while there is none: the
  * build then skips the sitemap and canonical links.
  */
-export const SITE_URL = '';
+export const SITE_URL = 'https://piano-guide.delfost.workers.dev';
 
 /**
  * Slug of the GitHub App through which the admin on the live site signs people in and saves to
@@ -31,7 +31,7 @@ export const KEYSTATIC_GITHUB_APP_SLUG = '';
  * `<branch>-<this host>`, which is where the admin's "Preview" button goes for any branch
  * other than the production one. Empty: taken from the address the admin is opened on.
  */
-export const WORKERS_DEV_HOST = '';
+export const WORKERS_DEV_HOST = 'piano-guide.delfost.workers.dev';
 
 /**
  * The sidebar sections, in order. Each one is a folder of `src/content/docs/`, a group in the
