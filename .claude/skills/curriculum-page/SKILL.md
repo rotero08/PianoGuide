@@ -7,7 +7,7 @@ description: Write or restructure content pages of The Complete Pianist (the MDX
 
 Content pages are MDX files under `src/content/docs/<section>/`. They are assembled from the custom components in `src/components/`, which are available in every page without an import line. For the exact props of any component, read the JSDoc on its `Props` interface in `src/components/<Name>.astro`: that JSDoc is the single source of truth (it also drives the editor hover docs and the Keystatic forms), so prefer it over guessing or copying an old usage.
 
-Pages are also edited through the Keystatic admin (`/keystatic` on the dev server), which rewrites a page in its own tidy format when it saves. Hand edits and Keystatic edits can be mixed freely as long as the page keeps to what Keystatic can read (see "What a page may contain").
+Pages are also edited through the Keystatic admin (`/keystatic`, on the dev server and on the live site), which rewrites a page in its own tidy format when it saves. Hand edits and Keystatic edits can be mixed freely as long as the page keeps to what Keystatic can read (see "What a page may contain").
 
 ## Start from the template
 
@@ -72,7 +72,7 @@ A new page is not reachable until it is wired up:
     label: Level 4 (Inversions + Speed)
   ```
 
-  A whole new section is different: it needs a folder, a group in the `sidebar` list of `astro.config.mjs`, and a collection in `keystatic.config.ts`.
+  A whole new section is different: create its folder and add a line to `SECTIONS` in `site.config.mjs`. The sidebar group and the Keystatic collection are both made from that list.
 - **Progress dashboard:** a new track needs a `<ProgressCard trackId="lvlN" title="…" />` in `src/content/docs/foundations/introduction.mdx`. The overall percentage picks up new tasks by itself.
 - **Cross-links:** internal links are root-relative with a trailing slash (`/curriculum/level-3/`).
 

@@ -1,13 +1,30 @@
 // Cloudflare Workers configuration. @astrojs/cloudflare fills in the rest at build time
 // (worker entrypoint, the static-assets directory and bindings), so only project-level
-// settings belong here. Build with `pnpm build`, then deploy with `pnpm exec wrangler deploy`.
+// settings belong here. `pnpm build` then `pnpm exec wrangler deploy` publishes; the README
+// lists the secrets the admin needs.
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "piano-guide",
 	"compatibility_date": "2026-10-09",
-	"compatibility_flags": ["nodejs_compat"],
+	"compatibility_flags": [
+		"nodejs_compat",
+		// Lets src/pages/api/preview.ts check that a branch's preview build exists: without it a
+		// Worker cannot fetch another address on the same workers.dev subdomain.
+		"global_fetch_strictly_public"
+	],
+	// Branch previews are served at <branch>-piano-guide.<account>.workers.dev, so the
+	// workers.dev address stays on even once the site has its own domain.
+	"workers_dev": true,
+	"preview_urls": true,
 	"assets": {
 		// Serve Starlight's 404.html for unknown URLs (automatic on Pages, opt-in on Workers).
-		"not_found_handling": "404-page"
-	}
+		"not_found_handling": "404-page",
+		// With that setting a browser navigation to a path that is not a file gets the 404 page
+		// without the Worker ever running. These are the paths the Worker answers itself: add any
+		// new on-demand route (`export const prerender = false`) here.
+		"run_worker_first": ["/keystatic", "/keystatic/*", "/api/*"]
+	},
+	// Settings for the preview builds of branches other than main (`wrangler preview`). They get
+	// none of the production secrets, so the admin does not work there; previews are for reading.
+	"previews": {}
 }

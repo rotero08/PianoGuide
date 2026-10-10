@@ -9,14 +9,11 @@
 // tag with no Keystatic form (see src/keystatic/components.ts). Fix the page, or document the
 // component's Props, rather than loosening this test: a page that fails cannot be edited in the CMS.
 
-import { spawn } from 'node:child_process';
 import fs from 'node:fs';
-import net from 'node:net';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { launchBrowser } from './browser.mjs';
+import { ROOT, startAstro } from './server.mjs';
 
-const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const DOCS = path.join(ROOT, 'src/content/docs');
 
 /** Every page with the Keystatic collection (its folder) or singleton it belongs to. */
@@ -27,35 +24,24 @@ const pages = [
   ),
 ].map((page) => ({ ...page, body: fs.readFileSync(path.join(DOCS, page.file), 'utf8').replace(/^---\n[\s\S]*?\n---\n/, '') }));
 
-const freePort = () => new Promise((resolve) => {
-  const probe = net.createServer().listen(0, '127.0.0.1', () => {
-    const { port } = probe.address();
-    probe.close(() => resolve(port));
-  });
-});
-
-const port = await freePort();
-const origin = `http://127.0.0.1:${port}`;
-const astroDir = path.join(ROOT, 'node_modules/astro');
-const astroCli = path.join(astroDir, JSON.parse(fs.readFileSync(path.join(astroDir, 'package.json'), 'utf8')).bin.astro);
-// `dev` must be on the command line: astro.config.mjs only loads Keystatic for the dev server.
-const server = spawn(process.execPath, [astroCli, 'dev', '--port', String(port)], { cwd: ROOT, stdio: 'ignore' });
+let server;
 let browser;
 let failures = 0;
 
 try {
-  for (let attempt = 0; ; attempt++) {
-    const up = await fetch(`${origin}/keystatic`).then((response) => response.ok, () => false);
-    if (up) break;
-    if (attempt > 120) throw new Error('The dev server did not start within 60 seconds.');
-    await new Promise((resolve) => setTimeout(resolve, 500));
-  }
+  // The dev server: that is where the admin edits local files, with nothing to sign in to.
+  server = await startAstro('dev', '/keystatic');
+  const { origin } = server;
 
   browser = await launchBrowser();
   const page = await browser.newPage();
   await page.goto(`${origin}/keystatic`, { waitUntil: 'networkidle2', timeout: 120_000 });
   await page.waitForFunction(() => document.body.innerText.includes('Dashboard'), { timeout: 60_000 });
   console.log('pass  admin dashboard loads');
+
+  await page.goto(`${origin}/keystatic/singleton/guide`, { waitUntil: 'networkidle2', timeout: 120_000 });
+  await page.waitForFunction(() => document.body.innerText.includes('Three things to leave alone'), { timeout: 60_000 });
+  console.log('pass  the editing guide is shown inside the admin');
 
   const results = await page.evaluate(async (pages) => {
     const { default: config } = await import('/keystatic.config.ts');
@@ -87,7 +73,7 @@ try {
   console.log(`FAIL  ${error.message}`);
 } finally {
   await browser?.close();
-  server.kill();
+  server?.stop();
 }
 
 process.exit(failures ? 1 : 0);

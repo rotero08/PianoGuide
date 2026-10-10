@@ -6,28 +6,37 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 "The Complete Pianist": a self-paced piano curriculum published as a docs site. Astro 6 + Starlight; the content is MDX in `src/content/docs/`, built from custom components in `src/components/` and editable through the Keystatic admin. Readers tick off tasks, mark resources done and pick benchmarks; all of that state lives in their browser (localStorage), there is no backend.
 
-`README.md` is the project roadmap, in five phases. Phases 1 (content and components), 2 (Cloudflare adapter) and 3 (Keystatic, local mode) are done. Phase 4 (live preview) is next; Phase 5 moves Keystatic to GitHub storage in production.
+`README.md` describes the project for people (what it is, how to run, deploy and set up editing); this file is about working in the code. `site.config.mjs` holds the facts several files share: the GitHub repository, the production branch, the site's addresses, the GitHub App slug and the list of sidebar sections.
 
 ## Commands
 
 The repo pins pnpm 12 (`packageManager` in package.json). A globally installed pnpm 9 ignores that pin: it runs scripts fine, but `pnpm install` / `pnpm add` offer to delete `node_modules` and reinstall. Run everything through corepack so the pinned version is used.
 
 ```sh
-corepack pnpm dev          # dev server on Node, http://localhost:4321 ; Keystatic admin at /keystatic
-corepack pnpm build        # production build: static site in dist/client/
+corepack pnpm dev          # dev server on Node, http://localhost:4321 ; Keystatic admin at /keystatic, editing local files
+corepack pnpm dev:github   # the same with the admin in GitHub mode (creating the GitHub App, trying the sign-in flow)
+corepack pnpm build        # production build: static site in dist/client/, Worker in dist/server/
 corepack pnpm preview      # serve the build on the Workers runtime (workerd)
 corepack pnpm check        # astro sync + type-check (see limits below)
-corepack pnpm test         # both test scripts below; run build first
+corepack pnpm test         # the three test scripts below; run build first
 corepack pnpm exec wrangler deploy --dry-run   # validate deploy packaging
 ```
 
 - `tests/smoke.mjs` drives the *built* site in a local Chromium-family browser and exercises every interactive widget. Its expectations use the Level 1 page as fixture, so update them when that page's ids or resource counts change.
-- `tests/keystatic.mjs` starts its own dev server and checks that every page opens and saves cleanly in Keystatic. Run either file directly with `node tests/<name>.mjs`. There is no linter.
+- `tests/routes.mjs` serves the build with `astro preview` and checks what the Worker answers: the admin, the preview endpoint (including that it cannot be used as an open redirect) and the "Edit page" link. It sends requests as browser navigations, which is what catches a route missing from `run_worker_first` (see Cloudflare below).
+- `tests/keystatic.mjs` starts its own dev server and checks that every page opens and saves cleanly in Keystatic. Run any of the three directly with `node tests/<name>.mjs`. There is no linter.
 - `pnpm check` only type-checks `.ts` files (scripts, utils, Keystatic config, generated component types). `.astro` frontmatter is not checked: the project uses TypeScript 7, which `@astrojs/check` does not support. The script filters out errors from Starlight's own shipped `.ts` sources.
-- `wrangler deploy` publishes the live site. Only run it when asked.
+- `wrangler deploy` publishes the live site. Only run it when asked. There is deliberately no `deploy` script: `pnpm deploy` is a built-in pnpm command, not a script runner.
 - When stopping a dev server you started, kill it by port (`lsof -ti tcp:<port>`); `pkill -f` with the command text also matches the shell running it.
 
 Version constraints that are deliberate (don't "fix" them by upgrading): Astro 6, Starlight 0.40, `@astrojs/cloudflare` 13, `@astrojs/react` 5. Newer majors exist, so `astro add <x>` and unpinned `pnpm add` pull incompatible versions; install integrations by explicit compatible version. TypeScript 7 removed `baseUrl`; `tsconfig.json` paths must stay relative. Packages with install scripts must be approved under `allowBuilds` in `pnpm-workspace.yaml`.
+
+## Git
+
+Commits and pull requests are made as the repository owner, with no trace of Claude: no `Co-Authored-By` trailer, no "Generated with Claude Code" line, no mention of an assistant in the message or the description. `.claude/settings.json` turns the automatic attribution off; do not add any by hand.
+
+- Write messages the way the existing history does: one short lowercase line saying what changed (`git log --oneline`).
+- This machine has no global git identity. Commit as the author of the existing commits by passing it for that command (`git -c user.name=… -c user.email=… commit`, values from `git log -1 --format='%an %ae'`), rather than changing git config.
 
 ## Architecture
 
@@ -52,9 +61,20 @@ Consequences: never hand-write component type declarations or Keystatic forms fo
 
 Keystatic's MDX editor rejects a whole page if it meets anything it has no model for. Content pages therefore must not contain `import` / `export` lines, `{/* comments */}` or other `{expressions}` in the body, raw HTML, or a tag without a Keystatic form. `tests/keystatic.mjs` enforces this. Saving in Keystatic rewrites a page in its normalised format (props in schema order, one tag per line, some characters escaped, e.g. `\#ref-1`); code that scans raw MDX (`contentIndex.ts`) must accept both forms.
 
-Keystatic (`keystatic.config.ts`) is in local mode: one collection per sidebar section folder plus a singleton for the home page. It is only loaded by `astro dev` (`isDev` in `astro.config.mjs`), because local mode needs Node's filesystem; builds do not include the admin.
+Keystatic drops any frontmatter key its form does not list, so a page's frontmatter is exactly `title`, `description` and `sidebar` (`order`, optional `label`); the home page has its own form. The sidebar is generated from the section folders and ordered by `sidebar.order`, which is why a page created in the admin appears without a config change. A new section is a folder plus one line in `SECTIONS` (`site.config.mjs`): the sidebar group and the Keystatic collection both come from that list.
 
-Keystatic drops any frontmatter key its form does not list, so a page's frontmatter is exactly `title`, `description` and `sidebar` (`order`, optional `label`); the home page has its own form. The sidebar is generated from the section folders and ordered by `sidebar.order`, which is why a page created in the admin appears without a config change. A new section needs a folder, a sidebar group in `astro.config.mjs` and a collection in `keystatic.config.ts`.
+### The admin: local files in dev, GitHub on the deployed site
+
+`keystatic.config.ts` defines one collection per section, a singleton for the home page and the "Editing guide" singleton. Where it stores content is decided by `usesGitHub` in `src/keystatic/admin.ts`:
+
+- **`pnpm dev`: local mode.** Save writes the `.mdx` files of the working copy. The dev server runs on Node without the Cloudflare adapter (`isDev` in `astro.config.mjs`) because this needs a real filesystem.
+- **Builds (and `pnpm dev:github`): GitHub mode.** The admin and its API are on-demand routes of the Worker. People sign in with GitHub through a GitHub App; someone with write access commits straight to the branch (on `main` that publishes), anyone else is taken through forking the repository and opening a pull request. That behaviour is Keystatic's own; nothing here implements it. It needs three Worker secrets (`KEYSTATIC_GITHUB_CLIENT_ID`, `KEYSTATIC_GITHUB_CLIENT_SECRET`, `KEYSTATIC_SECRET`) and the app's slug in `site.config.mjs`; the README has the setup steps. Until the secrets exist `src/middleware.ts` answers the admin routes with an explanation instead of Keystatic's bare error.
+
+Pieces around it:
+
+- **"Edit page" link** (`src/components/overrides/EditLink.astro`) at the foot of every page opens that page's editor. Admin addresses differ by mode (GitHub mode puts `/branch/<name>/` in them); build them with `adminPath()` from `src/keystatic/admin.ts`. A build renders the link only when `KEYSTATIC_GITHUB_APP_SLUG` is set and it is the production branch being built.
+- **Preview button** (`previewUrl` in the config, answered by `src/pages/api/preview.ts`). Pages are built ahead of time, so a branch cannot be rendered on demand: the endpoint sends the editor to where that branch is built, which is the site itself for `main` and Cloudflare's per-branch preview build for anything else. It only ever redirects to a path of this site or to that preview host; keep it that way.
+- **Editing guide** (`src/keystatic/guide.tsx`) is a tutorial inside the admin: a form field that renders text and stores nothing (`src/keystatic/guide.yaml` exists only so the entry does not show as "unsaved"). The public version is `src/content/docs/reference/contributing.mdx`. Both describe the editor's actual buttons, so change them together and check the wording against the running admin.
 
 ### Interactivity: plain modules, no framework
 
@@ -88,7 +108,13 @@ It reads through `getCollection`, not the filesystem, so it works in any runtime
 
 ### Cloudflare
 
-Builds use the Cloudflare adapter, which targets **Workers**; since Astro 6 it does not support Cloudflare Pages. All pages are prerendered (`output: 'static'`, the default), in Node (`prerenderEnvironment: 'node'`, because Starlight's build dependencies need it). A route opts into on-demand rendering with `export const prerender = false` and then runs on workerd in production, so anything such a route imports must avoid Node-only APIs. `wrangler.jsonc` holds only project-level settings; the adapter generates the deployable config into `dist/` at build time. The dev server does not use the adapter (see Keystatic above).
+Builds use the Cloudflare adapter, which targets **Workers**; since Astro 6 it does not support Cloudflare Pages. All content pages are prerendered (`output: 'static'`, the default), in Node (`prerenderEnvironment: 'node'`, because Starlight's build dependencies need it). `wrangler.jsonc` holds only project-level settings; the adapter generates the deployable config into `dist/` at build time. The dev server does not use the adapter (see the admin above).
+
+The on-demand routes (`export const prerender = false`) are the Keystatic admin (`/keystatic/*`), its API (`/api/keystatic/*`) and `/api/preview`. They run on workerd, so anything they import must avoid Node-only APIs. What is not obvious from the files:
+
+- **A new on-demand route must be added to `assets.run_worker_first` in `wrangler.jsonc`.** With `not_found_handling: "404-page"`, Cloudflare answers a browser navigation to a path that is not a file with the 404 page without running the Worker. Such a route works with `curl` and 404s in the browser; `tests/routes.mjs` exists to catch exactly that.
+- `astro.config.mjs` names a session driver only to stop the adapter from defaulting to a Cloudflare KV store (nothing uses sessions), and excludes `@keystatic/astro` from dependency pre-bundling because esbuild cannot resolve the virtual module its routes import. Both look removable and are not.
+- Branch previews come from Workers Builds running `wrangler preview` for branches other than `main`; they are served at `<branch>-<worker>.<account>.workers.dev` and get none of the production secrets (the `previews` block in `wrangler.jsonc`), so the admin does not work there.
 
 ## Project skills
 

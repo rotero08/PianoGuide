@@ -1,0 +1,67 @@
+---
+title: Contributing
+description: How to fix or add to this guide from your browser, with no code and nothing to install.
+sidebar:
+  order: 5
+---
+
+This guide is open to corrections and additions: a dead link, a better edition of a score, a clearer explanation, a resource that deserves a place. Every page has an **Edit page** link at the bottom. It opens that page in the site's editor, where you change it like a document and send the result for review.
+
+<Callout bordered={true} accentColor="gold" label="The short version" icon="target">
+  Press **Edit page** under the page you want to change, sign in with GitHub, make your change and press **Save**. Then choose **Create pull request** from the branch menu. Once a maintainer has reviewed and merged it, your change is live a couple of minutes later.
+</Callout>
+
+## What you need
+
+A free [GitHub](https://github.com/signup) account. The pages of this site are files in a public GitHub repository, [rotero08/PianoGuide](https://github.com/rotero08/PianoGuide), and the editor saves your work there under your name. You do not need to know Git, Markdown or any code.
+
+## Suggesting a change, step by step
+
+1. **Open the editor.** Go to the page you want to change, scroll to the bottom and press **Edit page**. To start from the list of all pages instead, open [/keystatic](/keystatic).
+2. **Sign in with GitHub.** The first time, GitHub asks you to authorise the editor. It can only touch repositories you later install it on.
+3. **Make your change.** The page appears as editable text. See [Using the editor](#using-the-editor) below.
+4. **Press Save.** The first time, the editor tells you that you cannot write to the repository and offers two links. Follow both, in order:
+
+   - **Fork the repo on GitHub** makes your own copy of the site's files. Your changes are saved there, so nothing you do can break the live site.
+   - **Install the Keystatic GitHub App on your fork** lets the editor save into that copy. Choose **Only select repositories** and pick your fork.
+
+   Back in the editor you are now working on your own copy.
+5. **Start a branch.** Open the branch menu at the top left of the editor, choose **New branch…** and give it a short name that says what you are doing, such as `fix-level-2-links`. A branch keeps one set of changes together; make your edits and save them on it.
+6. **Send it.** Open the branch menu again and choose **Create pull request**. GitHub opens with your changes listed. Say what you changed and why, then submit.
+
+A maintainer reads the pull request, may ask a question or suggest an adjustment there, and merges it. The site rebuilds by itself and your change is live a couple of minutes later.
+
+If your copy has fallen behind the site, open your fork on GitHub and press **Sync fork** before you start a new branch.
+
+## Using the editor
+
+The editor has its own **Editing guide**, first in its menu on the left, with the same information at hand while you work.
+
+- **Text** is edited in place. The toolbar sets headings, bold, italics, lists, links and tables.
+- **Boxes** are the building blocks of the site: a Callout, a Resource, a Task, a Grid. **Edit** on a box's title bar opens its settings as a form, and every field says underneath what it is for. Text inside a box is edited in place.
+- **To add a box**, put the cursor on an empty line and press **+** at the right of the toolbar; it lists every kind of box with a line on what it is for. Boxes can hold other boxes: a Grid holds Resource columns, which hold Resources. To remove one, click its title bar to select it and press Delete.
+- **Page settings** are in the panel on the right: the title, the description shown in search results, and the page's position in the sidebar.
+- **Preview**, at the top right, opens the page on the site. On your own fork there is no preview: your changes are checked from the pull request.
+
+## What to leave alone
+
+A few values look like labels but are keys that other things depend on.
+
+- **The Id of a Task or a Resource.** Readers' ticks and pins are saved under it in their browser, so changing it makes everyone lose that progress. A new Task or Resource needs an Id that no other page uses; follow the pattern of its neighbours, such as `lvl3-kravchuk` or `check-lvl3-leaps`.
+- **The Track id of a Task.** It must match the Verification box the task sits in, or the task stops counting towards the progress bar.
+- **The numbers of the sources in the [Reference Library](/reference/library/)**, written `#ref-7`. Other pages cite a source by that number. Add a new source at the end of the list with the next free number.
+- **The File name of a page.** It is the last part of the page's address, so changing it breaks every link to the page.
+
+## Before you send it
+
+- Open every link you added and check that it leads where you say.
+- Tag a resource honestly: `free` only if the whole thing is free, `paid` or `paid-book` otherwise.
+- A claim about how learning or the body works should cite a source in the Reference Library, the way the existing pages do.
+
+## Working with Git instead
+
+If you would rather work in your own editor, the pages are `.mdx` files under `src/content/docs/` in the [repository](https://github.com/rotero08/PianoGuide). Its README explains how to run the site on your machine, where the same editor is available at `/keystatic` and saves straight to your files. Open a pull request as you would for any project.
+
+## For maintainers
+
+If you have write access to the repository, **Save** commits directly to the branch you are on, and on `main` that publishes: the live site rebuilds and shows the change a couple of minutes later. For anything larger than a quick fix, work on a branch. It gets its own preview address, which the **Preview** button opens, and you merge it with a pull request when it is ready.

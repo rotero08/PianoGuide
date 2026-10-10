@@ -1,10 +1,23 @@
 // keystatic.config.ts
 //
-// The Keystatic admin (http://localhost:4321/keystatic while `pnpm dev` runs) edits the MDX pages
-// in src/content/docs directly. Each sidebar section is a collection over its folder, so a new
-// page is created in the right place and appears in that section of the sidebar by itself.
+// The Keystatic admin at /keystatic edits the MDX pages in src/content/docs. Each sidebar section
+// is a collection over its folder, so a new page is created in the right place and appears in
+// that section of the sidebar by itself.
+//
+// Under `pnpm dev` it edits the files of the working copy. On the deployed site it works through
+// GitHub: someone with write access to the repository commits directly, anyone else is taken
+// through forking it and opening a pull request.
 import { collection, config, fields, singleton } from '@keystatic/core';
+import { GITHUB_REPO, SECTIONS } from './site.config.mjs';
+import { usesGitHub } from './src/keystatic/admin';
 import { omitDefault, pageContent } from './src/keystatic/components';
+import { guideField } from './src/keystatic/guide';
+
+/**
+ * Address of the admin's "Preview" button for a page. Keystatic fills in `{branch}` (and `{slug}`
+ * in a collection); src/pages/api/preview.ts then sends the editor to wherever that branch is built.
+ */
+const previewUrl = (page: string) => `/api/preview?branch={branch}&to=${page}`;
 
 const description = fields.text({ label: 'Description', description: 'One sentence, shown in search results and link previews.', multiline: true });
 
@@ -17,6 +30,7 @@ function section(label: string, directory: string) {
     format: { contentField: 'content' },
     entryLayout: 'content',
     columns: ['title', 'description'],
+    previewUrl: previewUrl(`/${directory}/{slug}/`),
     schema: {
       title: fields.slug({
         name: { label: 'Title', validation: { isRequired: true } },
@@ -36,21 +50,29 @@ function section(label: string, directory: string) {
 }
 
 export default config({
-  storage: { kind: 'local' },
+  storage: usesGitHub ? { kind: 'github', repo: GITHUB_REPO } : { kind: 'local' },
   ui: {
     brand: { name: 'The Complete Pianist' },
     navigation: {
+      'Start here': ['guide'],
       Site: ['home'],
-      Pages: ['foundations', 'technique', 'curriculum', 'harmony', 'skills', 'reference'],
+      Pages: SECTIONS.map(({ directory }) => directory),
     },
   },
   singletons: {
+    // Not content: a tutorial for editors, shown inside the admin (src/keystatic/guide.tsx).
+    guide: singleton({
+      label: 'Editing guide',
+      path: 'src/keystatic/guide',
+      schema: { guide: guideField() },
+    }),
     // src/content/docs/index.mdx: the only page with Starlight's "hero" banner.
     home: singleton({
       label: 'Home page',
       path: 'src/content/docs/index',
       format: { contentField: 'content' },
       entryLayout: 'content',
+      previewUrl: previewUrl('/'),
       schema: {
         title: fields.text({ label: 'Title', validation: { isRequired: true } }),
         description,
@@ -73,12 +95,5 @@ export default config({
       },
     }),
   },
-  collections: {
-    foundations: section('Foundations', 'foundations'),
-    technique: section('Technique Foundations', 'technique'),
-    curriculum: section('Sight-Reading Curriculum', 'curriculum'),
-    harmony: section('Harmony & Keyboard Track', 'harmony'),
-    skills: section('Reading Skills & Tools', 'skills'),
-    reference: section('Discovery & Reference', 'reference'),
-  },
+  collections: Object.fromEntries(SECTIONS.map(({ directory, label }) => [directory, section(label, directory)])),
 });

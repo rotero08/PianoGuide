@@ -63,6 +63,8 @@ If a component needs a fact from other pages (which tasks exist, who cites what)
 corepack pnpm build && corepack pnpm check && corepack pnpm test
 ```
 
-`check` only covers `.ts` files, so a type error inside `.astro` frontmatter will not be reported; the build and the tests are what catch component mistakes. `tests/smoke.mjs` drives the built site in a real browser through every interactive widget (extend it when you add behaviour); `tests/keystatic.mjs` confirms every page still opens in the Keystatic editor, which is what breaks when a prop is renamed or its type stops matching the content.
+`check` only covers `.ts` files, so a type error inside `.astro` frontmatter will not be reported; the build and the tests are what catch component mistakes. `tests/smoke.mjs` drives the built site in a real browser through every interactive widget (extend it when you add behaviour); `tests/keystatic.mjs` confirms every page still opens in the Keystatic editor, which is what breaks when a prop is renamed or its type stops matching the content; `tests/routes.mjs` covers the routes the Worker answers and is not affected by component work.
+
+If a change alters what an author sees in the editor (a renamed prop, a new component people should know about), check whether the editing guide (`src/keystatic/guide.tsx`) and the Contributing page (`src/content/docs/reference/contributing.mdx`) still describe it correctly.
 
 Then look at the result yourself with `corepack pnpm dev`: both themes (the theme picker in the header), a narrow window, and for anything stateful, that it is still there after a reload.

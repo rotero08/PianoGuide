@@ -1,5 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "permissions": {
     "allow": [
       "Bash(corepack pnpm install --frozen-lockfile)",
@@ -17,12 +21,14 @@
       "Bash(corepack pnpm test)",
       "Bash(corepack pnpm run test)",
       "Bash(node tests/smoke.mjs)",
-      "Bash(node tests/keystatic.mjs)"
+      "Bash(node tests/keystatic.mjs)",
+      "Bash(node tests/routes.mjs)"
     ],
     "ask": [
       "Bash(*wrangler deploy*)",
       "Bash(*wrangler versions upload*)",
-      "Bash(*wrangler secret *)"
+      "Bash(*wrangler secret *)",
+      "Bash(*wrangler preview*)"
     ]
   }
 }

@@ -1,0 +1,50 @@
+---
+// src/components/overrides/EditLink.astro
+//
+// Starlight's "Edit page" link at the foot of every page, pointed at the page's editor in the
+// Keystatic admin instead of at the file on GitHub.
+import { Icon } from '@astrojs/starlight/components';
+import { KEYSTATIC_GITHUB_APP_SLUG, PRODUCTION_BRANCH } from '../../../site.config.mjs';
+import { adminPath, CONTRIBUTING_PATH } from '../../keystatic/admin';
+
+// The dev server always has its admin. A build only has a working one once the GitHub App
+// exists, and only the build of the production branch: Cloudflare's preview builds of other
+// branches (it names the branch in WORKERS_CI_BRANCH) carry no sign-in secrets.
+const buildBranch = process.env.WORKERS_CI_BRANCH || PRODUCTION_BRANCH;
+const adminWorks = import.meta.env.DEV || (Boolean(KEYSTATIC_GITHUB_APP_SLUG) && buildBranch === PRODUCTION_BRANCH);
+
+const file = Astro.locals.starlightRoute.entry.filePath?.match(/src\/content\/docs\/(.+)\.mdx?$/)?.[1];
+const href = adminWorks && file ? adminPath(file) : undefined;
+---
+
+{
+	href && (
+		<div class="edit-links sl-flex print:hidden">
+			<a href={href} class="edit sl-flex" rel="nofollow">
+				<Icon name="pencil" size="1.2em" />
+				{Astro.locals.t('page.editLink')}
+			</a>
+			<a href={CONTRIBUTING_PATH}>How editing works</a>
+		</div>
+	)
+}
+
+<style>
+	.edit-links {
+		gap: 0.35rem 1.25rem;
+		align-items: center;
+		flex-wrap: wrap;
+	}
+	a {
+		text-decoration: none;
+		color: var(--text-muted);
+	}
+	a:hover {
+		color: var(--text-main);
+	}
+	.edit {
+		gap: 0.5rem;
+		align-items: center;
+		color: var(--gold);
+	}
+</style>

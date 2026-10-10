@@ -5,11 +5,12 @@
   "packageManager": "pnpm@12.10.1",
   "scripts": {
     "dev": "astro dev",
+    "dev:github": "PUBLIC_KEYSTATIC_STORAGE=github astro dev",
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro sync && ! tsc --noEmit --pretty false | grep -v '^node_modules/' | grep 'error TS'",
-    "test": "node tests/smoke.mjs && node tests/keystatic.mjs",
+    "test": "node tests/smoke.mjs && node tests/routes.mjs && node tests/keystatic.mjs",
     "icons": "node tools/make-icons.mjs",
     "astro": "astro"
   },
@@ -25,6 +26,8 @@
     "sharp": "^0.34.5"
   },
   "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "puppeteer-core": "^25.13.0",
     "typescript": "^7.0.2",
     "wrangler": "^4.149.0"
