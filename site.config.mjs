@@ -23,7 +23,7 @@ export const SITE_URL = 'https://piano-guide.delfost.workers.dev';
  * GitHub (the last part of `https://github.com/apps/<slug>`). While it is empty the live site
  * shows no "Edit page" links, because the admin could not sign anyone in.
  */
-export const KEYSTATIC_GITHUB_APP_SLUG = 'rotero08-pianoguide-keystatic';
+export const KEYSTATIC_GITHUB_APP_SLUG = 'the-complete-pianist-editor';
 
 /**
  * The Worker's `workers.dev` host. Cloudflare serves the preview build of a branch at
