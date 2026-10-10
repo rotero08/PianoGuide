@@ -2,6 +2,8 @@
 // Renders the fallback icons from the logo (public/favicon.svg): `pnpm icons`.
 //   public/favicon.ico           16, 32 and 48 px, for clients that don't take SVG icons
 //   public/apple-touch-icon.png  180 px, for iOS home screens
+//   .github/assets/app-logo.png  512 px, the picture of the editor's GitHub App (uploaded by hand
+//                                in the app's settings on GitHub)
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
@@ -31,3 +33,12 @@ fs.writeFileSync(inPublic('favicon.ico'), Buffer.concat([directory, ...images]))
 
 // iOS applies its own mask, so the corners outside the rounded tile must be filled, not transparent.
 await sharp(await render(180)).flatten({ background: '#12131F' }).png().toFile(inPublic('apple-touch-icon.png'));
+
+// GitHub shows an app's picture in a circle: the keys sit smaller on a full square of the tile
+// colour, so that nothing is cut off.
+const appLogo = fileURLToPath(new URL('../.github/assets/app-logo.png', import.meta.url));
+fs.mkdirSync(new URL('../.github/assets/', import.meta.url), { recursive: true });
+await sharp({ create: { width: 512, height: 512, channels: 4, background: '#12131F' } })
+  .composite([{ input: await render(352) }])
+  .png()
+  .toFile(appLogo);

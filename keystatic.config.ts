@@ -10,6 +10,7 @@
 import { collection, config, fields, singleton } from '@keystatic/core';
 import { GITHUB_REPO, SECTIONS } from './site.config.mjs';
 import { usesGitHub } from './src/keystatic/admin';
+import { BrandMark } from './src/keystatic/brand';
 import { omitDefault, pageContent } from './src/keystatic/components';
 import { guideField } from './src/keystatic/guide';
 
@@ -52,7 +53,7 @@ function section(label: string, directory: string) {
 export default config({
   storage: usesGitHub ? { kind: 'github', repo: GITHUB_REPO } : { kind: 'local' },
   ui: {
-    brand: { name: 'The Complete Pianist' },
+    brand: { name: 'The Complete Pianist', mark: BrandMark },
     navigation: {
       'Start here': ['guide'],
       Site: ['home'],

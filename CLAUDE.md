@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 "The Complete Pianist": a self-paced piano curriculum published as a docs site. Astro 6 + Starlight; the content is MDX in `src/content/docs/`, built from custom components in `src/components/` and editable through the Keystatic admin. Readers tick off tasks, mark resources done and pick benchmarks; all of that state lives in their browser (localStorage), there is no backend.
 
-`README.md` is the public description of the project: what it is and what it does, kept short on purpose. Technical and setup detail belongs in this file, not there. `site.config.mjs` holds the facts several files share: the GitHub repository, the production branch, the site's addresses, the GitHub App slug and the list of sidebar sections.
+`README.md` is the public face of the project: what it is and what it does, with the logo, badges and screenshots, and little else. Technical and setup detail belongs in this file, not there. `site.config.mjs` holds the facts several files share: the GitHub repository, the production branch, the site's addresses, the GitHub App slug and the list of sidebar sections.
 
 ## Commands
 
@@ -20,6 +20,7 @@ corepack pnpm preview      # serve the build on the Workers runtime (workerd)
 corepack pnpm check        # astro sync + type-check (see limits below)
 corepack pnpm test         # the three test scripts below; run build first
 corepack pnpm exec wrangler deploy --dry-run   # validate deploy packaging
+corepack pnpm screenshots  # retake the README screenshots from the build (.github/assets/)
 ```
 
 - `tests/smoke.mjs` drives the *built* site in a local Chromium-family browser and exercises every interactive widget. Its expectations use the Level 1 page as fixture, so update them when that page's ids or resource counts change.
@@ -117,7 +118,9 @@ It reads through `getCollection`, not the filesystem, so it works in any runtime
 
 ### Logo
 
-`public/favicon.svg` is the logo: the browser-tab icon and, through `.site-title::before` in `custom.css`, the mark beside the site name. `public/favicon.ico` and `public/apple-touch-icon.png` are rendered from it (three PNG sizes in an .ico container; a 180px PNG flattened onto the tile colour). Run `corepack pnpm icons` after changing the SVG to regenerate both.
+`public/favicon.svg` is the logo: the browser-tab icon and, through `.site-title::before` in `custom.css`, the mark beside the site name. `public/favicon.ico` and `public/apple-touch-icon.png` are rendered from it (three PNG sizes in an .ico container; a 180px PNG flattened onto the tile colour). Run `corepack pnpm icons` after changing the SVG to regenerate both. The same command renders `.github/assets/app-logo.png`, the picture of the editor's GitHub App, which has to be uploaded by hand in the app's settings on GitHub. The admin shows the logo beside the site name through `ui.brand.mark` in `keystatic.config.ts`.
+
+The README's screenshots live in `.github/assets/` too and are taken by `tools/make-screenshots.mjs` (`corepack pnpm screenshots`, after a build): the site in its dark theme with some progress filled in, and the editor from the dev server. Retake them when the look of those pages changes.
 
 ### Cloudflare
 

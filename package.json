@@ -12,6 +12,7 @@
     "check": "astro sync && ! tsc --noEmit --pretty false | grep -v '^node_modules/' | grep 'error TS'",
     "test": "node tests/smoke.mjs && node tests/routes.mjs && node tests/keystatic.mjs",
     "icons": "node tools/make-icons.mjs",
+    "screenshots": "node tools/make-screenshots.mjs",
     "astro": "astro"
   },
   "dependencies": {
