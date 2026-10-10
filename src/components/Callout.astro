@@ -1,130 +1,92 @@
 ---
 // src/components/Callout.astro
 import Icon from './Icon.astro';
+import type { IconChoice } from './icons';
 
 /**
- * ### Callout Component
- * 
- * A styled highlight panel used to emphasize warnings, notes, or tips.
+ * A highlight panel for goals, warnings, notes and tips.
+ *
+ * @example
+ * <Callout bordered={true} accentColor="gold" label="Your goal for this level" icon="target">
+ *   Read two notes at once and simple triads as single visual shapes.
+ * </Callout>
  */
 export interface Props {
-  /** 
-   * The main header title displayed inside the callout block.
-   * @default undefined
-   * @example title="Important Note"
+  /**
+   * Heading shown at the top of the panel. Takes precedence over `label`.
+   * @example title="How to use this list"
    */
   title?: string;
-  /** 
-   * An alternative heading or label for the callout. If both `title` and `label` are provided,
-   * they will merge into the header display.
-   * @default undefined
+  /**
+   * Alternative name for `title` (used when `title` is not set).
    * @example label="Why audiation comes first"
    */
-  label?: string; 
-  /** 
-   * Optional name of an icon (from the `Icon.astro` lookup directory) to display beside the title.
+  label?: string;
+  /**
+   * Icon shown beside the heading. Only rendered when there is a heading.
    * @default "none"
    */
-  icon?: 'info' | 'target' | 'warning' | 'play-box' | 'link' | 'speed-wall' | 'app-trap' | 'acronym-trap' | 'repeat' | 'moon' | 'retreat' | 'chevron-down' | 'star' | 'map' | 'none'; 
-  /** 
-   * If set to true, displays a styled left border using the current accent color.
+  icon?: IconChoice;
+  /**
+   * Draws a 1px outline with a thick left edge in the accent colour.
    * @default false
    */
-  bordered?: boolean; 
-  /** 
-   * The background theme style of the callout box.
+  bordered?: boolean;
+  /**
+   * Panel background: `dark` (neutral), `tint` (a wash of the accent colour), or `transparent` / `none`.
    * @default "dark"
    */
   bgColor?: 'dark' | 'tint' | 'transparent' | 'none';
-  /** 
-   * The accent theme color used to style headers and bordered highlights.
+  /**
+   * Colour of the heading and the bordered edge.
    * @default "gold"
    */
   accentColor?: 'gold' | 'rose' | 'none';
-  /** 
-   * Custom CSS color variable or hex string to style paragraph typography elements inside.
-   * @default undefined
+  /**
+   * Any CSS colour, applied to the body text.
+   * @example textColor="var(--text-main)"
    */
   textColor?: string;
 }
 
-const { 
-  title, 
-  label,
-  icon,
-  bordered = false,
-  bgColor = "dark",
-  accentColor = "gold",
-  textColor
-} = Astro.props;
-
-const displayTitle = title || label;
-
-const presetAccents: Record<string, string> = {
-  gold: "var(--gold)",
-  rose: "var(--rose)",
-  none: "transparent"
-};
-const resolvedAccent = presetAccents[accentColor] || accentColor;
-
-const presetBackgrounds: Record<string, string> = {
-  transparent: "transparent",
-  none: "transparent",
-  tint: accentColor === 'rose' ? "rgba(212, 118, 138, 0.07)" : "rgba(201, 168, 76, 0.07)"
-};
-
-const isDefaultBg = bgColor === 'dark';
-const isTintBg = bgColor === 'tint';
-const resolvedBg = (isDefaultBg || isTintBg) ? undefined : (presetBackgrounds[bgColor] || bgColor);
-
-const containerStyle = {
-  ...(resolvedBg && { backgroundColor: resolvedBg }),
-  ...(textColor && { color: textColor }),
-  ...(bordered ? {
-    borderLeftWidth: "4px",
-    borderLeftStyle: "solid",
-    borderLeftColor: resolvedAccent,
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: "var(--border-color)",
-    borderRightWidth: "1px",
-    borderRightStyle: "solid",
-    borderRightColor: "var(--border-color)",
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: "var(--border-color)"
-  } : {
-    borderLeftWidth: "0px",
-    borderTopWidth: "0px",
-    borderRightWidth: "0px",
-    borderBottomWidth: "0px"
-  })
-};
-
-const labelStyle = { color: resolvedAccent !== 'transparent' ? resolvedAccent : undefined };
-const contentStyle = { ...(textColor && { color: textColor }) };
+const { title, label, icon = 'none', bordered = false, bgColor = 'dark', accentColor = 'gold', textColor } = Astro.props;
+const heading = title || label;
+const textStyle = textColor ? `color:${textColor}` : undefined;
+const clear = bgColor === 'transparent' || bgColor === 'none';
+const boxStyle = [clear && 'background-color:transparent', textStyle].filter(Boolean).join(';') || undefined;
 ---
 
-<div class:list={['callout-container', { bordered, tint: isTintBg }, accentColor]} style={containerStyle}>
-  {displayTitle && (
-    <span class="callout-label" style={labelStyle}>
-      {icon && icon !== 'none' && <Icon name={icon} class="callout-svg" />}
-      {displayTitle}
+<div class:list={['callout-container', accentColor, { bordered, tint: bgColor === 'tint' }]} style={boxStyle}>
+  {heading && (
+    <span class="callout-label">
+      {icon !== 'none' && <Icon name={icon} class="callout-svg" />}
+      {heading}
     </span>
   )}
-  <div class="callout-content" style={contentStyle}>
+  <div class="callout-content" style={textStyle}>
     <slot />
   </div>
 </div>
 
 <style>
   .callout-container {
+    --accent: var(--gold);
+    border: 0 solid var(--border-color);
     border-radius: 0 8px 8px 0;
     padding: 1.5rem;
     margin: 2rem 0;
     box-sizing: border-box;
+    background-color: rgba(30, 41, 59, 0.3);
   }
-  .callout-container { background-color: rgba(30, 41, 59, 0.3); }
+  .callout-container.rose { --accent: var(--rose); }
+  .callout-container.none { --accent: transparent; }
+
+  .callout-container.bordered {
+    border-width: 1px 1px 1px 4px;
+    border-left-color: var(--accent);
+    padding: 1.1rem 1.4rem;
+  }
+
   .callout-container.tint.gold { background-color: rgba(201, 168, 76, 0.07); }
   .callout-container.tint.rose { background-color: rgba(212, 118, 138, 0.07); }
 
@@ -132,8 +94,6 @@ const contentStyle = { ...(textColor && { color: textColor }) };
   :root[data-theme="light"] .callout-container.tint.gold { background-color: rgba(201, 168, 76, 0.05); }
   :root[data-theme="light"] .callout-container.tint.rose { background-color: rgba(212, 118, 138, 0.05); }
 
-  .callout-container.bordered { padding: 1.1rem 1.4rem; }
-  
   .callout-label {
     display: flex;
     align-items: center;
@@ -142,13 +102,15 @@ const contentStyle = { ...(textColor && { color: textColor }) };
     font-size: 1.05rem;
     font-weight: 700;
     margin-bottom: 0.6rem;
+    color: var(--accent);
   }
+  .none .callout-label { color: inherit; }
 
-  .callout-label :global(.callout-svg) {
+  .callout-svg {
     width: 18px;
     height: 18px;
   }
-  
+
   .callout-content :global(p) {
     margin: 0;
     font-size: 0.98rem;

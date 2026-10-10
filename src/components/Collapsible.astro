@@ -1,25 +1,31 @@
 ---
 // src/components/Collapsible.astro
 import Icon from './Icon.astro';
+import type { IconChoice } from './icons';
 
 /**
- * ### Collapsible Component
- * 
- * An accordion-style details block used to group supplementary lessons or alternatives.
+ * An accordion block for supplementary lessons. Inside it, each `####` heading starts a new
+ * sub-section separated by a divider.
+ *
+ * @example
+ * <Collapsible title="Active Audiation Practice">
+ *   #### Sing before you play
+ *   Hum the first interval of the phrase, then check it at the keyboard.
+ * </Collapsible>
  */
 export interface Props {
-  /** The primary title text displayed inside the summary details header. */
+  /** Heading shown in the always-visible summary row. */
   title: string;
-  /** 
-   * If true, renders the widget expanded and open by default.
+  /**
+   * Starts expanded.
    * @default false
    */
   open?: boolean;
-  /** 
-   * Optional icon lookup identifier name (from the `Icon.astro` catalog) to display next to the header text.
+  /**
+   * Icon shown beside the title.
    * @default "play-box"
    */
-  icon?: 'info' | 'target' | 'warning' | 'play-box' | 'link' | 'speed-wall' | 'app-trap' | 'acronym-trap' | 'repeat' | 'moon' | 'retreat' | 'chevron-down' | 'star' | 'map' | 'none'; 
+  icon?: IconChoice;
 }
 
 const { title, open = false, icon = 'play-box' } = Astro.props;
@@ -41,7 +47,7 @@ const { title, open = false, icon = 'play-box' } = Astro.props;
 </details>
 
 <style>
-  :global(.collapsible-widget) {
+  .collapsible-widget {
     background-color: var(--bg-card) !important;
     border: 1px solid var(--border-color) !important;
     border-radius: var(--radius) !important;
@@ -50,8 +56,8 @@ const { title, open = false, icon = 'play-box' } = Astro.props;
     box-sizing: border-box !important;
     padding: 0 !important;
   }
-  
-  :global(.collapsible-header) {
+
+  .collapsible-header {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
@@ -63,28 +69,24 @@ const { title, open = false, icon = 'play-box' } = Astro.props;
     cursor: pointer !important;
     user-select: none !important;
     list-style: none !important;
-    list-style-type: none !important;
     transition: background-color 0.2s !important;
   }
-  
-  :global(.collapsible-header::-webkit-details-marker) {
+  .collapsible-header::-webkit-details-marker {
     display: none !important;
   }
-  :global(.collapsible-header::marker) {
-    display: none !important;
+  .collapsible-header::marker {
     content: "" !important;
   }
-  :global(.collapsible-header::before),
-  :global(.collapsible-header::after) {
+  .collapsible-header::before,
+  .collapsible-header::after {
     display: none !important;
     content: none !important;
   }
-  
-  :global(.collapsible-header:hover) {
+  .collapsible-header:hover {
     background-color: rgba(255, 255, 255, 0.02) !important;
   }
-  
-  :global(.collapsible-header h3) {
+
+  .collapsible-header h3 {
     margin: 0 !important;
     font-size: 1.05rem !important;
     display: flex !important;
@@ -94,18 +96,13 @@ const { title, open = false, icon = 'play-box' } = Astro.props;
     font-family: 'Space Grotesk', var(--sl-font), sans-serif !important;
     font-weight: 700 !important;
   }
-  
-  :global([data-theme="light"] .collapsible-header h3) {
-    color: var(--sl-color-accent) !important;
-  }
-  
-  :global(.collapsible-header h3 .collapsible-svg) {
+  .collapsible-svg {
     width: 18px !important;
     height: 18px !important;
     color: inherit !important;
   }
 
-  :global(.collapse-arrow) {
+  .collapse-arrow {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -114,19 +111,18 @@ const { title, open = false, icon = 'play-box' } = Astro.props;
     color: var(--text-muted) !important;
     transition: transform 0.2s ease !important;
   }
-  :global(.collapse-arrow svg) {
+  .collapse-arrow :global(svg) {
     width: 100% !important;
     height: 100% !important;
   }
-  :global(.collapsible-widget[open] .collapse-arrow) {
+  .collapsible-widget[open] .collapse-arrow {
     transform: rotate(180deg) !important;
   }
-  
-  :global(.collapsible-content) {
+
+  .collapsible-content {
     padding: 0.2rem 1rem 1.2rem 1rem !important;
   }
-
-  :global(.collapsible-content h4) {
+  .collapsible-content :global(h4) {
     font-size: 0.95rem !important;
     font-weight: 700 !important;
     color: var(--text-main) !important;
@@ -134,27 +130,23 @@ const { title, open = false, icon = 'play-box' } = Astro.props;
     margin-bottom: 0.35rem !important;
     font-family: 'Space Grotesk', var(--sl-font), sans-serif !important;
   }
-  
-  :global(.collapsible-content h4:first-of-type) {
+  .collapsible-content :global(h4:first-of-type) {
     border-top: none !important;
     padding-top: 0 !important;
     margin-top: 0 !important;
   }
-  
-  :global(.collapsible-content h4 ~ h4) {
+  .collapsible-content :global(h4 ~ h4) {
     border-top: 1px solid var(--border-color) !important;
     padding-top: 1.3rem !important;
   }
-
-  :global(.collapsible-content p) {
+  .collapsible-content :global(p) {
     font-size: 0.88rem !important;
     color: var(--text-muted) !important;
     line-height: 1.55 !important;
     margin-top: 0 !important;
     margin-bottom: 0 !important;
   }
-
-  :global(.collapsible-content h4 a) {
+  .collapsible-content :global(h4 a) {
     color: var(--gold) !important;
     font-weight: 700 !important;
     font-size: 0.8rem !important;
@@ -163,16 +155,14 @@ const { title, open = false, icon = 'play-box' } = Astro.props;
     display: inline-block !important;
     transition: color 0.15s ease !important;
   }
-  :global([data-theme="light"] .collapsible-content h4 a) {
-    color: var(--sl-color-accent) !important;
-  }
-  :global(.collapsible-content h4 a:hover) {
+  .collapsible-content :global(h4 a:hover) {
     text-decoration: underline !important;
   }
 
-  :global(.collapsible-content :is(h1, h2, h3, h4, h5, h6) + a),
-  :global(.collapsible-content .anchor),
-  :global(.collapsible-content .heading-link) {
+  /* Headings inside the accordion don't get Starlight's hover anchor links. */
+  .collapsible-content :global(:is(h1, h2, h3, h4, h5, h6) + a),
+  .collapsible-content :global(.anchor),
+  .collapsible-content :global(.heading-link) {
     display: none !important;
   }
 </style>

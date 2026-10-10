@@ -1,29 +1,41 @@
 ---
 // src/components/ProgressCard.astro
+import { getContentIndex } from '../utils/contentIndex';
 
 /**
- * ### ProgressCard Component
- * 
- * An individual card displaying completion progress for a single track.
- * Features a high-contrast progress bar track dynamically updated by the state engine.
+ * A compact card with the live completion percentage and progress bar of one track. Works on
+ * any page: the track's task list comes from the build, the ticks from the reader's browser.
+ *
+ * @example
+ * <ProgressCard trackId="lvl1" title="Level 1: Intervals & Chords" />
  */
 export interface Props {
-  /** The parent progress track identifier this task contributes calculations to. */
+  /**
+   * Progress track to summarise: counts every `<Task>` with this `trackId`, wherever it lives.
+   * @example trackId="lvl1"
+   */
   trackId: string;
-  /** The descriptive title heading printed inside the progress card. */
+  /** Name of the track shown on the card. */
   title: string;
 }
+
 const { trackId, title } = Astro.props;
+const taskIds = (await getContentIndex()).tasks[trackId] ?? [];
 ---
-<div class="po-row" data-progress-row={trackId}>
+
+<div class="po-row" data-progress-tasks={taskIds.join(' ')}>
   <div class="po-top">
     <span class="po-name">{title}</span>
-    <span class="po-pct" id={`${trackId}-pct`}>0%</span>
+    <span class="po-pct" data-progress-label>0%</span>
   </div>
   <div class="po-bar-bg">
-    <div class="po-bar-fg" id={`${trackId}-bar`}></div>
+    <div class="po-bar-fg" data-progress-bar></div>
   </div>
 </div>
+
+<script>
+  import '../scripts/progress';
+</script>
 
 <style>
   .po-row {
@@ -38,9 +50,6 @@ const { trackId, title } = Astro.props;
   .po-row:hover {
     transform: translateY(-1px) !important;
     border-color: var(--gold) !important;
-  }
-  :root[data-theme="light"] .po-row:hover {
-    border-color: var(--sl-color-accent) !important;
   }
 
   .po-top {
@@ -68,13 +77,10 @@ const { trackId, title } = Astro.props;
     font-size: 0.78rem !important;
     flex-shrink: 0 !important;
   }
-  :root[data-theme="light"] .po-pct {
-    color: var(--sl-color-accent) !important;
-  }
 
   .po-bar-bg {
     height: 5px !important;
-    background: rgba(128, 128, 128, 0.2) !important; /* Semi-transparent track, clearly visible in all light/dark themes */
+    background: rgba(128, 128, 128, 0.2) !important;
     border-radius: 3px !important;
     overflow: hidden !important;
     width: 100% !important;
@@ -86,8 +92,5 @@ const { trackId, title } = Astro.props;
     background: var(--gold) !important;
     border-radius: 3px !important;
     transition: width 0.5s ease-out !important;
-  }
-  :root[data-theme="light"] .po-bar-fg {
-    background: var(--sl-color-accent) !important;
   }
 </style>

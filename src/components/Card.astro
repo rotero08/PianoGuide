@@ -1,77 +1,74 @@
 ---
 // src/components/Card.astro
 import Icon from './Icon.astro';
+import type { IconChoice } from './icons';
 
+/**
+ * A boxed content tile with an optional icon, badge, stat number and call-to-action button.
+ * With `variant="flat"` it is only a borderless column that stacks its children (used to lay
+ * out the two halves of a `<VerificationBox>`); every other prop is ignored in that mode.
+ *
+ * @example
+ * <Card border="left" accentColor="gold" icon="map" title="Core Reading Levels" link="/curriculum/pre-staff/" buttonText="Start with Pre-Staff">
+ *   Your central reading path, from Pre-Staff up to Level 7.
+ * </Card>
+ */
 export interface Props {
-  /** 
-   * The primary title heading text populated inside the card. Not rendered in `variant="flat"`.
-   * @default undefined
+  /**
+   * Heading of the card.
    * @example title="Requirements & Checklist"
    */
   title?: string;
-  /** 
-   * Optional decorative subtitle displayed as monospaced uppercase metadata at the top of the card.
-   * @default undefined
+  /**
+   * Small uppercase line above the heading.
    * @example subtitle="Preparatory Level"
    */
-  subtitle?: string; 
-  /** 
-   * Inserts a bold accent decorative border line on the selected edge.
+  subtitle?: string;
+  /**
+   * Thickens one edge of the card and paints it in the accent colour.
    * @default "none"
-   * @example border="left"
    */
-  border?: 'top' | 'left' | 'none'; 
-  /** 
-   * Theme styling preset applied to subtitles, decorative borders, and vector icons.
+  border?: 'top' | 'left' | 'none';
+  /**
+   * Colour of the subtitle, thick edge, icon and badge.
    * @default "gold"
-   * @example accentColor="rose"
    */
   accentColor?: 'gold' | 'rose' | 'none';
-  /** 
-   * Optional identifier name of an icon (from the `Icon.astro` catalog) to display inside the card header.
+  /**
+   * Icon shown above the heading. Only rendered when there is a `title`.
    * @default "none"
-   * @example icon="repeat"
    */
-  icon?: 'info' | 'target' | 'warning' | 'play-box' | 'link' | 'speed-wall' | 'app-trap' | 'acronym-trap' | 'repeat' | 'moon' | 'retreat' | 'chevron-down' | 'star' | 'map' | 'none'; 
-  /** 
-   * Destination URL or path. Setting this renders an action anchor button at the bottom.
-   * @default undefined
+  icon?: IconChoice;
+  /**
+   * URL or site path. When set, a full-width button linking to it is added at the bottom (opens in a new tab).
    * @example link="/curriculum/pre-staff/"
    */
-  link?: string; 
-  /** 
-   * The button text displayed when a CTA link is configured.
+  link?: string;
+  /**
+   * Label of the `link` button.
    * @default "Open ↗"
-   * @example buttonText="Start Training"
    */
   buttonText?: string;
-  /** 
-   * Custom tag classification string used to filter elements inside searchable grids.
-   * @default "none"
+  /**
+   * Category the card belongs to, matched by the dropdown of a `<Grid searchable>`.
    * @example category="theory"
    */
-  category?: 'acoustics' | 'pedagogy' | 'theory' | 'none'; 
-  /** 
-   * Renders the title as a giant stat number.
+  category?: string;
+  /**
+   * Renders the `title` as a large stat figure in the accent colour.
    * @default false
-   * @example isStat={true}
    */
   isStat?: boolean;
-  /** 
-   * Text rendered inside an optional monospaced uppercase badge.
-   * @default undefined
+  /**
+   * Text of a small pill shown at the top-right.
    * @example badge="MANDATORY"
    */
   badge?: string;
-  /** 
-   * The layout rendering style:
-   * - `card` (standard boxed card layout)
-   * - `flat` (borderless column grouping container, useful for verification layout columns)
+  /**
+   * `card` is the boxed tile; `flat` is a plain column wrapper.
    * @default "card"
    */
   variant?: 'card' | 'flat';
-  /** Standard slot parameter reserved for MDX compilation. */
-  slot?: string;
 }
 
 const {
@@ -79,26 +76,26 @@ const {
   subtitle,
   border = 'none',
   accentColor = 'gold',
-  icon,
+  icon = 'none',
   link,
-  buttonText = "Open ↗",
+  buttonText = 'Open ↗',
   category,
   isStat = false,
   badge,
-  variant = 'card'
+  variant = 'card',
 } = Astro.props;
 ---
 
 {variant === 'card' ? (
-  <div class:list={['unified-card', border !== 'none' ? `border-${border}` : '', accentColor]} data-category={category}>
+  <div class:list={['unified-card', border !== 'none' && `border-${border}`, accentColor]} data-category={category}>
     <div class="card-meta-row">
       {subtitle && <div class="card-subtitle">{subtitle}</div>}
       {badge && <span class:list={['card-badge', accentColor]}>{badge}</span>}
     </div>
-    
+
     {title && (
       <div class="card-header">
-        {icon && icon !== 'none' && (
+        {icon !== 'none' && (
           <span class="card-icon" aria-hidden="true">
             <Icon name={icon} class="card-svg" />
           </span>
@@ -141,23 +138,14 @@ const {
   .unified-card:hover {
     transform: translateY(-2px);
     border-color: var(--gold);
-    box-shadow: 0 4px 20px -2px rgba(201, 168, 76, 0.05);
-  }
-  :root[data-theme="light"] .unified-card:hover {
-    border-color: var(--sl-color-accent);
-    box-shadow: 0 4px 20px -2px rgba(154, 116, 32, 0.05);
+    box-shadow: 0 4px 20px -2px rgba(var(--gold-rgb), 0.05);
   }
 
   .border-top { border-top-width: 3px !important; }
   .border-left { border-left-width: 3px !important; }
-
-  /* Border Colors */
   .gold.border-top { border-top-color: var(--gold) !important; }
-  :root[data-theme="light"] .gold.border-top { border-top-color: var(--sl-color-accent) !important; }
   .rose.border-top { border-top-color: var(--rose) !important; }
-
   .gold.border-left { border-left-color: var(--gold) !important; }
-  :root[data-theme="light"] .gold.border-left { border-left-color: var(--sl-color-accent) !important; }
   .rose.border-left { border-left-color: var(--rose) !important; }
 
   .card-meta-row {
@@ -175,7 +163,6 @@ const {
     font-weight: 700 !important;
   }
   .gold .card-subtitle { color: var(--gold) !important; }
-  :root[data-theme="light"] .gold .card-subtitle { color: var(--sl-color-accent) !important; }
   .rose .card-subtitle { color: var(--rose) !important; }
 
   .card-badge {
@@ -189,14 +176,9 @@ const {
     display: inline-block !important;
   }
   .card-badge.gold {
-    background: rgba(201, 168, 76, 0.15) !important;
+    background: rgba(var(--gold-rgb), 0.15) !important;
     color: var(--gold) !important;
-    border: 1px solid rgba(201, 168, 76, 0.3) !important;
-  }
-  :root[data-theme="light"] .card-badge.gold {
-    background: rgba(154, 116, 32, 0.15) !important;
-    color: var(--sl-color-accent) !important;
-    border-color: rgba(154, 116, 32, 0.3) !important;
+    border: 1px solid rgba(var(--gold-rgb), 0.3) !important;
   }
   .card-badge.rose {
     background: rgba(212, 118, 138, 0.15) !important;
@@ -217,9 +199,8 @@ const {
     flex-shrink: 0 !important;
   }
   .gold .card-icon { color: var(--gold) !important; }
-  :root[data-theme="light"] .gold .card-icon { color: var(--sl-color-accent) !important; }
   .rose .card-icon { color: var(--rose) !important; }
-  .card-icon :global(.card-svg) {
+  .card-svg {
     width: 26px !important;
     height: 26px !important;
   }
@@ -236,9 +217,6 @@ const {
     color: var(--gold) !important;
     line-height: 1 !important;
     margin-bottom: 0.5rem !important;
-  }
-  :root[data-theme="light"] .card-title-stat {
-    color: var(--sl-color-accent) !important;
   }
   .card-content {
     font-size: 0.88rem !important;
@@ -268,34 +246,6 @@ const {
   .card-content :global(li strong) {
     color: var(--text-main) !important;
   }
-  .btn-link {
-    display: inline-block !important;
-    text-align: center !important;
-    background-color: var(--bg-card2) !important;
-    border: 1px solid var(--border-color) !important;
-    color: var(--text-main) !important;
-    padding: 0.6rem 1rem !important;
-    border-radius: 6px !important;
-    font-size: 0.85rem !important;
-    text-decoration: none !important;
-    font-weight: 600 !important;
-    transition: all 0.2s !important;
-    cursor: pointer !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    margin-top: auto !important;
-  }
-  .btn-link:hover {
-    background-color: var(--gold) !important;
-    color: var(--sl-color-black) !important;
-    border-color: var(--gold) !important;
-    text-decoration: none !important;
-  }
-  :root[data-theme="light"] .btn-link:hover {
-    background-color: var(--sl-color-accent) !important;
-    color: var(--sl-color-white) !important;
-    border-color: var(--sl-color-accent) !important;
-  }
 
   .flat-column {
     display: flex !important;
@@ -305,10 +255,7 @@ const {
     width: 100% !important;
   }
 
-  /* 
-    Benchmark height fix: prevents boxed cards from stretching to the full height 
-    of the verification checklist.
-  */
+  /* Cards placed in a flat column size to their content instead of stretching to the column height. */
   .flat-column :global(.resource-card),
   .flat-column :global(.unified-card) {
     height: auto !important;

@@ -1,1 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><path fill-rule="evenodd" d="M81 36 64 0 47 36l-1 2-9-10a6 6 0 0 0-9 9l10 10h-2L0 64l36 17h2L28 91a6 6 0 1 0 9 9l9-10 1 2 17 36 17-36v-2l9 10a6 6 0 1 0 9-9l-9-9 2-1 36-17-36-17-2-1 9-9a6 6 0 1 0-9-9l-9 10v-2Zm-17 2-2 5c-4 8-11 15-19 19l-5 2 5 2c8 4 15 11 19 19l2 5 2-5c4-8 11-15 19-19l5-2-5-2c-8-4-15-11-19-19l-2-5Z" clip-rule="evenodd"/><path d="M118 19a6 6 0 0 0-9-9l-3 3a6 6 0 1 0 9 9l3-3Zm-96 4c-2 2-6 2-9 0l-3-3a6 6 0 1 1 9-9l3 3c3 2 3 6 0 9Zm0 82c-2-2-6-2-9 0l-3 3a6 6 0 1 0 9 9l3-3c3-2 3-6 0-9Zm96 4a6 6 0 0 1-9 9l-3-3a6 6 0 1 1 9-9l3 3Z"/><style>path{fill:#000}@media (prefers-color-scheme:dark){path{fill:#fff}}</style></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>The Complete Pianist</title>
+  <!-- C, D and E: the three white keys around a pair of black keys, the first landmark a pianist learns.
+       Gold and rose are the site's two tracks (technique and sight-reading). -->
+  <rect width="64" height="64" rx="14" fill="#12131F"/>
+  <path d="M8.75 12h13.5v37a3.5 3.5 0 0 1-3.5 3.5h-6.5a3.5 3.5 0 0 1-3.5-3.5z" fill="#C9A84C"/>
+  <path d="M25.25 12h13.5v37a3.5 3.5 0 0 1-3.5 3.5h-6.5a3.5 3.5 0 0 1-3.5-3.5z" fill="#F0EDE6"/>
+  <path d="M41.75 12h13.5v37a3.5 3.5 0 0 1-3.5 3.5h-6.5a3.5 3.5 0 0 1-3.5-3.5z" fill="#D4768A"/>
+  <path d="M18.5 12H29v22a2.2 2.2 0 0 1-2.2 2.2h-6.1a2.2 2.2 0 0 1-2.2-2.2z" fill="#12131F"/>
+  <path d="M35 12h10.5v22a2.2 2.2 0 0 1-2.2 2.2h-6.1A2.2 2.2 0 0 1 35 34z" fill="#12131F"/>
+</svg>

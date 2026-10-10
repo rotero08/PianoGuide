@@ -3,10 +3,17 @@
 import Icon from './Icon.astro';
 
 /**
- * Astro props interface for the ScreenTrap block component.
+ * The rose "Screen / Device Trap" warning panel about falling-note apps and practising from a
+ * screen. The heading is fixed; the body is whatever you put inside.
+ *
+ * @example
+ * <ScreenTrap>
+ *   Screens split your attention. Practise from a **printed score** with devices out of reach.
+ * </ScreenTrap>
  */
-export type Props = Record<string, never>;
+export interface Props {}
 ---
+
 <div class="screen-trap">
   <div class="screen-trap-head">
     <Icon name="warning" class="screen-trap-svg" />
@@ -36,7 +43,7 @@ export type Props = Record<string, never>;
     font-size: 1.3rem !important;
     font-weight: 700 !important;
   }
-  .screen-trap-head :global(.screen-trap-svg) {
+  .screen-trap-svg {
     width: 24px !important;
     height: 24px !important;
     flex-shrink: 0 !important;

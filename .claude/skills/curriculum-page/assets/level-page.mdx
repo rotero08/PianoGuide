@@ -1,0 +1,105 @@
+---
+title: "Level LEVEL ([Short Focus])"
+description: "[One sentence: what this level adds.]"
+sidebar:
+  order: 99
+---
+
+
+*Level LEVEL · [two or three word theme]*
+
+<Callout bordered={true} accentColor="gold" label="Your goal for this level" icon="target">
+  [What the learner can do when this level is finished.]
+</Callout>
+
+[One or two paragraphs introducing the level.]
+
+<Grid cols={2}>
+  <ResourceColumn id="technique" title="Technique Support" subtitle="[What the hands learn here.]">
+    <Resource
+      variant="drawer"
+      id="lvlN-[name]"
+      title="[Author: Title]"
+      tagline="[One line shown while collapsed.]"
+      link="https://"
+      tags="paid"
+    >
+      [Why this resource, and how to use it.]
+    </Resource>
+  </ResourceColumn>
+
+  <ResourceColumn id="reading" title="Sight-Reading" subtitle="[What the eyes learn here.]" accentColor="rose">
+    <Resource
+      variant="drawer"
+      id="lvlN-[name]"
+      title="[Author: Title]"
+      tagline="[One line shown while collapsed.]"
+      link="https://"
+      tags="imslp recommended"
+      practicePlan="[How much, how often.]"
+      doneWhen="[Observable finish line.]"
+    >
+      [Why this resource, and how to use it.]
+    </Resource>
+
+    <AlternativesBox>
+      <Resource variant="drawer" id="lvlN-[name]" title="[Author: Title]" tagline="[One line.]" link="https://" tags="free" isAlternative={true}>
+        [Short description.]
+      </Resource>
+    </AlternativesBox>
+  </ResourceColumn>
+</Grid>
+
+<VerificationBox trackId="lvlN" title="Level LEVEL Verification & Checkpoint" subtitle="[What is being confirmed]" levelInfo="≈ ABRSM/RCM Grade [X] Reading">
+  <BenchmarkGuide title="How to use these benchmarks & calibrate difficulty">
+    [How to run the benchmark at this level.]
+  </BenchmarkGuide>
+
+  <Grid cols={2}>
+    <Card variant="flat">
+      ### CHECKLIST & VERIFICATION
+
+      <Task id="check-lvlN-[name]" trackId="lvlN" link="https://" linkText="open ↗">
+        **[Skill]:** [Concrete, checkable outcome.]
+      </Task>
+
+      <Task id="check-lvlN-checkpoint" trackId="lvlN">
+        **Self-audit check:** [What to verify before moving on.]
+      </Task>
+    </Card>
+
+    <Card variant="flat">
+      ### PRIMARY GATE & GRADED BENCHMARKS
+
+      <Resource
+        variant="card"
+        isBenchmark={true}
+        id="lvlN-cole-[page]"
+        era="Method Audition"
+        tags="free audition"
+        title="Cole Audition Book — Page [X]"
+        composer="Mayron Cole"
+        sheetUrl="https://www.freepianomethod.com/supplemental-items-for-teachers.html"
+        audioUrl="https://www.freepianomethod.com/supplemental-items-for-teachers.html"
+      >
+        [What sight-reading this page proves.]
+      </Resource>
+
+      <BenchmarkSelector level="lvlN">
+        <Resource
+          variant="card"
+          isBenchmark={true}
+          isPrimarySelectable={true}
+          id="lvlN-[composer]"
+          era="Baroque"
+          tags="free"
+          title="[Composer: Piece]"
+          sheetUrl="https://"
+          audioUrl="https://"
+        >
+          [One line on what this piece tests. Add one such Resource per era: Classical, Romantic, C20, Modern.]
+        </Resource>
+      </BenchmarkSelector>
+    </Card>
+  </Grid>
+</VerificationBox>

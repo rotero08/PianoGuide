@@ -2,45 +2,51 @@ To set up the split-screen live preview with Keystatic, here is the step-by-step
 
 ---
 
-### Phase 1: Content Porting & Component Building (Your Current Stage)
+### Phase 1: Content Porting & Component Building (Done)
 *Do this entirely inside your local code editor (VS Code/Cursor).*
 
 1.  **Build your Components:** Finalize the design of your custom Astro components (like `Callout` and `Card`) inside `src/components/`. 
-2.  **Add JSDoc Comments:** Strictly document their `Props` interfaces in the component frontmatter using JSDoc. This ensures you have autocompletion as you build [2].
+2.  **Add JSDoc Comments:** Strictly document their `Props` interfaces in the component frontmatter using JSDoc. This ensures you have autocompletion as you build [2]. The hover docs and autocomplete you see on component tags inside `.mdx` files are generated from that JSDoc (`integrations/mdx-components.mjs`), so the component file is the only place to edit them.
 3.  **Port Your Pages:** Copy-paste and clean up your legacy HTML content, converting pages into standard Starlight `.mdx` files under `src/content/docs/`. Use your custom `<Callout>` and `<Card>` tags inline where needed.
-4.  **Confirm Local Dev Works:** Run `pnpm dev` locally and make sure every Starlight page compiles, formats, and displays correctly.
+4.  **Confirm Local Dev Works:** Run `pnpm dev` locally and make sure every Starlight page compiles, formats, and displays correctly. `pnpm build`, `pnpm check` (types) and `pnpm test` (a browser smoke test of the checklists, drawers, benchmark picker and citations, run against the build) should all pass.
 
 ---
 
-### Phase 2: Configure your SSR Adapter (For Production Previews)
-*To render previews dynamically in production (Vercel, Netlify, or Cloudflare), Astro must be configured for Server-Side Rendering (SSR) [1.2.8].*
+### Phase 2: Configure your SSR Adapter (Done)
+*To render previews dynamically in production, Astro needs a server adapter. This project is hosted on Cloudflare.*
 
-1.  **Add an SSR Adapter:** Choose your hosting provider (e.g., Vercel) and run the Astro CLI command to add the adapter:
+1.  **Add an SSR Adapter:** `@astrojs/cloudflare` is installed and enabled in `astro.config.mjs`, with the project settings in `wrangler.jsonc`:
     ```zsh
-    pnpm astro add vercel
+    pnpm add @astrojs/cloudflare@^13
+    pnpm add -D wrangler
     ```
-2.  **Set Output Mode:** Ensure your `astro.config.mjs` is configured with `output: 'hybrid'` (this keeps your Starlight docs pre-rendered as fast static HTML, but allows Keystatic's admin panel and preview endpoints to run on-demand server-side) [1.2.8]:
+    Install it by version rather than with `pnpm astro add cloudflare`: that command picks the newest adapter, which targets a newer Astro major than the one this project is on (Astro 6 pairs with adapter v13).
+
+    **Cloudflare Workers, not Pages.** Since Astro 6 the Cloudflare adapter only deploys to Cloudflare *Workers* (static files plus a Worker for on-demand routes); Cloudflare *Pages* is no longer supported by it. `pnpm build` now writes the static site to `dist/client/`, and it is deployed with `pnpm exec wrangler deploy` (see Phase 5).
+2.  **Set Output Mode:** Nothing to set. `output: 'hybrid'` was removed in Astro 5 and its behaviour is now the default (`output: 'static'`): every page is pre-rendered as fast static HTML, and an individual route opts into on-demand rendering with `export const prerender = false`. Keystatic's admin panel and preview endpoints (Phases 3 and 4) will be those routes:
     ```javascript
     // astro.config.mjs
     export default defineConfig({
-      output: 'hybrid',
-      integrations: [starlight({ ... }), react(), keystatic()]
+      adapter: cloudflare({ ... }),
+      integrations: [starlight({ ... })]   // react() and keystatic() join in Phase 3
     });
     ```
 
 ---
 
-### Phase 3: Set Up Keystatic & Component Schemas
-*Now that your content is ported and your component properties are finalized, you can write your Keystatic schemas.*
+### Phase 3: Set Up Keystatic & Component Schemas (Done)
+*With the content ported and the component properties finalized, Keystatic can edit the pages.*
 
-1.  **Create your Config:** Create the `keystatic.config.ts` file in your project root.
-2.  **Map JSDoc to Fields:** Look directly at the JSDoc `Props` you wrote in Phase 1 [2]. Map each property (such as `accentColor` or `bordered`) to its corresponding Keystatic field preset (like `fields.select()` or `fields.checkbox()`) [1.1.2, 1.1.4].
-3.  **Define Collections:** Tell Keystatic to read and write directly to your Starlight path (`src/content/docs/***`).
-4.  **Local Test:** Run `pnpm dev` and visit `localhost:4321/keystatic` to verify that you can visually edit pages locally.
+1.  **Create your Config:** `keystatic.config.ts` in the project root, with `@keystatic/core`, `@keystatic/astro` and `@astrojs/react` installed. Keystatic runs in local mode and is only loaded by `pnpm dev`: local mode writes straight to the files on disk, which needs Node, so the dev server runs on Node while builds stay on the Cloudflare adapter without the admin. (Phase 5 switches production to GitHub storage.)
+2.  **Map JSDoc to Fields:** Done automatically. `src/keystatic/components.ts` builds each component's editing form from the same JSDoc `Props` you wrote in Phase 1 [2]: a `string` becomes a text input, a `boolean` a checkbox, a union such as `'gold' | 'rose'` a dropdown, and the JSDoc description becomes the field's help text [1.1.2, 1.1.4]. A new or changed prop shows up in the editor without touching the Keystatic config. A checkbox or dropdown left at its `@default` is not written to the file, so saved pages stay as short as hand-written ones.
+3.  **Define Collections:** Each sidebar section is a collection over its folder in `src/content/docs/`, and the home page is a singleton (it is the only page with a hero banner). The sidebar is generated from those folders, so a page created in Keystatic appears in its section by itself; its position and label are the "Sidebar" fields of the page.
+4.  **Local Test:** Run `pnpm dev` and visit `localhost:4321/keystatic`. `pnpm test` also checks that every page opens and saves cleanly in the editor.
+
+**What Keystatic needs from a page.** Its MDX editor only understands Markdown plus the components it has a form for, so content pages must not contain `import` lines, `{/* comments */}` or raw HTML. Components are therefore auto-imported: write `<Callout>` and the import is added when the page is compiled. Saving a page in Keystatic also normalises its formatting (one tag per line, props in a fixed order); the rendered page does not change.
 
 ---
 
-### Phase 4: Configure the Split-Screen Live Preview (`previewUrl`)
+### Phase 4: Configure the Split-Screen Live Preview (`previewUrl`) (Your Current Stage)
 *This is where the preview configuration connects Keystatic to your Astro engine.*
 
 #### 1. Understand the environment distinction:
@@ -102,6 +108,6 @@ Create a dynamic draft reader utility that checks if a preview cookie exists. If
 
 ### Phase 5: Deploy & Invite Collaborators
 1.  **Publish to GitHub:** Push your code to your GitHub repository.
-2.  **Deploy to Hosting Provider:** Link your repository to Vercel, Netlify, or your preferred host.
+2.  **Deploy to Hosting Provider:** Deploy to Cloudflare Workers: run `pnpm build && pnpm exec wrangler deploy`, or connect the repository in the Cloudflare dashboard (Workers Builds) with build command `pnpm build` and deploy command `pnpm exec wrangler deploy`.
 3.  **Enable GitHub Storage:** Change Keystatic's storage storage setting from `'local'` to `'github'` and configure your GitHub App connection keys in your environment variables.
 4.  **Invite Contributors:** Share your live website `/keystatic` admin link with your collaborators so they can log in, edit visually, and submit Pull Requests [1.2.2].

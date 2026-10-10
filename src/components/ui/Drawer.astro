@@ -1,0 +1,77 @@
+---
+// src/components/ui/Drawer.astro
+// Internal building block (not for MDX): the gold-headed collapsible panel shared by
+// <AlternativesBox> and the alternatives list of <BenchmarkSelector>.
+import Icon from '../Icon.astro';
+
+interface Props {
+  /** Heading shown in the summary row. */
+  title: string;
+  /** Extra classes from the parent, e.g. to add spacing. */
+  class?: string;
+  /** Start hidden, for drawers a script reveals only once they have content. */
+  hidden?: boolean;
+}
+
+const { title, class: className, hidden = false } = Astro.props;
+---
+
+<details class:list={['alternatives-drawer', className]} hidden={hidden}>
+  <summary class="alternatives-header">
+    <Icon name="chevron-right" class="alternatives-chev" strokeWidth={2.5} />
+    <h3>{title}</h3>
+  </summary>
+  <div class="alternatives-content-body">
+    <slot />
+  </div>
+</details>
+
+<style>
+  .alternatives-drawer {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius) !important;
+    overflow: visible !important; /* tooltips of the badges inside must not be clipped */
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+  .alternatives-header {
+    background-color: rgba(var(--gold-rgb), 0.04) !important;
+    padding: 0.9rem 1.6rem !important;
+    cursor: pointer !important;
+    user-select: none !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    gap: 0.55rem !important;
+    list-style: none !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0 !important;
+    margin: 0 !important;
+  }
+  .alternatives-header h3 {
+    margin: 0 !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 0.95rem !important;
+    color: var(--gold) !important;
+  }
+  .alternatives-chev {
+    width: 12px !important;
+    height: 12px !important;
+    color: var(--gold) !important;
+    transition: transform 0.2s ease, color 0.15s ease !important;
+    flex-shrink: 0 !important;
+  }
+  .alternatives-drawer[open] .alternatives-chev {
+    transform: rotate(90deg) !important;
+  }
+  .alternatives-content-body {
+    border-top: 1px solid var(--border-color) !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+</style>

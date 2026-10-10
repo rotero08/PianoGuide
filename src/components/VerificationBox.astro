@@ -1,37 +1,63 @@
 ---
 // src/components/VerificationBox.astro
+import { getContentIndex } from '../utils/contentIndex';
 
+/**
+ * The gold-edged "Verification & Checkpoint" panel that closes a level. Its header shows the
+ * live completion percentage of the track; the body normally holds a `<BenchmarkGuide>` and a
+ * two-column `<Grid>` with the `<Task>` checklist on one side and the benchmarks on the other.
+ *
+ * @example
+ * <VerificationBox trackId="lvl1" title="Level 1 Verification & Checkpoint" levelInfo="≈ ABRSM/RCM Grade 1 to 2 Reading">
+ *   <Task id="check-lvl1-triads" trackId="lvl1">**Triad shapes:** …</Task>
+ * </VerificationBox>
+ */
 export interface Props {
+  /**
+   * Progress track summarised in the header: the percentage counts every `<Task>` with this `trackId`.
+   * @example trackId="lvl1"
+   */
   trackId: string;
+  /** Heading of the panel. */
   title: string;
+  /** One-line description under the heading. */
   subtitle?: string;
+  /**
+   * Short note shown beside the progress bar, typically the equivalent exam grade.
+   * @example levelInfo="≈ ABRSM/RCM Grade 1 to 2 Reading"
+   */
   levelInfo?: string;
-  slot?: string;
 }
 
 const { trackId, title, subtitle, levelInfo } = Astro.props;
+const taskIds = (await getContentIndex()).tasks[trackId] ?? [];
 ---
+
 <div class="verification-outer-container">
   <div class="verification-header-box">
     <div class="vh-header-top-row">
       <h2 class="vh-title-text">{title}</h2>
       <div class="vh-right-content">
         {levelInfo && <span class="vh-level-badge">{levelInfo}</span>}
-        <div class="vh-progress-bar-wrapper">
+        <div class="vh-progress-bar-wrapper" data-progress-tasks={taskIds.join(' ')}>
           <div class="vh-bar-bg">
-            <div class="vh-bar-fg" id={`${trackId}-bar`}></div>
+            <div class="vh-bar-fg" data-progress-bar></div>
           </div>
-          <span class="vh-pct-label" id={`${trackId}-pct`}>0%</span>
+          <span class="vh-pct-label" data-progress-label>0%</span>
         </div>
       </div>
     </div>
     {subtitle && <p class="vh-subtitle-text">{subtitle}</p>}
   </div>
-  
+
   <div class="verification-body-content">
     <slot />
   </div>
 </div>
+
+<script>
+  import '../scripts/progress';
+</script>
 
 <style>
   .verification-outer-container {
@@ -39,18 +65,12 @@ const { trackId, title, subtitle, levelInfo } = Astro.props;
     border: 1px solid var(--border-color) !important;
     border-left: 4px solid var(--gold) !important;
     border-radius: var(--radius) !important;
-    padding: 1.5rem !important; /* Slightly tighter overall container padding */
+    padding: 1.5rem !important;
     margin: 2rem 0 !important;
     box-sizing: border-box !important;
   }
-  :root[data-theme="light"] .verification-outer-container {
-    border-left-color: var(--sl-color-accent) !important;
-  }
 
-  /* 
-    Localized overrides strictly for nested Grid elements. 
-    This eliminates default margin compounding to produce clean, tight gaps.
-  */
+  /* Nested grids keep tight gaps instead of compounding their default margins. */
   .verification-outer-container :global(.grid-container) {
     margin-top: 0.1rem !important;
     margin-bottom: 0.1rem !important;
@@ -60,16 +80,16 @@ const { trackId, title, subtitle, levelInfo } = Astro.props;
     display: flex !important;
     flex-direction: column !important;
     border-bottom: 1px solid var(--border-color) !important;
-    padding-bottom: 0.85rem !important; /* Clean, tighter padding below the line */
-    margin-bottom: 0.85rem !important; /* Reduced margin below the line to tighten the upper gap */
-    gap: 0.35rem !important; 
+    padding-bottom: 0.85rem !important;
+    margin-bottom: 0.85rem !important;
+    gap: 0.35rem !important;
     width: 100% !important;
   }
 
   .vh-header-top-row {
     display: flex !important;
     justify-content: space-between !important;
-    align-items: center !important; 
+    align-items: center !important;
     width: 100% !important;
     flex-wrap: wrap !important;
     gap: 1.5rem !important;
@@ -93,13 +113,13 @@ const { trackId, title, subtitle, levelInfo } = Astro.props;
 
   .vh-right-content {
     display: flex !important;
-    align-items: center !important; 
+    align-items: center !important;
     gap: 1.25rem !important;
   }
 
   .vh-level-badge {
     font-family: 'Space Grotesk', var(--sl-font), sans-serif !important;
-    font-size: 1rem !important; 
+    font-size: 1rem !important;
     color: var(--text-main) !important;
     font-weight: 500 !important;
     letter-spacing: -0.01em !important;
@@ -115,7 +135,7 @@ const { trackId, title, subtitle, levelInfo } = Astro.props;
 
   .vh-bar-bg {
     flex-grow: 1 !important;
-    height: 6px !important; 
+    height: 6px !important;
     background-color: rgba(255, 255, 255, 0.1) !important;
     border-radius: 999px !important;
     overflow: hidden !important;
@@ -131,37 +151,34 @@ const { trackId, title, subtitle, levelInfo } = Astro.props;
     border-radius: 999px !important;
     transition: width 0.5s ease-out !important;
   }
-  :root[data-theme="light"] .vh-bar-fg {
-    background-color: var(--sl-color-accent) !important;
-  }
 
   .vh-pct-label {
     font-family: 'Space Grotesk', var(--sl-font), sans-serif !important;
-    font-size: 1rem !important; 
+    font-size: 1rem !important;
     color: var(--gold) !important;
     font-weight: 600 !important;
     min-width: 32px !important;
     text-align: right !important;
     line-height: 1 !important;
   }
-  :root[data-theme="light"] .vh-pct-label {
-    color: var(--sl-color-accent) !important;
-  }
 
   .verification-body-content :global(h3) {
     font-family: 'Space Grotesk', sans-serif !important;
-    font-size: 0.92rem !important; 
+    font-size: 0.92rem !important;
     font-weight: 700 !important;
     letter-spacing: 0.08em !important;
     text-transform: uppercase !important;
     margin-top: 0 !important;
     margin-bottom: 0.85rem !important;
+  }
+  /* Rose is for the section headings written in the page ("### CHECKLIST…"), which Starlight
+     wraps; headings that components render inside the box keep their own colour. */
+  .verification-body-content :global(.sl-heading-wrapper h3) {
     color: var(--rose) !important;
   }
 
-  /* Completely hide anchor link icons for all headers inside the verification container */
-  .verification-outer-container :is(h1, h2, h3, h4, h5, h6) :global(.anchor-link),
-  .verification-outer-container :is(h1, h2, h3, h4, h5, h6) :global(a) {
+  /* Headings inside the panel don't get Starlight's hover anchor links. */
+  .verification-outer-container :global(.sl-anchor-link) {
     display: none !important;
   }
 </style>

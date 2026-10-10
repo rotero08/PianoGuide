@@ -1,17 +1,32 @@
 {
-  "name": "starlight-temp",
+  "name": "piano-guide",
   "type": "module",
   "version": "0.0.1",
+  "packageManager": "pnpm@12.10.1",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "check": "astro sync && ! tsc --noEmit --pretty false | grep -v '^node_modules/' | grep 'error TS'",
+    "test": "node tests/smoke.mjs && node tests/keystatic.mjs",
+    "icons": "node tools/make-icons.mjs",
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^13.7.0",
+    "@astrojs/react": "^5.0.7",
     "@astrojs/starlight": "^0.40.0",
+    "@keystatic/astro": "^6.0.0",
+    "@keystatic/core": "^0.6.9",
     "astro": "^6.4.5",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
     "sharp": "^0.34.5"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^25.13.0",
+    "typescript": "^7.0.2",
+    "wrangler": "^4.149.0"
   }
 }

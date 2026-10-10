@@ -8,13 +8,11 @@
     "dist"
   ],
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
       "@components/*": [
-        "src/components/*"
+        "./src/components/*"
       ]
-    },
-    "ignoreDeprecations": "6.0"
+    }
   },
   "mdx": {
     "checkMdx": false

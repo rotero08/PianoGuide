@@ -2,16 +2,22 @@
 // src/components/BranchFlag.astro
 
 /**
- * Astro props interface for the BranchFlag component.
+ * A small pill that marks a page (or section) as an optional branch of the curriculum.
+ * Place it directly above a heading; the heading's top margin collapses to sit under it.
+ *
+ * @example
+ * <BranchFlag text="Optional branch · unlocks after Level 1" />
  */
 export interface Props {
-  /** The localized descriptive metadata content string written on the flag label. */
+  /** Text shown on the pill. */
   text: string;
 }
+
 const { text } = Astro.props;
 ---
+
 <span class="branch-flag">
-  <span class="legend-dot opt"></span>
+  <span class="legend-dot"></span>
   {text}
 </span>
 
@@ -24,34 +30,22 @@ const { text } = Astro.props;
     font-size: 0.66rem !important;
     letter-spacing: 0.04em !important;
     color: var(--rose) !important;
-    border: 1px solid rgba(212, 118, 138, 0.4) !important;
+    border: 1px solid rgba(var(--rose-rgb), 0.4) !important;
     border-radius: 999px !important;
     padding: 0.3rem 0.75rem !important;
-    margin-bottom: 0.5rem !important; /* Reduced bottom margin */
+    margin-bottom: 0.5rem !important;
     width: max-content !important;
-  }
-  :root[data-theme="light"] .branch-flag {
-    color: var(--badge-branch) !important;
-    border-color: rgba(168, 80, 105, 0.4) !important;
   }
   .legend-dot {
     width: 11px !important;
     height: 11px !important;
     border-radius: 50% !important;
     flex-shrink: 0 !important;
-  }
-  .legend-dot.opt {
     background: transparent !important;
     border: 2px solid var(--rose) !important;
   }
-  :root[data-theme="light"] .legend-dot.opt {
-    border-color: var(--badge-branch) !important;
-  }
 
-  /* 
-    Adjacent sibling selector matching Starlight's heading wrapper div.
-    This overrides the default margin-top (52.5px) to collapse the gap.
-  */
+  /* Starlight wraps headings in a div with a large top margin; pull it up under the flag. */
   .branch-flag + :global(.sl-heading-wrapper) {
     margin-top: 0.5rem !important;
   }

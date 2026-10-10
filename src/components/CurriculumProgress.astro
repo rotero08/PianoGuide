@@ -1,22 +1,32 @@
 ---
 // src/components/CurriculumProgress.astro
-export interface Props {
-  id?: string;
-}
+import { getContentIndex } from '../utils/contentIndex';
 
-const { id = "curriculumOverview" } = Astro.props;
+/**
+ * The headline "Overall Curriculum Progress" figure and bar: the share of every `<Task>` in the
+ * whole guide that the reader has ticked off. Pair it with a grid of `<ProgressCard>`s.
+ *
+ * @example
+ * <CurriculumProgress />
+ */
+export interface Props {}
+
+const allTaskIds = Object.values((await getContentIndex()).tasks).flat();
 ---
 
-<div id={id} class="progress-overview-container">
-  <!-- Main Overall Progress Header -->
-  <div class="po-overall-header">
-    <div class="po-big-pct" id="overall-pct">0%</div>
+<div class="progress-overview-container">
+  <div class="po-overall-header" data-progress-tasks={allTaskIds.join(' ')}>
+    <div class="po-big-pct" data-progress-label>0%</div>
     <div class="po-cap-label">Overall Curriculum Progress</div>
     <div class="po-overall-bar-bg">
-      <div class="po-overall-bar-fg" id="overall-bar"></div>
+      <div class="po-overall-bar-fg" data-progress-bar></div>
     </div>
   </div>
 </div>
+
+<script>
+  import '../scripts/progress';
+</script>
 
 <style>
   .progress-overview-container {
@@ -38,9 +48,6 @@ const { id = "curriculumOverview" } = Astro.props;
     gap: 0.5rem !important;
     box-sizing: border-box !important;
   }
-  :root[data-theme="light"] .po-overall-header {
-    border-left-color: var(--sl-color-accent) !important;
-  }
 
   .po-big-pct {
     font-family: 'Playfair Display', serif !important;
@@ -48,9 +55,6 @@ const { id = "curriculumOverview" } = Astro.props;
     font-weight: 700 !important;
     color: var(--gold) !important;
     line-height: 1 !important;
-  }
-  :root[data-theme="light"] .po-big-pct {
-    color: var(--sl-color-accent) !important;
   }
 
   .po-cap-label {
@@ -63,7 +67,7 @@ const { id = "curriculumOverview" } = Astro.props;
 
   .po-overall-bar-bg {
     height: 8px !important;
-    background: rgba(128, 128, 128, 0.2) !important; /* Semi-transparent track, clearly visible in all light/dark themes */
+    background: rgba(128, 128, 128, 0.2) !important;
     border-radius: 4px !important;
     overflow: hidden !important;
     width: 100% !important;
@@ -74,8 +78,5 @@ const { id = "curriculumOverview" } = Astro.props;
     background: linear-gradient(90deg, var(--gold), var(--rose)) !important;
     border-radius: 4px !important;
     transition: width 0.5s ease-out !important;
-  }
-  :root[data-theme="light"] .po-overall-bar-fg {
-    background: linear-gradient(90deg, var(--sl-color-accent), var(--rose)) !important;
   }
 </style>

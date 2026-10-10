@@ -13,16 +13,13 @@ hero:
       icon: setting
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
-import InteractivePiano from '@components/InteractivePiano.astro';
-
 <InteractivePiano />
 
 <CardGrid>
-  <Card title="Why this exists" icon="star">
+  <StarlightCard title="Why this exists" icon="star">
     Self-taught players rarely stall for lack of effort; they stall because their tips never form a sequence. This guide collects what working teachers recommend most.
-  </Card>
-  <Card title="How it's built" icon="setting">
+  </StarlightCard>
+  <StarlightCard title="How it's built" icon="setting">
     Relaxed technique leads, and sight-reading joins once your hands are calm, with the two growing side by side, level by level.
-  </Card>
+  </StarlightCard>
 </CardGrid>

@@ -1,18 +1,27 @@
 ---
 // src/components/BenchmarkGuide.astro
+import Icon from './Icon.astro';
 
+/**
+ * A dashed gold, collapsible note (open by default) that explains how to use a level's
+ * benchmarks. Normally the first child of a `<VerificationBox>`.
+ *
+ * @example
+ * <BenchmarkGuide title="How to use these benchmarks & calibrate difficulty">
+ *   A benchmark is a short, real piece, not an exercise.
+ * </BenchmarkGuide>
+ */
 export interface Props {
+  /** Heading shown in the summary row (rendered in uppercase). */
   title: string;
-  slot?: string;
 }
 
 const { title } = Astro.props;
 ---
+
 <details class="benchmark-dashed-callout" open>
   <summary class="benchmark-guide-header">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="benchmark-chev">
-      <polyline points="9 18 15 12 9 6"></polyline>
-    </svg>
+    <Icon name="chevron-right" class="benchmark-chev" strokeWidth={2.5} />
     <h4>{title}</h4>
   </summary>
   <div class="benchmark-guide-content">
@@ -23,7 +32,7 @@ const { title } = Astro.props;
 <style>
   .benchmark-dashed-callout {
     background: linear-gradient(135deg, rgba(201, 168, 76, 0.03) 0%, rgba(19, 27, 46, 0.2) 100%) !important;
-    border: 1px dashed rgba(201, 168, 76, 0.4) !important;
+    border: 1px dashed rgba(var(--gold-rgb), 0.4) !important;
     border-radius: var(--radius) !important;
     padding: 1.25rem 1.5rem !important;
     margin-bottom: 2rem !important;
@@ -32,7 +41,6 @@ const { title } = Astro.props;
   }
   :root[data-theme="light"] .benchmark-dashed-callout {
     background: linear-gradient(135deg, rgba(154, 116, 32, 0.02) 0%, rgba(244, 239, 231, 0.2) 100%) !important;
-    border-color: rgba(154, 116, 32, 0.4) !important;
   }
 
   .benchmark-guide-header {
@@ -45,11 +53,6 @@ const { title } = Astro.props;
     list-style: none !important;
     width: fit-content !important;
   }
-  .benchmark-guide-header::-webkit-details-marker,
-  .benchmark-guide-header::marker {
-    display: none !important;
-    content: "" !important;
-  }
 
   .benchmark-dashed-callout h4 {
     font-family: 'Space Grotesk', sans-serif !important;
@@ -60,9 +63,6 @@ const { title } = Astro.props;
     text-transform: uppercase !important;
     letter-spacing: 0.03em !important;
   }
-  :root[data-theme="light"] .benchmark-dashed-callout h4 {
-    color: var(--sl-color-accent) !important;
-  }
 
   .benchmark-chev {
     width: 12px !important;
@@ -70,9 +70,6 @@ const { title } = Astro.props;
     color: var(--gold) !important;
     transition: transform 0.2s ease, color 0.15s ease !important;
     flex-shrink: 0 !important;
-  }
-  :root[data-theme="light"] .benchmark-chev {
-    color: var(--sl-color-accent) !important;
   }
   .benchmark-dashed-callout[open] .benchmark-chev {
     transform: rotate(90deg) !important;

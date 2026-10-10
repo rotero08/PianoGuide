@@ -1,0 +1,18 @@
+---
+// src/components/overrides/Head.astro
+// Starlight <Head> override (wired up in astro.config.mjs). Adds the citation script to every
+// page, plus the reference numbering it needs on pages that actually cite something.
+import Default from '@astrojs/starlight/components/Head.astro';
+import { getContentIndex } from '../../utils/contentIndex';
+
+const index = Astro.locals.starlightRoute.entry.body?.includes('#ref-') ? await getContentIndex() : undefined;
+const citationData = index && JSON.stringify({ numToSlug: index.numToSlug, slugToNumber: index.slugToNumber }).replace(/</g, '\\u003c');
+---
+
+<Default />
+
+{citationData && <script type="application/json" id="citation-data" set:html={citationData} />}
+
+<script>
+  import '../../scripts/citations';
+</script>

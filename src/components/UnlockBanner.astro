@@ -1,29 +1,45 @@
 ---
 // src/components/UnlockBanner.astro
+import Icon from './Icon.astro';
 
+/**
+ * A dashed rose banner announcing that an optional branch of the curriculum has unlocked,
+ * with a button that leads to it. The body text goes inside the tag.
+ *
+ * @example
+ * <UnlockBanner link="/harmony/lead-sheets/">
+ *   **Lead Sheets** is now available. It is optional; run it alongside the spine.
+ * </UnlockBanner>
+ */
 export interface Props {
+  /**
+   * Small uppercase heading beside the lock icon.
+   * @default "Optional Branch Unlocked"
+   */
   title?: string;
+  /** URL or site path the button leads to. */
   link: string;
+  /**
+   * Label of the button.
+   * @default "Open Lead Sheets →"
+   */
   buttonText?: string;
 }
 
-const { title = "Optional Branch Unlocked", link, buttonText = "Open Lead Sheets →" } = Astro.props;
+const { title = 'Optional Branch Unlocked', link, buttonText = 'Open Lead Sheets →' } = Astro.props;
 ---
 
 <div class="unlock-banner-container">
   <div class="unlock-header-row">
     <div class="unlock-logo-wrapper">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="unlock-lock-svg">
-        <rect x="5" y="11" width="14" height="9" rx="2"></rect>
-        <path d="M8 11V7a4 4 0 0 1 7.9-.9"></path>
-      </svg>
+      <Icon name="lock" class="unlock-lock-svg" strokeWidth={1.8} />
     </div>
     <span class="unlock-title">{title}</span>
   </div>
   <div class="unlock-markdown-content">
     <slot />
   </div>
-  <a href={link} class="unlock-action-btn">{buttonText}</a>
+  <a href={link} class="unlock-action-btn btn-pill">{buttonText}</a>
 </div>
 
 <style>
@@ -31,48 +47,35 @@ const { title = "Optional Branch Unlocked", link, buttonText = "Open Lead Sheets
     display: flex !important;
     flex-direction: column !important;
     gap: 0.55rem !important;
-    border: 1px dashed rgba(212, 118, 138, 0.45) !important;
-    background: rgba(212, 118, 138, 0.05) !important;
+    border: 1px dashed rgba(var(--rose-rgb), 0.45) !important;
+    background: rgba(var(--rose-rgb), 0.05) !important;
     border-radius: var(--radius) !important;
     padding: 1.4rem !important;
     margin-top: 1.5rem !important;
     margin-bottom: 1.5rem !important;
     box-sizing: border-box !important;
   }
-  :root[data-theme="light"] .unlock-banner-container {
-    background: rgba(168, 80, 105, 0.05) !important;
-    border-color: rgba(168, 80, 105, 0.45) !important;
-  }
 
-  /* Icon + title on the same horizontal row */
   .unlock-header-row {
     display: flex !important;
     align-items: center !important;
     gap: 0.65rem !important;
   }
-
   .unlock-logo-wrapper {
     flex-shrink: 0 !important;
     width: 28px !important;
     height: 28px !important;
     border-radius: 7px !important;
-    background: rgba(212, 118, 138, 0.15) !important;
+    background: rgba(var(--rose-rgb), 0.15) !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-  }
-  :root[data-theme="light"] .unlock-logo-wrapper {
-    background: rgba(168, 80, 105, 0.15) !important;
   }
   .unlock-lock-svg {
     width: 14px !important;
     height: 14px !important;
     color: var(--rose) !important;
   }
-  :root[data-theme="light"] .unlock-lock-svg {
-    color: var(--badge-branch) !important;
-  }
-
   .unlock-title {
     font-family: 'JetBrains Mono', monospace !important;
     font-size: 0.65rem !important;
@@ -82,11 +85,7 @@ const { title = "Optional Branch Unlocked", link, buttonText = "Open Lead Sheets
     color: var(--rose) !important;
     line-height: 1 !important;
   }
-  :root[data-theme="light"] .unlock-title {
-    color: var(--badge-branch) !important;
-  }
 
-  /* Body text from slot */
   .unlock-markdown-content :global(p) {
     font-size: 0.88rem !important;
     line-height: 1.6 !important;
@@ -103,38 +102,9 @@ const { title = "Optional Branch Unlocked", link, buttonText = "Open Lead Sheets
   }
 
   .unlock-action-btn {
-    display: inline-flex !important;
     align-self: flex-start !important;
-    align-items: center !important;
-    gap: 0.4rem !important;
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 0.68rem !important;
-    letter-spacing: 0.04em !important;
     font-weight: 600 !important;
-    color: var(--gold-light) !important;
-    background: rgba(201, 168, 76, 0.06) !important;
-    text-decoration: none !important;
-    border: 1px solid rgba(201, 168, 76, 0.35) !important;
-    border-radius: 999px !important;
     padding: 0.45rem 1rem !important;
-    transition: all 0.18s !important;
-    cursor: pointer !important;
     margin-top: 0.2rem !important;
-  }
-  .unlock-action-btn:hover {
-    border-color: var(--gold) !important;
-    color: var(--gold) !important;
-    background: rgba(201, 168, 76, 0.13) !important;
-    text-decoration: none !important;
-  }
-  :root[data-theme="light"] .unlock-action-btn {
-    color: var(--sl-color-accent) !important;
-    background: rgba(154, 116, 32, 0.06) !important;
-    border-color: rgba(154, 116, 32, 0.35) !important;
-  }
-  :root[data-theme="light"] .unlock-action-btn:hover {
-    border-color: var(--sl-color-accent) !important;
-    color: var(--sl-color-accent) !important;
-    background: rgba(154, 116, 32, 0.13) !important;
   }
 </style>

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(corepack pnpm install --frozen-lockfile)",
+      "Bash(corepack pnpm build)",
+      "Bash(corepack pnpm check)",
+      "Bash(corepack pnpm run build)",
+      "Bash(corepack pnpm run check)",
+      "Bash(corepack pnpm dev *)",
+      "Bash(corepack pnpm preview *)",
+      "Bash(corepack pnpm exec astro sync)",
+      "Bash(corepack pnpm exec astro build)",
+      "Bash(corepack pnpm exec astro dev *)",
+      "Bash(corepack pnpm exec astro preview *)",
+      "Bash(corepack pnpm exec tsc --noEmit *)",
+      "Bash(corepack pnpm test)",
+      "Bash(corepack pnpm run test)",
+      "Bash(node tests/smoke.mjs)",
+      "Bash(node tests/keystatic.mjs)"
+    ],
+    "ask": [
+      "Bash(*wrangler deploy*)",
+      "Bash(*wrangler versions upload*)",
+      "Bash(*wrangler secret *)"
+    ]
+  }
+}

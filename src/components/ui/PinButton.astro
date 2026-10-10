@@ -1,0 +1,56 @@
+---
+// src/components/ui/PinButton.astro
+// Internal building block (not for MDX): the pin toggle used by resource drawers and benchmark cards.
+// The scripts toggle `.active` on it; while active, hovering previews the "unpin" icon.
+import Icon from '../Icon.astro';
+
+interface Props {
+  /** Id of the resource this button pins; read by the scripts from `data-pin-id`. */
+  id?: string;
+  /** Accessible name and tooltip. */
+  label: string;
+}
+
+const { id, label } = Astro.props;
+---
+
+<button type="button" class="pin-btn" data-pin-id={id} aria-label={label} title={label}>
+  <Icon name="pin" class="pin-on" strokeWidth={2} />
+  <Icon name="pin-off" class="pin-off" strokeWidth={2} />
+</button>
+
+<style>
+  .pin-btn {
+    background: none !important;
+    border: none !important;
+    color: var(--text-faint) !important;
+    cursor: pointer !important;
+    padding: 5px !important;
+    border-radius: 4px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: color 0.15s, background-color 0.15s !important;
+    flex-shrink: 0 !important;
+  }
+  .pin-btn:hover {
+    color: var(--gold) !important;
+    background-color: rgba(var(--gold-rgb), 0.08) !important;
+  }
+  .pin-btn.active {
+    color: var(--gold) !important;
+  }
+
+  .pin-on,
+  .pin-off {
+    width: 14px !important;
+    height: 14px !important;
+  }
+  .pin-off,
+  .pin-btn.active:hover .pin-on {
+    display: none !important;
+  }
+  .pin-btn.active:hover .pin-off {
+    display: block !important;
+  }
+</style>

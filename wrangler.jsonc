@@ -1,0 +1,13 @@
+// Cloudflare Workers configuration. @astrojs/cloudflare fills in the rest at build time
+// (worker entrypoint, the static-assets directory and bindings), so only project-level
+// settings belong here. Build with `pnpm build`, then deploy with `pnpm exec wrangler deploy`.
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "piano-guide",
+	"compatibility_date": "2026-10-09",
+	"compatibility_flags": ["nodejs_compat"],
+	"assets": {
+		// Serve Starlight's 404.html for unknown URLs (automatic on Pages, opt-in on Workers).
+		"not_found_handling": "404-page"
+	}
+}

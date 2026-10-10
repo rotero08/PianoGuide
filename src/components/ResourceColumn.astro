@@ -1,46 +1,58 @@
 ---
 // src/components/ResourceColumn.astro
+import Icon from './Icon.astro';
 
+/**
+ * One of the two study columns at the top of a level ("Technique" and "Sight-Reading"). Holds
+ * `<Resource variant="drawer">` rows and, optionally, one `<AlternativesBox>` at the end. The
+ * header shows how many of the column's resources the reader has marked done.
+ *
+ * @example
+ * <ResourceColumn id="reading" title="Sight-Reading" subtitle="Graded reading, hands together." accentColor="rose">
+ *   <Resource variant="drawer" id="lvl1-bartok" title="Bartók: Mikrokosmos, Book 1" link="https://imslp.org/" tags="imslp" />
+ * </ResourceColumn>
+ */
 export interface Props {
+  /**
+   * Which column this is. Picks the header icon (hand / eye); `reading` also adds the
+   * "THE EYES · HANDS-TOGETHER" tag. Use each value at most once per page.
+   */
   id: 'technique' | 'reading';
+  /** Heading of the column. */
   title: string;
+  /**
+   * Description under the heading. Supports Markdown-style links: `[text](url)`.
+   * @example subtitle="Posture details live in [Technique 1](/technique/technique-1/)."
+   */
   subtitle?: string;
+  /**
+   * Colour of the top edge, icon and progress bar.
+   * @default "gold"
+   */
   accentColor?: 'gold' | 'rose';
-  slot?: string;
 }
 
 const { id, title, subtitle, accentColor = 'gold' } = Astro.props;
 
-// Convert simple markdown links [text](url) to HTML anchors dynamically on the server
-const processedSubtitle = subtitle
-  ? subtitle.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
-  : '';
+// The subtitle arrives as a plain attribute string, so its [text](url) links are converted here.
+const subtitleHtml = subtitle?.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
 ---
 
 <div class:list={['res-column-wrapper', id, accentColor]} id={id}>
   <div class="res-column-header">
     <div class="res-title-box">
-      {id === 'technique' ? (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="col-header-svg">
-          <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v5M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8M10 10.5V5.5a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v9M6 13V9a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v6a10 10 0 0 0 10 10h1a10 10 0 0 0 10-10v-4" />
-        </svg>
-      ) : (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="col-header-svg">
-          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-          <circle cx="12" cy="12" r="3" />
-        </svg>
-      )}
+      <Icon name={id === 'technique' ? 'hand' : 'eye'} class="col-header-svg" strokeWidth={1.8} />
       <h3>{title}</h3>
       {id === 'reading' && <span class="res-reading-tag-meta">THE EYES · HANDS-TOGETHER</span>}
     </div>
-    
-    {processedSubtitle && <p class="res-column-subtitle" set:html={processedSubtitle}></p>}
+
+    {subtitleHtml && <p class="res-column-subtitle" set:html={subtitleHtml} />}
 
     <div class="column-track-progress">
       <div class="ct-progress-bar-bg">
-        <div class="ct-progress-bar-fg" id={`col-bar-${id}`}></div>
+        <div class="ct-progress-bar-fg" data-progress-bar></div>
       </div>
-      <span class="ct-progress-text" id={`col-pct-${id}`}>0/0 done</span>
+      <span class="ct-progress-text" data-progress-label>0/0 done</span>
     </div>
   </div>
 
@@ -62,9 +74,6 @@ const processedSubtitle = subtitle
   }
   .res-column-wrapper.gold {
     border-top: 3px solid var(--gold) !important;
-  }
-  :root[data-theme="light"] .res-column-wrapper.gold {
-    border-top-color: var(--sl-color-accent) !important;
   }
   .res-column-wrapper.rose {
     border-top: 3px solid var(--rose) !important;
@@ -92,10 +101,7 @@ const processedSubtitle = subtitle
     height: 18px !important;
     flex-shrink: 0 !important;
   }
-  
-  /* Fixed color mapping typo */
   .gold .col-header-svg { color: var(--gold) !important; }
-  :root[data-theme="light"] .gold .col-header-svg { color: var(--sl-color-accent) !important; }
   .rose .col-header-svg { color: var(--rose) !important; }
 
   .res-reading-tag-meta {
@@ -114,9 +120,6 @@ const processedSubtitle = subtitle
   .res-column-subtitle :global(a) {
     color: var(--gold) !important;
     text-decoration: underline !important;
-  }
-  :root[data-theme="light"] .res-column-subtitle :global(a) {
-    color: var(--sl-color-accent) !important;
   }
   .column-track-progress {
     display: flex !important;
@@ -139,7 +142,6 @@ const processedSubtitle = subtitle
     transition: width 0.3s ease-out !important;
   }
   .gold .ct-progress-bar-fg { background-color: var(--gold) !important; }
-  :root[data-theme="light"] .gold .ct-progress-bar-fg { background-color: var(--sl-color-accent) !important; }
   .rose .ct-progress-bar-fg { background-color: var(--rose) !important; }
   .ct-progress-text {
     font-family: 'JetBrains Mono', monospace !important;
@@ -153,156 +155,3 @@ const processedSubtitle = subtitle
     flex-direction: column !important;
   }
 </style>
-
-<script is:inline define:vars={{ id }}>
-  (function() {
-    function updateColumnPercentages() {
-      const column = document.getElementById(id);
-      if (!column) return;
-
-      const listContainer = column.querySelector('.res-list-container');
-      if (!listContainer) return;
-
-      const rows = Array.from(listContainer.querySelectorAll('.resource-row-container')).filter(row => {
-        return !row.closest('.alternatives-list-container');
-      });
-      const total = rows.length;
-
-      let completed = 0;
-      const checkedStates = JSON.parse(localStorage.getItem('cp-checked-resources') || '{}');
-
-      rows.forEach(row => {
-        const resId = row.getAttribute('data-res-id');
-        if (checkedStates[resId]) {
-          completed++;
-        }
-      });
-
-      const bar = document.getElementById(`col-bar-${id}`);
-      const label = document.getElementById(`col-pct-${id}`);
-
-      if (label) {
-        label.textContent = `${completed}/${total} done`;
-      }
-      if (bar) {
-        const pct = total > 0 ? (completed / total) * 100 : 0;
-        bar.style.width = `${pct}%`;
-      }
-    }
-
-    function syncAlternatives() {
-      const column = document.getElementById(id);
-      if (!column) return;
-
-      const listContainer = column.querySelector('.res-list-container');
-      if (!listContainer) return;
-
-      const altBox = column.querySelector('.alternatives-wrapper');
-      const altContainer = column.querySelector('.alternatives-list-container');
-      if (!altContainer) return;
-
-      const pinnedStates = JSON.parse(localStorage.getItem('cp-pinned-resources') || '{}');
-      const alternatives = column.querySelectorAll('.resource-row-container[data-is-alternative="true"]');
-
-      alternatives.forEach(alt => {
-        if (!alt.hasAttribute('data-initial-parent')) {
-          const startedInAlt = alt.closest('.alternatives-list-container') !== null;
-          alt.setAttribute('data-initial-parent', startedInAlt ? 'alt' : 'main');
-        }
-      });
-
-      let pinnedCount = 0;
-      const totalAlts = alternatives.length;
-
-      alternatives.forEach(alt => {
-        const resId = alt.getAttribute('data-res-id');
-        const initialParent = alt.getAttribute('data-initial-parent');
-
-        const hasUserSetting = pinnedStates.hasOwnProperty(resId);
-        const isPinned = hasUserSetting 
-          ? (pinnedStates[resId] === true || pinnedStates[resId] === 'true')
-          : (initialParent === 'main');
-
-        if (isPinned) {
-          if (initialParent === 'alt') {
-            pinnedCount++;
-          }
-          if (altBox && alt.parentElement !== listContainer) {
-            listContainer.insertBefore(alt, altBox);
-          } else if (!altBox && alt.parentElement !== listContainer) {
-            listContainer.appendChild(alt);
-          }
-          alt.style.removeProperty('display');
-        } else {
-          if (alt.parentElement !== altContainer) {
-            altContainer.appendChild(alt);
-          }
-        }
-      });
-
-      const altChildren = Array.from(altContainer.querySelectorAll('.resource-row-container'));
-      altChildren.sort((a, b) => {
-        const aRec = a.getAttribute('data-is-recommended') === 'true';
-        const bRec = b.getAttribute('data-is-recommended') === 'true';
-        if (aRec && !bRec) return -1;
-        if (!aRec && bRec) return 1;
-        
-        const aId = a.getAttribute('data-res-id') || '';
-        const bId = b.getAttribute('data-res-id') || '';
-        return aId.localeCompare(bId);
-      });
-      altChildren.forEach(child => altContainer.appendChild(child));
-
-      if (altBox) {
-        const defaultAlts = Array.from(alternatives).filter(alt => alt.getAttribute('data-initial-parent') === 'alt');
-        if (pinnedCount === defaultAlts.length && defaultAlts.length > 0) {
-          altBox.style.setProperty('display', 'none', 'important');
-        } else {
-          altBox.style.removeProperty('display');
-        }
-      }
-
-      const allRows = listContainer.querySelectorAll('.resource-row-container');
-      allRows.forEach(row => row.classList.remove('last-visible'));
-
-      const visibleMainRows = Array.from(allRows).filter(row => {
-        if (row.closest('.alternatives-list-container')) return false;
-        return row.style.display !== 'none';
-      });
-      if (visibleMainRows.length > 0) {
-        visibleMainRows[visibleMainRows.length - 1].classList.add('last-visible');
-      }
-
-      updateColumnPercentages();
-      window.dispatchEvent(new CustomEvent('cp-alternatives-synced'));
-    }
-
-    function initColumn() {
-      const column = document.getElementById(id);
-      if (!column) return;
-
-      column.__syncAlternatives = syncAlternatives;
-      column.__updateColumnPercentages = updateColumnPercentages;
-
-      syncAlternatives();
-      updateColumnPercentages();
-    }
-
-    if (!window.__globalPianoColListeners) {
-      window.__globalPianoColListeners = true;
-      window.addEventListener('cp-resource-pin-changed', () => {
-        document.querySelectorAll('.res-column-wrapper').forEach(col => {
-          if (typeof col.__syncAlternatives === 'function') col.__syncAlternatives();
-        });
-      });
-      window.addEventListener('cp-resource-state-changed', () => {
-        document.querySelectorAll('.res-column-wrapper').forEach(col => {
-          if (typeof col.__updateColumnPercentages === 'function') col.__updateColumnPercentages();
-        });
-      });
-    }
-
-    initColumn();
-    document.addEventListener('astro:page-load', initColumn);
-  })();
-</script>

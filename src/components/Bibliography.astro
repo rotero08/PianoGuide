@@ -1,12 +1,14 @@
 ---
 // src/components/Bibliography.astro
-import { getCitationData } from '../utils/citationScanner';
+import { getContentIndex } from '../utils/contentIndex';
 
 /**
- * ### Bibliography Component
- * 
- * Renders the academic citation bibliography list, dynamically binding backlink metadata.
- * 
+ * The numbered academic bibliography. Write one list item per source, each starting with a
+ * `#ref-N` marker; at build time the marker becomes a stable `#ref-<author>` anchor and is
+ * replaced by "^" backlinks to every place in the guide that cites the source.
+ *
+ * Cite a source anywhere with `[N](/reference/library/#ref-N)`.
+ *
  * @example
  * <Bibliography>
  *   * #ref-1 **Rubin-Rabson, G. (1940).** *Studies in the psychology of memorizing piano music.*
@@ -14,12 +16,32 @@ import { getCitationData } from '../utils/citationScanner';
  */
 export interface Props {}
 
-const { backlinks, numToSlug, slugToNumber } = await getCitationData();
-const bibliographyId = `bib-${Math.random().toString(36).substring(2, 11)}`;
+const { numToSlug, backlinks } = await getContentIndex();
+
+function backlinksFor(slug: string): string {
+  const cites = backlinks[slug] ?? [];
+  if (cites.length === 0) return '';
+  const links =
+    cites.length === 1
+      ? `<a href="${cites[0].url}" class="backlink-arrow" title="Back to citation">^</a> `
+      : '<span class="backlink-arrow-text">^</span> ' +
+        cites
+          .map(({ url }, i) => {
+            const letter = String.fromCharCode(97 + i);
+            return `<a href="${url}" class="backlink-letter" title="Back to citation ${letter}">${letter}</a> `;
+          })
+          .join('');
+  return `<span class="backlink-span">${links}</span>`;
+}
+
+const list = (await Astro.slots.render('default')).replace(/<li>\s*#ref-(\d+)\s*/g, (item, num) => {
+  const slug = numToSlug[num];
+  return slug ? `<li id="ref-${slug}">${backlinksFor(slug)}` : item;
+});
 ---
 
-<div id={bibliographyId} class="bibliography-container" data-backlinks={JSON.stringify(backlinks)} data-num-to-slug={JSON.stringify(numToSlug)} data-slug-to-number={JSON.stringify(slugToNumber)}>
-  <slot />
+<div class="bibliography-container">
+  <Fragment set:html={list} />
 </div>
 
 <style>
@@ -47,19 +69,15 @@ const bibliographyId = `bib-${Math.random().toString(36).substring(2, 11)}`;
   }
 
   .bibliography-container :global(li) {
-    margin: 0 !important;
-    padding: 0 !important;
     counter-increment: bib-counter;
     position: relative !important;
-    padding-left: 2.4rem !important; 
+    margin: 0 0 0.5rem !important;
+    padding: 0 0 0 2.4rem !important;
     font-size: 0.9rem !important;
     line-height: 1.6 !important;
-    margin-bottom: 0.5rem !important;
     color: var(--text-muted) !important;
     scroll-margin-top: 6rem;
-    break-inside: avoid-column !important;
-    -webkit-column-break-inside: avoid !important;
-    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 
   .bibliography-container :global(li:last-child) {
@@ -80,10 +98,6 @@ const bibliographyId = `bib-${Math.random().toString(36).substring(2, 11)}`;
     color: var(--gold) !important;
   }
 
-  :root[data-theme="light"] .bibliography-container :global(li::before) {
-    color: var(--sl-color-accent) !important;
-  }
-
   .bibliography-container :global(li strong) {
     color: var(--text-main) !important;
   }
@@ -96,23 +110,19 @@ const bibliographyId = `bib-${Math.random().toString(36).substring(2, 11)}`;
     font-weight: 700 !important;
     display: inline-block !important;
   }
-  
+
   .bibliography-container :global(.backlink-arrow),
   .bibliography-container :global(.backlink-letter) {
     color: var(--gold) !important;
     text-decoration: none !important;
     transition: color 0.15s ease !important;
   }
-  :root[data-theme="light"] .bibliography-container :global(.backlink-arrow),
-  :root[data-theme="light"] .bibliography-container :global(.backlink-letter) {
-    color: var(--sl-color-accent) !important;
-  }
-  
+
   .bibliography-container :global(.backlink-arrow-text) {
     color: var(--sl-color-gray-1) !important;
     opacity: 0.45;
   }
-  
+
   .bibliography-container :global(.backlink-arrow:hover),
   .bibliography-container :global(.backlink-letter:hover) {
     text-decoration: underline !important;

@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-
 :root {
   --sl-font: 'Space Grotesk', sans-serif;
   --sl-font-mono: 'JetBrains Mono', monospace;
@@ -14,30 +12,46 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ==========================================
-   SIDEBAR HEADER TITLE AND SUBTITLE
+   SITE TITLE: LOGO, NAME AND SUBTITLE
    ========================================== */
+/* The logo is the favicon itself (public/favicon.svg), drawn beside the name.
+   Sizes shrink with the viewport on phones so the name is never clipped; from tablet width up
+   every clamp() below sits at its maximum. */
 .site-title {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-start !important;
-  gap: 0.4rem !important; 
+  display: grid !important;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "logo name" "logo subtitle";
+  align-items: center !important;
+  column-gap: clamp(0.55rem, 2.6vw, 0.85rem) !important;
+  row-gap: 0.4rem !important;
   text-decoration: none !important;
-  padding-top: 0.8rem !important; 
+  padding-top: 0.8rem !important;
   padding-bottom: 0.8rem !important;
 }
+.site-title::before {
+  content: "";
+  grid-area: logo;
+  width: clamp(1.8rem, 9vw, 2.9rem);
+  height: clamp(1.8rem, 9vw, 2.9rem);
+  background: url('/favicon.svg') center / contain no-repeat;
+}
 .site-title span {
+  grid-area: name;
+  align-self: end;
   font-family: 'Playfair Display', serif !important;
   font-style: italic !important;
   font-weight: 700 !important;
-  font-size: 1.7rem !important; 
+  font-size: clamp(0.95rem, 4.9vw, 1.7rem) !important;
   letter-spacing: -0.015em !important;
   color: var(--sl-color-accent-high) !important;
   line-height: 1.1 !important;
 }
 .site-title::after {
   content: "TECHNIQUE \00d7  SIGHT-READING" !important;
+  grid-area: subtitle;
+  align-self: start;
   font-family: 'JetBrains Mono', monospace !important;
-  font-size: 0.8rem !important; 
+  font-size: clamp(0.5rem, 2.45vw, 0.8rem) !important;
   font-style: normal !important;
   font-weight: 400 !important;
   letter-spacing: 0.1em !important;
@@ -65,11 +79,6 @@ select option {
   color: var(--text-main) !important;
   font-family: var(--sl-font-mono) !important;
   font-size: 0.85rem !important;
-}
-[data-theme="light"] select option,
-:root[data-theme="light"] select option {
-  background-color: var(--bg-card) !important;
-  color: var(--text-main) !important;
 }
 
 /* ==========================================
@@ -105,25 +114,19 @@ starlight-menu-button button[aria-expanded="true"] {
 }
 .sidebar-content a:hover {
   color: var(--sl-color-white) !important;
-  background-color: rgba(201, 168, 76, 0.05) !important;
+  background-color: rgba(var(--gold-rgb), 0.05) !important;
   border-left: 3px solid var(--sl-color-accent) !important;
   padding-left: calc(1.5rem - 3px) !important;
 }
-:root[data-theme="light"] .sidebar-content a:hover,
-[data-theme="light"] .sidebar-content a:hover {
-  background-color: rgba(154, 116, 32, 0.05) !important;
-}
 .sidebar-content a[aria-current="page"] {
   color: var(--sl-color-accent-high) !important;
-  background-color: rgba(201, 168, 76, 0.07) !important;
+  background-color: rgba(var(--gold-rgb), 0.07) !important;
   border-left: 3px solid var(--sl-color-accent) !important;
   padding-left: calc(1.5rem - 3px) !important;
   font-weight: 600 !important;
 }
-:root[data-theme="light"] .sidebar-content a[aria-current="page"],
-[data-theme="light"] .sidebar-content a[aria-current="page"] {
+:root[data-theme="light"] .sidebar-content a[aria-current="page"] {
   color: var(--sl-color-accent) !important;
-  background-color: rgba(154, 116, 32, 0.07) !important;
 }
 
 /* ==========================================
@@ -145,12 +148,6 @@ starlight-menu-button button[aria-expanded="true"] {
   color: var(--gold) !important; 
   opacity: 1 !important;
   font-weight: 600 !important;
-}
-:root[data-theme="light"] .right-sidebar a[aria-current="true"],
-:root[data-theme="light"] .right-sidebar a[aria-current="page"],
-[data-theme="light"] .right-sidebar a[aria-current="true"],
-[data-theme="light"] .right-sidebar a[aria-current="page"] {
-  color: var(--sl-color-accent) !important;
 }
 
 /* ==========================================
@@ -189,9 +186,6 @@ starlight-menu-button button[aria-expanded="true"] {
   margin-left: 0.15rem !important;
   margin-right: 0.15rem !important;
 }
-:root[data-theme="light"] .sl-markdown-content a[href*="/reference/library/#ref-"] {
-  color: var(--sl-color-accent) !important;
-}
 .sl-markdown-content a[href*="/reference/library/#ref-"]:hover {
   text-decoration: underline !important;
 }
@@ -205,18 +199,81 @@ starlight-menu-button button[aria-expanded="true"] {
   box-shadow: none !important;
 }
 
-/* Dynamic temporary link active state highlighting */
-.flash-active-link {
-  text-decoration: underline !important;
-  color: var(--gold) !important;
-  outline: none !important;
+/* Flash on the block that holds the current #hash target (added by scripts/citations.ts) */
+@keyframes citation-flash {
+  from {
+    background-color: var(--flash-color);
+    box-shadow: 0 0 0 8px var(--flash-color);
+  }
+  to {
+    background-color: transparent;
+    box-shadow: 0 0 0 0 transparent;
+  }
 }
-:root[data-theme="light"] .flash-active-link {
-  color: var(--sl-color-accent) !important;
+.citation-flash {
+  border-radius: 4px;
+  animation: citation-flash 2.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 /* ==========================================
-   LEGACY DESIGN TOKENS
+   SHARED BUTTONS (used by several components)
+   ========================================== */
+/* Solid full-width action button: Card, Resource */
+.btn-link {
+  display: inline-block !important;
+  text-align: center !important;
+  background-color: var(--bg-card2) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-main) !important;
+  padding: 0.6rem 1rem !important;
+  border-radius: 6px !important;
+  font-size: 0.85rem !important;
+  text-decoration: none !important;
+  font-weight: 600 !important;
+  transition: all 0.2s !important;
+  cursor: pointer !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  margin-top: auto !important;
+}
+.btn-link:hover {
+  background-color: var(--gold) !important;
+  color: var(--sl-color-black) !important;
+  border-color: var(--gold) !important;
+  text-decoration: none !important;
+}
+:root[data-theme="light"] .btn-link:hover {
+  color: var(--sl-color-white) !important;
+}
+
+/* Outlined gold pill: Resource drawer "Open", UnlockBanner */
+.btn-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.4rem !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 0.68rem !important;
+  letter-spacing: 0.04em !important;
+  color: var(--gold-light) !important;
+  background: rgba(var(--gold-rgb), 0.06) !important;
+  text-decoration: none !important;
+  border: 1px solid rgba(var(--gold-rgb), 0.35) !important;
+  border-radius: 999px !important;
+  transition: all 0.18s !important;
+  cursor: pointer !important;
+}
+.btn-pill:hover,
+:root[data-theme="light"] .btn-pill {
+  color: var(--gold) !important;
+}
+.btn-pill:hover {
+  border-color: var(--gold) !important;
+  background: rgba(var(--gold-rgb), 0.13) !important;
+  text-decoration: none !important;
+}
+
+/* ==========================================
+   DESIGN TOKENS
    ========================================== */
 :root[data-theme="dark"], [data-theme="dark"] {
   color-scheme: dark !important;
@@ -237,26 +294,25 @@ starlight-menu-button button[aria-expanded="true"] {
   --sl-color-text-accent: #C9A84C !important;
 
   --gold: #C9A84C;
+  --gold-rgb: 201, 168, 76; /* --gold as channels, for rgba(var(--gold-rgb), <alpha>) tints */
   --gold-light: #E2C47A;
   --rose: #D4768A;
+  --rose-rgb: 212, 118, 138;
   --rose-dark: #A85069;
   --radius: 10px;
-  --transition: 0.22s ease;
   --bg-dark: #12131F;
-  --bg-mid: #12131F;
   --bg-card: #1C1F30;
   --bg-card2: #252840;
   --border-color: rgba(245,240,232,0.14);
   --text-main: #FAF8F5;
   --text-muted: #B6B0A6;
-  --accent-pink: #D4768A;
+  --text-faint: rgba(245, 240, 232, 0.45); /* idle icons (chevrons, pins) and strike-through lines */
+  --flash-color: rgba(var(--gold-rgb), 0.25);
 
   --badge-free: #6FB58A;
-  --badge-paid: var(--gold);
   --badge-imslp: #8E86E0;
   --badge-video: #D4768A;
   --badge-theory: #B58AD4;
-  --badge-branch: var(--rose);
 }
 
 :root[data-theme="light"], [data-theme="light"] {
@@ -278,26 +334,25 @@ starlight-menu-button button[aria-expanded="true"] {
   --sl-color-text-accent: #9a7420 !important;
 
   --gold: #9a7420;
+  --gold-rgb: 154, 116, 32;
   --gold-light: #8a6820;
   --rose: #A85069;
+  --rose-rgb: 168, 80, 105;
   --rose-dark: #A85069;
   --radius: 10px;
-  --transition: 0.22s ease;
   --bg-dark: #FAF7F2;
-  --bg-mid: #F4EFE7;
   --bg-card: #EDE8DF;
   --bg-card2: #E4DDD3;
   --border-color: rgba(30,20,10,0.2);
   --text-main: #1A1824;
   --text-muted: #4B4339;
-  --accent-pink: #A85069;
+  --text-faint: rgba(30, 20, 10, 0.45);
+  --flash-color: rgba(var(--gold-rgb), 0.2);
 
   --badge-free: #3E8A63;
-  --badge-paid: #9a7420;
   --badge-imslp: #5b54b0;
   --badge-video: #A85069;
   --badge-theory: #7d4fb0;
-  --badge-branch: #A85069;
 }
 
 /* ==========================================================================

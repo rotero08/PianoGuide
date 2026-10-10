@@ -1,10 +1,16 @@
 ---
 // src/components/InteractivePiano.astro
+import Icon from './Icon.astro';
 
 /**
- * Astro props interface for the InteractivePiano component.
+ * A playable two-octave keyboard (click, tap, or use the A S D F G H J K / W E T Y U keys)
+ * followed by a "play your first chord" button. Sound is synthesised in the browser.
+ * Use at most once per page.
+ *
+ * @example
+ * <InteractivePiano />
  */
-export type Props = Record<string, never>;
+export interface Props {}
 ---
 
 <div class="lab-block">
@@ -49,11 +55,9 @@ export type Props = Record<string, never>;
   <p class="keyboard-hint">Tap a key, or play A S D F G H J K (White) or W E T Y U (Black).</p>
 </div>
 
-<div class="intro-chord-block" id="introChordBtn">
+<div class="intro-chord-block" id="introChordBtn" role="button" tabindex="0">
   <div class="chord-play-btn">
-    <svg viewBox="0 0 24 24" fill="currentColor" class="chord-play-svg">
-      <polygon points="6 3 20 12 6 21 6 3" />
-    </svg>
+    <Icon name="play" class="chord-play-svg" />
   </div>
   <div class="chord-block-text">
     <div class="chord-block-title">C major, your first chord</div>
@@ -231,134 +235,87 @@ export type Props = Record<string, never>;
 </style>
 
 <script>
-  function initPiano() {
-    const NOTE_FREQS: Record<string, number> = {
-      "F3": 174.61, "F#3": 185.00, "G3": 196.00, "G#3": 207.65, "A3": 220.00, "A#3": 233.08, "B3": 246.94,
-      "C4": 261.63, "C#4": 277.18, "D4": 293.66, "D#4": 311.13, "E4": 329.63, "F4": 349.23, "F#4": 369.99, "G4": 392.00, "G#4": 415.30, "A4": 440.00, "A#4": 466.16, "B4": 493.88,
-      "C5": 523.25, "C#5": 554.37, "D5": 587.33, "D#5": 622.25, "E5": 659.25, "F5": 698.46, "F#5": 739.99, "G5": 783.99
-    };
+  const NOTE_FREQS: Record<string, number> = {
+    "F3": 174.61, "F#3": 185.00, "G3": 196.00, "G#3": 207.65, "A3": 220.00, "A#3": 233.08, "B3": 246.94,
+    "C4": 261.63, "C#4": 277.18, "D4": 293.66, "D#4": 311.13, "E4": 329.63, "F4": 349.23, "F#4": 369.99, "G4": 392.00, "G#4": 415.30, "A4": 440.00, "A#4": 466.16, "B4": 493.88,
+    "C5": 523.25, "C#5": 554.37, "D5": 587.33, "D#5": 622.25, "E5": 659.25, "F5": 698.46, "F#5": 739.99, "G5": 783.99
+  };
 
-    const KEY_MAP: Record<string, string> = {
-      "a": "C4", "s": "D4", "d": "E4", "f": "F4", "g": "G4", "h": "A4", "j": "B4", "k": "C5",
-      "w": "C#4", "e": "D#4", "t": "F#4", "y": "G#4", "u": "A#4"
-    };
+  const KEY_MAP: Record<string, string> = {
+    "a": "C4", "s": "D4", "d": "E4", "f": "F4", "g": "G4", "h": "A4", "j": "B4", "k": "C5",
+    "w": "C#4", "e": "D#4", "t": "F#4", "y": "G#4", "u": "A#4"
+  };
 
-    let audioCtx: AudioContext | null = null;
+  const keyboard = document.getElementById('keyboard');
+  const keyFor = (note: string) => keyboard?.querySelector(`[data-note="${note}"]`);
+  let audioCtx: AudioContext | undefined;
 
-    function playNote(freq: number) {
-      try {
-        if (!audioCtx) {
-          audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') {
-          audioCtx.resume();
-        }
+  /** A triangle fundamental plus a quiet sine octave, with a fast attack and a ~1.2s decay. */
+  function playNote(freq: number) {
+    try {
+      audioCtx ??= new AudioContext();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const now = audioCtx.currentTime;
 
-        const now = audioCtx.currentTime;
+      const master = audioCtx.createGain();
+      master.gain.setValueAtTime(0, now);
+      master.gain.linearRampToValueAtTime(0.6, now + 0.008);
+      master.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
+      master.connect(audioCtx.destination);
 
-        const osc1 = audioCtx.createOscillator();
-        const gain1 = audioCtx.createGain();
-        osc1.type = 'triangle';
-        osc1.frequency.setValueAtTime(freq, now);
-
-        const osc2 = audioCtx.createOscillator();
-        const gain2 = audioCtx.createGain();
-        osc2.type = 'sine';
-        osc2.frequency.setValueAtTime(freq * 2, now);
-
-        const masterGain = audioCtx.createGain();
-
-        osc1.connect(gain1);
-        gain1.gain.setValueAtTime(0.5, now);
-        gain1.connect(masterGain);
-
-        osc2.connect(gain2);
-        gain2.gain.setValueAtTime(0.15, now);
-        gain2.connect(masterGain);
-
-        masterGain.connect(audioCtx.destination);
-
-        masterGain.gain.setValueAtTime(0, now);
-        masterGain.gain.linearRampToValueAtTime(0.6, now + 0.008);
-        masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
-
-        osc1.start(now);
-        osc2.start(now);
-
-        osc1.stop(now + 1.25);
-        osc2.stop(now + 1.25);
-      } catch (e) {
-        console.warn("AudioContext setup failed:", e);
+      const voices: [OscillatorType, number, number][] = [['triangle', freq, 0.5], ['sine', freq * 2, 0.15]];
+      for (const [type, frequency, level] of voices) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(frequency, now);
+        gain.gain.setValueAtTime(level, now);
+        osc.connect(gain).connect(master);
+        osc.start(now);
+        osc.stop(now + 1.25);
       }
-    }
-
-    const keys = document.querySelectorAll('.key-white, .key-black');
-
-    keys.forEach(key => {
-      const triggerPlay = () => {
-        const note = key.getAttribute('data-note');
-        if (note && NOTE_FREQS[note]) {
-          playNote(NOTE_FREQS[note]);
-          key.classList.add('pressed');
-          setTimeout(() => key.classList.remove('pressed'), 150);
-        }
-      };
-
-      key.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        triggerPlay();
-      });
-      key.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        triggerPlay();
-      });
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.repeat) return;
-      const keyName = e.key.toLowerCase();
-      if (KEY_MAP[keyName]) {
-        const note = KEY_MAP[keyName];
-        const keyEl = document.querySelector(`[data-note="${note}"]`);
-        if (keyEl) {
-          playNote(NOTE_FREQS[note]);
-          keyEl.classList.add('pressed');
-        }
-      }
-    });
-
-    document.addEventListener('keyup', (e) => {
-      const keyName = e.key.toLowerCase();
-      if (KEY_MAP[keyName]) {
-        const note = KEY_MAP[keyName];
-        const keyEl = document.querySelector(`[data-note="${note}"]`);
-        if (keyEl) {
-          keyEl.classList.remove('pressed');
-        }
-      }
-    });
-
-    const introChordBtn = document.getElementById('introChordBtn');
-    if (introChordBtn) {
-      introChordBtn.addEventListener('click', () => {
-        playNote(NOTE_FREQS["C4"]);
-        playNote(NOTE_FREQS["E4"]);
-        playNote(NOTE_FREQS["G4"]);
-
-        const cEl = document.querySelector('[data-note="C4"]');
-        const eEl = document.querySelector('[data-note="E4"]');
-        const gEl = document.querySelector('[data-note="G4"]');
-
-        [cEl, eEl, gEl].forEach(el => {
-          if (el) {
-            el.classList.add('pressed');
-            setTimeout(() => el.classList.remove('pressed'), 250);
-          }
-        });
-      });
+    } catch (e) {
+      console.warn("AudioContext setup failed:", e);
     }
   }
 
-  initPiano();
-  document.addEventListener('astro:page-load', initPiano);
+  /** Sounds a note and lights its key; with `holdMs` the key releases by itself. */
+  function press(note: string, holdMs?: number) {
+    if (!(note in NOTE_FREQS)) return;
+    playNote(NOTE_FREQS[note]);
+    const key = keyFor(note);
+    key?.classList.add('pressed');
+    if (holdMs) setTimeout(() => key?.classList.remove('pressed'), holdMs);
+  }
+
+  for (const type of ['mousedown', 'touchstart'] as const) {
+    keyboard?.addEventListener(type, (e) => {
+      const note = (e.target as Element).closest<HTMLElement>('[data-note]')?.dataset.note;
+      if (!note) return;
+      e.preventDefault();
+      press(note, 150);
+    });
+  }
+
+  // Letter keys play notes, but never while typing in a field (e.g. the search box) or using a shortcut.
+  const isTyping = (e: KeyboardEvent) =>
+    e.ctrlKey || e.metaKey || e.altKey || (e.target instanceof HTMLElement && e.target.matches('input, textarea, select, [contenteditable]'));
+
+  document.addEventListener('keydown', (e) => {
+    const note = KEY_MAP[e.key.toLowerCase()];
+    if (note && !e.repeat && !isTyping(e)) press(note);
+  });
+  document.addEventListener('keyup', (e) => {
+    const note = KEY_MAP[e.key.toLowerCase()];
+    if (note) keyFor(note)?.classList.remove('pressed');
+  });
+
+  const chordBtn = document.getElementById('introChordBtn');
+  const playChord = () => ['C4', 'E4', 'G4'].forEach((note) => press(note, 250));
+  chordBtn?.addEventListener('click', playChord);
+  chordBtn?.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    playChord();
+  });
 </script>

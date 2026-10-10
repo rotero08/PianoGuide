@@ -1,77 +1,75 @@
 ---
 // src/components/Task.astro
+import Icon from './Icon.astro';
 
 /**
- * ### Task Component
- * 
- * A single, interactive progress checklist row containing a custom circular checkbox.
- * 
+ * One row of a level's checklist: a round checkbox, the task text, and an optional link button.
+ * Ticking it is saved in the reader's browser and feeds the progress bars of its track.
+ *
+ * `id` and `trackId` must be written as plain string literals: the build reads them straight
+ * from the page source to work out which tasks make up each track.
+ *
  * @example
- * <Task id="check-prestaff-posture" trackId="prestaff">
- *   **Posture drop:** Drop each hand...
+ * <Task id="check-prestaff-posture" trackId="prestaff" link="/technique/technique-1/">
+ *   **Posture drop:** Drop each hand freely onto keys with loose, springy wrists.
  * </Task>
  */
 export interface Props {
-  /** The unique storage identifier for this checklist item. Must match an ID defined inside GLOBAL_TASK_REGISTRY in `trackingHelper.client.ts`. */
+  /**
+   * Unique id of this task across the whole site; it is the key the tick is saved under.
+   * @example id="check-lvl1-triads"
+   */
   id: string;
-  /** The parent progress track identifier this task contributes percentage calculations to. */
-  trackId: 'tech1' | 'tech2' | 'prestaff' | 'lvl0' | 'lvl1' | 'lvl2' | 'lvl3' | 'lvl4' | 'lvl5' | 'lvl6' | 'lvl7' | 'leadsheets';
-  /** Optional frequency or category tag metadata badge. */
+  /**
+   * The progress track this task counts towards. Use the same value as the `trackId` of the
+   * level's `<VerificationBox>` / `<ProgressCard>`.
+   * @example trackId="lvl1"
+   */
+  trackId: string;
+  /**
+   * Small frequency/category badge shown before the text.
+   * @default "none"
+   */
   tag?: 'daily' | 'weekly' | 'monthly' | 'check' | 'prereq' | 'none';
-  /** Optional target path or external URL for instructional course materials. */
+  /**
+   * URL or site path of the material for this task. Adds a small button at the end of the row.
+   * @example link="/harmony/lead-sheets/"
+   */
   link?: string;
-  /** Custom text populated inside the optional navigation button. */
+  /**
+   * Label of the `link` button. Convention: `go →` for pages of this site, `open ↗` for external sites.
+   * @default "go →"
+   */
   linkText?: string;
 }
 
-const { id, trackId, tag = "none", link, linkText = "go →" } = Astro.props;
-
-const tagStyles: Record<string, { label: string; class: string }> = {
-  daily: { label: 'Daily', class: 'tag-daily' },
-  weekly: { label: 'Weekly', class: 'tag-weekly' },
-  monthly: { label: 'Monthly', class: 'tag-monthly' },
-  check: { label: 'Check', class: 'tag-check' },
-  prereq: { label: 'Prereq', class: 'tag-prereq' }
-};
-
-const activeTag = tag !== 'none' ? tagStyles[tag] : null;
+const { id, tag = 'none', link, linkText = 'go →' } = Astro.props;
+const tagLabel = tag[0].toUpperCase() + tag.slice(1);
 ---
 
-<div class="task-row-container" data-task-container={id}>
+<div class="task-row-container">
   <div class="task-interactive-left">
-    <!-- Circle Checkbox on the Left -->
     <div class="task-checkbox-wrapper">
-      <input 
-        type="checkbox" 
-        id={id} 
-        data-track-id={trackId} 
-        class="task-checkbox-input" 
-      />
+      <input type="checkbox" id={id} class="task-checkbox-input" />
       <label for={id} class="task-checkbox-label">
         <span class="sr-only">Mark task as complete</span>
-        <svg viewBox="0 0 24 24" fill="none" class="checkmark-svg">
-          <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
-        </svg>
+        <Icon name="check" class="checkmark-svg" strokeWidth={3} />
       </label>
     </div>
-    
-    {activeTag && (
-      <span class:list={['task-tag-badge', activeTag.class]}>
-        {activeTag.label}
-      </span>
-    )}
+
+    {tag !== 'none' && <span class:list={['task-tag-badge', `tag-${tag}`]}>{tagLabel}</span>}
 
     <div class="task-body-content">
       <slot />
     </div>
   </div>
 
-  {link && (
-    <a href={link} class="task-nav-btn">
-      {linkText}
-    </a>
-  )}
+  {link && <a href={link} class="task-nav-btn">{linkText}</a>}
 </div>
+
+<script>
+  import '../scripts/progress';
+</script>
 
 <style>
   .sr-only {
@@ -141,17 +139,9 @@ const activeTag = tag !== 'none' ? tagStyles[tag] : null;
   .task-checkbox-input:hover + .task-checkbox-label {
     border-color: var(--gold) !important;
   }
-  :root[data-theme="light"] .task-checkbox-input:hover + .task-checkbox-label {
-    border-color: var(--sl-color-accent) !important;
-  }
-
   .task-checkbox-input:checked + .task-checkbox-label {
     background-color: var(--gold) !important;
     border-color: var(--gold) !important;
-  }
-  :root[data-theme="light"] .task-checkbox-input:checked + .task-checkbox-label {
-    background-color: var(--sl-color-accent) !important;
-    border-color: var(--sl-color-accent) !important;
   }
 
   .checkmark-svg {
@@ -165,7 +155,6 @@ const activeTag = tag !== 'none' ? tagStyles[tag] : null;
   :root[data-theme="light"] .checkmark-svg {
     color: var(--sl-color-bg) !important;
   }
-
   .task-checkbox-input:checked + .task-checkbox-label .checkmark-svg {
     opacity: 1 !important;
     transform: scale(1) !important;
@@ -184,21 +173,14 @@ const activeTag = tag !== 'none' ? tagStyles[tag] : null;
     text-align: center !important;
   }
   .tag-daily {
-    background-color: rgba(201, 168, 76, 0.15) !important;
+    background-color: rgba(var(--gold-rgb), 0.15) !important;
     color: var(--gold) !important;
-  }
-  :root[data-theme="light"] .tag-daily {
-    background-color: rgba(154, 116, 32, 0.15) !important;
-    color: var(--sl-color-accent) !important;
   }
   .tag-weekly {
     background-color: rgba(212, 118, 138, 0.15) !important;
     color: var(--rose) !important;
   }
-  .tag-monthly {
-    background-color: rgba(142, 134, 224, 0.15) !important;
-    color: var(--badge-imslp) !important;
-  }
+  .tag-monthly,
   .tag-check {
     background-color: rgba(142, 134, 224, 0.15) !important;
     color: var(--badge-imslp) !important;
@@ -220,7 +202,7 @@ const activeTag = tag !== 'none' ? tagStyles[tag] : null;
     font-weight: 700 !important;
   }
 
-  .task-checkbox-input:checked ~ .task-body-content {
+  .task-interactive-left:has(.task-checkbox-input:checked) .task-body-content {
     text-decoration: line-through !important;
     text-decoration-color: var(--text-faint) !important;
     opacity: 0.55 !important;
@@ -242,9 +224,6 @@ const activeTag = tag !== 'none' ? tagStyles[tag] : null;
     align-self: center !important;
     font-weight: 600 !important;
   }
-  :root[data-theme="light"] .task-nav-btn {
-    color: var(--sl-color-accent) !important;
-  }
   .task-nav-btn:hover {
     background-color: var(--gold) !important;
     border-color: var(--gold) !important;
@@ -252,8 +231,6 @@ const activeTag = tag !== 'none' ? tagStyles[tag] : null;
     text-decoration: none !important;
   }
   :root[data-theme="light"] .task-nav-btn:hover {
-    border-color: var(--sl-color-accent) !important;
-    background-color: var(--sl-color-accent) !important;
     color: var(--sl-color-white) !important;
   }
 </style>
